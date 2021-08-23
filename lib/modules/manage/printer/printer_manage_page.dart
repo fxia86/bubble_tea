@@ -1,7 +1,9 @@
+import 'package:bubble_tea/data/models/shop_model.dart';
 import 'package:bubble_tea/widgets/body_layout.dart';
 import 'package:bubble_tea/widgets/simple_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:menu_button/menu_button.dart';
 
 import 'printer_manage_controller.dart';
 
@@ -30,11 +32,13 @@ class PrinterManagePage extends GetView<PrinterManageController> {
                                 height: context.height * 0.35,
                                 child: PrinterForm()),
                             SizedBox(height: 24),
-                            Container(
-                              color: Colors.white,
-                              width: context.width,
-                              child: PrinterTable(),
-                            ),
+                            Expanded(
+                              child: Container(
+                                color: Colors.white,
+                                width: context.width,
+                                child: PrinterTable(),
+                              ),
+                            )
                           ],
                         )),
                   )
@@ -44,7 +48,6 @@ class PrinterManagePage extends GetView<PrinterManageController> {
           ],
         ),
       ),
-      resizeToAvoidBottomInset: false, //底部弹出时不改变页面大小
     );
   }
 }
@@ -98,6 +101,13 @@ class PrinterForm extends StatelessWidget {
                                         color: Get.theme.primaryColor)
                                     : Get.textTheme.bodyText1,
                               ),
+                              subtitle: Text(
+                                controller.pairedPrinters[index].address ?? "",
+                                style: controller.radioValue.value == index + 1
+                                    ? Get.textTheme.subtitle1?.copyWith(
+                                        color: Get.theme.primaryColor)
+                                    : Get.textTheme.subtitle1,
+                              ),
                               selected:
                                   controller.radioValue.value == index + 1,
                             )
@@ -113,21 +123,23 @@ class PrinterForm extends StatelessWidget {
           child: Padding(
             padding: EdgeInsets.symmetric(horizontal: 50),
             child: Obx(() => Form(
-                  // autovalidateMode: AutovalidateMode.onUserInteraction,
                   child: SingleChildScrollView(
                     child: Column(
                       children: [
                         SizedBox(height: 30),
-                        SimpleTextInput(
-                          enable: false,
-                          initialValue: controller.editItem.value.address,
-                          labelText: "MAC Address",
-                          onChanged: (val) {
-                            controller.editItem.value.address = val.trim();
-                          },
-                        ),
+                        // SimpleTextInput(
+                        //   key: Key('address_${controller.radioValue}'),
+                        //   enable: false,
+                        //   initialValue: controller.editItem.value.address,
+                        //   labelText: "MAC Address",
+                        //   onChanged: (val) {
+                        //     controller.editItem.value.address = val.trim();
+                        //   },
+                        // ),
+                        ShopSelect(),
                         SizedBox(height: 30),
                         SimpleTextInput(
+                          key: Key('alias_${controller.radioValue}'),
                           initialValue: controller.editItem.value.alias,
                           labelText: "Nick Name",
                           onChanged: (val) {
@@ -164,29 +176,87 @@ class PrinterTable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Obx(() => DataTable(
-          dataRowHeight: 72,
-          columns: [
-            DataColumn(label: Text('Name')),
-            DataColumn(label: Text('Address')),
-            DataColumn(label: Text('Nick Name')),
-            DataColumn(label: Text('')),
-          ],
-          rows: [
-            for (var item in controller.items)
-              DataRow(cells: [
-                DataCell(Text(item.name ?? "")),
-                DataCell(Text(item.address ?? "")),
-                DataCell(Text(item.alias ?? "")),
-                DataCell(
-                  IconButton(
-                    onPressed: () => controller.deleteConfirm(item.id),
-                    icon: Icon(Icons.delete),
-                    color: Colors.red,
+    return Scrollbar(
+        child: ListView(children: [
+      Obx(() => DataTable(
+            dataRowHeight: 72,
+            columns: [
+              DataColumn(label: Text('Printer')),
+              DataColumn(label: Text('Shop')),
+              DataColumn(label: Text('Nick Name')),
+              DataColumn(label: Text('')),
+            ],
+            rows: [
+              for (var item in controller.items)
+                DataRow(cells: [
+                  DataCell(Text(item.name ?? "")),
+                  DataCell(Text(item.shopName ?? "")),
+                  DataCell(Text(item.alias ?? "")),
+                  DataCell(
+                    IconButton(
+                      onPressed: () => controller.deleteConfirm(item.id),
+                      icon: Icon(Icons.delete),
+                      color: Colors.red,
+                    ),
                   ),
-                ),
-              ])
+                ])
+            ],
+          ))
+    ]));
+  }
+}
+
+class ShopSelect extends StatelessWidget {
+  final controller = Get.find<PrinterManageController>();
+
+  Widget childButton() => Container(
+        height: 60,
+        padding: const EdgeInsets.symmetric(horizontal: 10),
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.grey),
+          borderRadius: BorderRadius.circular(5),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            Flexible(
+              child: Obx(() => Text(
+                    controller.editItem.value.shopName ?? "Shop",
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                        fontSize: 20,
+                        color: controller.editItem.value.shopId == null
+                            ? Colors.grey
+                            : Colors.black),
+                  )),
+            ),
+            Icon(
+              Icons.arrow_drop_down,
+              color: Colors.grey,
+              size: 36,
+            ),
           ],
-        ));
+        ),
+      );
+
+  @override
+  Widget build(BuildContext context) {
+    return MenuButton<ShopModel>(
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.transparent),
+      ),
+      child: childButton(),
+      items: controller.shops,
+      itemBuilder: (item) => Container(
+        height: 60,
+        alignment: Alignment.centerLeft,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: Text(item.name!, style: Get.textTheme.bodyText1),
+      ),
+      toggledChild: Container(
+        child: childButton(),
+      ),
+      onItemSelected: (item) => controller.selectShop(item),
+    );
   }
 }

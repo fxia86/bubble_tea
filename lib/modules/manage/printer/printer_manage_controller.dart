@@ -1,13 +1,17 @@
 import 'package:blue_thermal_printer/blue_thermal_printer.dart';
 import 'package:bubble_tea/data/models/printer_model.dart';
+import 'package:bubble_tea/data/models/shop_model.dart';
 import 'package:bubble_tea/data/repositories/printer_repository.dart';
+import 'package:bubble_tea/data/repositories/shop_repository.dart';
 import 'package:bubble_tea/utils/confirm_box.dart';
 import 'package:bubble_tea/utils/message_box.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
 class PrinterManageController extends GetxController {
   final PrinterRepository repository = Get.find();
 
+  var shops = <ShopModel>[];
   var items = <PrinterModel>[].obs;
   var editItem = PrinterModel().obs;
   var radioValue = 0.obs;
@@ -25,6 +29,8 @@ class PrinterManageController extends GetxController {
     ever(radioValue, (_) => edit());
 
     items.value = await repository.getAll();
+    shops = await Get.find<ShopRepository>().getAll();
+
     // dataSource = ShopDataSource();
   }
 
@@ -35,11 +41,16 @@ class PrinterManageController extends GetxController {
   }
 
   void initPrinters() async {
-    final devices = await bluetooth.getBondedDevices();
-    // pairedPrinters.value = devices
-    //     .where((element) => element.name!.toLowerCase().contains("print"))
-    //     .toList();
-    pairedPrinters.value = devices;
+    try {
+      final devices = await bluetooth.getBondedDevices();
+      // pairedPrinters.value = devices;
+      pairedPrinters.value = devices
+          .where((element) => element.name!.toLowerCase().contains("print"))
+          .toList();
+    } catch (e) {
+      PlatformException exception = e as PlatformException;
+      MessageBox.error(exception.code, exception.message ?? "");
+    }
   }
 
   void edit() {
@@ -49,7 +60,14 @@ class PrinterManageController extends GetxController {
         (element) => element.address == printer.address, orElse: () {
       return PrinterModel(name: printer.name, address: printer.address);
     });
-    editItem.value = item;
+
+    editItem.value = PrinterModel(
+        name: item.name,
+        address: item.address,
+        alias: item.alias,
+        shopId: item.shopId,
+        shopName: item.shopName);
+    editItem.value.id = item.id;
   }
 
   void deleteConfirm(String? id) {
@@ -67,24 +85,48 @@ class PrinterManageController extends GetxController {
     }
   }
 
+  void selectShop(ShopModel item) {
+    editItem.value.shopId = item.id;
+    editItem.value.shopName = item.name;
+    editItem.refresh();
+  }
+
   void save() async {
-    if (editItem.value.alias == null || editItem.value.alias!.isEmpty) {
+    if (editItem.value.shopId == null || editItem.value.shopId!.isEmpty) {
+      MessageBox.error('Please select a shop');
+    } else if (editItem.value.alias == null || editItem.value.alias!.isEmpty) {
       MessageBox.error('Invalid name');
     } else {
-      // var item =
-      //     items.singleWhere((element) => element.id == editItem.value.id);
+      final idx = items.indexWhere((element) =>
+          element.alias == editItem.value.alias &&
+          element.id != editItem.value.id);
+      if (idx > -1) {
+        MessageBox.error('Duplicated Name');
+        return;
+      }
 
-      // if (item.name == editItem.value.name &&
-      //     item.address == editItem.value.address) {
-      //   return;
-      // }
-      // var result = await repository.edit(editItem.value);
-      // if (result) {
-      //   item
-      //     ..name = editItem.value.name
-      //     ..address = editItem.value.address;
-      //   items.refresh();
-      // }
+      if (editItem.value.id == null) {
+        var item = await repository.add(editItem.value);
+        items.insert(0, item);
+      } else {
+        var item =
+            items.singleWhere((element) => element.id == editItem.value.id);
+
+        if (item.shopId == editItem.value.shopId &&
+            item.name == editItem.value.name &&
+            item.address == editItem.value.address &&
+            item.alias == editItem.value.alias) {
+          return;
+        }
+
+        var result = await repository.edit(editItem.value);
+        if (result) {
+          item
+            ..shopName = editItem.value.shopName
+            ..alias = editItem.value.alias;
+          items.refresh();
+        }
+      }
     }
   }
 }

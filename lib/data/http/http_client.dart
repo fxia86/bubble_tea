@@ -6,8 +6,8 @@ import 'package:dio/dio.dart';
 import 'request_interceptor.dart';
 
 class HttpClient {
-  static const CONNECT_TIMEOUT = 100000;
-  static const RECEIVE_TIMEOUT = 100000;
+  static const CONNECT_TIMEOUT = 60000;
+  static const RECEIVE_TIMEOUT = 60000;
 
   static HttpClient instance = HttpClient._internal();
 

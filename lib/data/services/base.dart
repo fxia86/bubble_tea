@@ -13,4 +13,5 @@ class ServiceUrl {
   static const Material = "/api/material";
   static const CATALOG = "/api/catalog";
   static const DISH = "/api/dish";
+  static const PRINTER = "/api/printer";
 }

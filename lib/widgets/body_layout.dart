@@ -14,27 +14,38 @@ class Left extends StatelessWidget {
       color: Colors.white,
       width: Get.width * 0.2,
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          UserAccountsDrawerHeader(
-            decoration: BoxDecoration(
-                color: Colors.white,
-                border:
-                    Border(bottom: BorderSide(color: Get.theme.dividerColor))),
-            accountName: Text(
-              user.name!,
-              style: Get.textTheme.bodyText1,
-            ),
-            accountEmail: Text(
-              user.email!,
-              style: Get.textTheme.subtitle1,
-            ),
-            currentAccountPicture: CircleAvatar(
-              child: FlutterLogo(
-                size: 42,
-              ),
-            ),
-            // onDetailsPressed: (){ print("object");},
+          // UserAccountsDrawerHeader(
+          //   decoration: BoxDecoration(
+          //       color: Colors.white,
+          //       border:
+          //           Border(bottom: BorderSide(color: Get.theme.dividerColor))),
+          //   accountName: Text(
+          //     user.name!,
+          //     style: Get.textTheme.bodyText1,
+          //   ),
+          //   accountEmail: Text(
+          //     user.email!,
+          //     style: Get.textTheme.subtitle1,
+          //   ),
+          //   currentAccountPicture: CircleAvatar(
+          //     child: FlutterLogo(
+          //       size: 42,
+          //     ),
+          //   ),
+          //   // onDetailsPressed: (){ print("object");},
+          // ),
+          FlutterLogo(),
+          Text(
+            user.name!,
+            style: Get.textTheme.bodyText1,
           ),
+          Text(
+            user.email!,
+            style: Get.textTheme.subtitle1,
+          ),
+          Divider(),
           Expanded(
             child: ListView(
               // padding: EdgeInsets.zero,
@@ -74,9 +85,7 @@ class Left extends StatelessWidget {
               ],
             ),
           ),
-          Divider(
-            thickness: 1,
-          ),
+          Divider(),
           ListTile(
             leading: Icon(Icons.logout),
             title: Text(

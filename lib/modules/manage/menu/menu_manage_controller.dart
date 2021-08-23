@@ -1,14 +1,18 @@
 import 'package:bubble_tea/data/models/catalog_model.dart';
 import 'package:bubble_tea/data/models/dish_model.dart';
 import 'package:bubble_tea/data/models/material_model.dart';
+import 'package:bubble_tea/data/models/printer_model.dart';
+import 'package:bubble_tea/data/models/shop_model.dart';
 import 'package:bubble_tea/data/repositories/catalog_repository.dart';
 import 'package:bubble_tea/data/repositories/dish_repository.dart';
 import 'package:bubble_tea/data/repositories/materia_repository.dart';
+import 'package:bubble_tea/data/repositories/printer_repository.dart';
 import 'package:bubble_tea/utils/confirm_box.dart';
 import 'package:bubble_tea/utils/message_box.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:collection/collection.dart';
 
 class MenuManageController extends GetxController
     with SingleGetTickerProviderMixin {
@@ -17,8 +21,10 @@ class MenuManageController extends GetxController
 
   var isNew = true.obs;
 
-  var catalogs = <CatalogModel>[].obs;
-  var materials = <MaterialModel>[].obs;
+  var catalogs = <CatalogModel>[];
+  var materials = <MaterialModel>[];
+  var printers = <PrinterModel>[];
+  var printerMap = {};
   var dishMaterials = <DishMaterialModel>[].obs;
   var items = <DishModel>[].obs;
   var editItem = DishModel().obs;
@@ -26,33 +32,43 @@ class MenuManageController extends GetxController
   final _picker = ImagePicker();
   XFile? _image;
   var imagePath = "".obs;
-  // FocusNode qtyFocusNode = FocusNode();
+  
+  FocusNode qtyFocusNode = FocusNode();
   @override
   void onInit() {
     super.onInit();
     tabController = TabController(length: catalogs.length, vsync: this);
-    // qtyFocusNode.addListener(() {
-    //   if (qtyFocusNode.hasFocus) {
-    //   } else {
-    //     for (var item in dishMaterials) {
-    //       item.selected = false;
-    //     }
-    //   }
-    // });
+    qtyFocusNode.addListener(() {
+      if (qtyFocusNode.hasFocus) {
+      } else {
+        for (var item in dishMaterials) {
+          item.selected = false;
+        }
+        dishMaterials.refresh();
+      }
+    });
   }
 
   @override
-  void onReady() {
+  void onReady() async {
     super.onReady();
 
-    Get.find<CatalogRepository>().getAll(showLoading: false).then((value) {
-      catalogs.value = value;
-      catalogs.insert(0, CatalogModel(name: "Popular"));
-      tabController = TabController(length: catalogs.length, vsync: this);
+    catalogs = await Get.find<CatalogRepository>().getAll();
+    catalogs.insert(0, CatalogModel(name: "Popular"));
+    tabController = TabController(length: catalogs.length, vsync: this);
+
+    repository.getAll(showLoading: false).then((value) {
+      items.value = value;
     });
 
     Get.find<MaterialRepository>().getAll(showLoading: false).then((value) {
-      materials.value = value;
+      materials = value;
+      materials.sort((a,b)=>a.name!.compareTo(b.name!));
+    });
+
+    Get.find<PrinterRepository>().getAll(showLoading: false).then((value) {
+      printers = value;
+      printerMap = groupBy(printers, (PrinterModel p) => p.shopName);
     });
   }
 
@@ -74,7 +90,6 @@ class MenuManageController extends GetxController
     editItem.value = DishModel(name: item.name);
     editItem.value.id = item.id;
 
-    // repository.getAll(showLoading: false).then((value) => null);
     // repository.getAll(showLoading: false).then((value) => null);
   }
 
