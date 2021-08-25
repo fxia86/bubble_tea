@@ -98,7 +98,7 @@ class CatalogTable extends StatelessWidget {
                               margin: EdgeInsets.symmetric(horizontal: 15),
                               child: ReorderableDragStartListener(
                                 index: index,
-                                child: Icon(Icons.drag_handle),
+                                child: Icon(Icons.reorder),
                               ),
                             ),
                           ],
@@ -118,61 +118,6 @@ class CatalogTable extends StatelessWidget {
     );
   }
 }
-
-// class CatalogTable extends StatelessWidget {
-//   final controller = Get.find<CatalogManageController>();
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Obx(() => ReorderableTable(
-//           header: Container(
-//             padding: EdgeInsets.only(bottom: 10),
-//             decoration:
-//                 BoxDecoration(border: Border(bottom: BorderSide(width: 0.1))),
-//             child: ReorderableTableRow(
-//               mainAxisSize: MainAxisSize.max,
-//               mainAxisAlignment: MainAxisAlignment.spaceAround,
-//               children: [
-//                 Text('Serial',style: Get.textTheme.bodyText1),
-//                 Text('Name',style: Get.textTheme.bodyText1),
-//                 Text('',style: Get.textTheme.bodyText1),
-//               ],
-//             ),
-//           ),
-//           children: [
-//             for (var item in controller.items)
-//               ReorderableTableRow(
-//                 decoration:
-//                     BoxDecoration(border: Border(bottom: BorderSide(width: 5))),
-//                 //a key must be specified for each row
-//                 key: ObjectKey(item),
-//                 mainAxisSize: MainAxisSize.max,
-//                 mainAxisAlignment: MainAxisAlignment.spaceAround,
-//                 children: <Widget>[
-//                   Text((controller.items.indexOf(item) + 1).toString(),style: Get.textTheme.bodyText1),
-//                   Text(item.name??"",style: Get.textTheme.bodyText1,),
-//                   Row(
-//                     children: [
-//                       IconButton(
-//                         onPressed: () => controller.edit(item.id),
-//                         icon: Icon(Icons.edit),
-//                         color: Colors.orange,
-//                       ),
-//                       IconButton(
-//                         onPressed: () => controller.deleteConfirm(item.id),
-//                         icon: Icon(Icons.delete),
-//                         color: Colors.red,
-//                       ),
-//                     ],
-//                   )
-//                 ],
-//               )
-//           ],
-//           onReorder: (int oldIndex, int newIndex) =>
-//               controller.reorder(oldIndex, newIndex),
-//         ));
-//   }
-// }
 
 class CatalogForm extends StatelessWidget {
   final controller = Get.find<CatalogManageController>();

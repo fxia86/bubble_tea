@@ -71,6 +71,10 @@ class Left extends StatelessWidget {
                     routeName: Routes.MANAGE_CATALOG,
                     iconData: Icons.dashboard),
                 NaviItem(
+                    text: "Addition",
+                    routeName: Routes.MANAGE_ADDITION,
+                    iconData: Icons.fact_check),
+                NaviItem(
                     text: "Menu",
                     routeName: Routes.MANAGE_MENU,
                     iconData: Icons.restaurant_menu),

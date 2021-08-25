@@ -1,8 +1,9 @@
+import 'package:bubble_tea/data/models/addition_model.dart';
 import 'package:bubble_tea/data/models/catalog_model.dart';
 import 'package:bubble_tea/data/models/dish_model.dart';
 import 'package:bubble_tea/data/models/material_model.dart';
 import 'package:bubble_tea/data/models/printer_model.dart';
-import 'package:bubble_tea/data/models/shop_model.dart';
+import 'package:bubble_tea/data/repositories/addition_repository.dart';
 import 'package:bubble_tea/data/repositories/catalog_repository.dart';
 import 'package:bubble_tea/data/repositories/dish_repository.dart';
 import 'package:bubble_tea/data/repositories/materia_repository.dart';
@@ -21,10 +22,13 @@ class MenuManageController extends GetxController
 
   var isNew = true.obs;
 
+  var category = 1.obs;
+
   var catalogs = <CatalogModel>[];
   var materials = <MaterialModel>[];
   var printers = <PrinterModel>[];
   var printerMap = {};
+  var additions = <AdditionModel>[];
   var dishMaterials = <DishMaterialModel>[].obs;
   var items = <DishModel>[].obs;
   var editItem = DishModel().obs;
@@ -70,11 +74,15 @@ class MenuManageController extends GetxController
       printers = value;
       printerMap = groupBy(printers, (PrinterModel p) => p.shopName);
     });
+
+    Get.find<AdditionRepository>().getAll(showLoading: false).then((value) {
+      additions = value;
+    });
   }
 
   @override
   void onClose() {
-    // qtyFocusNode.dispose();
+    qtyFocusNode.dispose();
     super.onClose();
   }
 

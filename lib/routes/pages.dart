@@ -1,5 +1,7 @@
 import 'package:bubble_tea/modules/login/login_binding.dart';
 import 'package:bubble_tea/modules/login/login_page.dart';
+import 'package:bubble_tea/modules/manage/addition/addition_manage_binding.dart';
+import 'package:bubble_tea/modules/manage/addition/addition_manage_page.dart';
 import 'package:bubble_tea/modules/manage/catelog/catalog_manage_binding.dart';
 import 'package:bubble_tea/modules/manage/catelog/catalog_manage_page.dart';
 import 'package:bubble_tea/modules/manage/material/material_manage_binding.dart';
@@ -54,6 +56,11 @@ class Pages {
       name: Routes.MANAGE_CATALOG,
       page: () => CatalogManagePage(),
       binding: CatalogManageBinding(),
+    ),
+    GetPage(
+      name: Routes.MANAGE_ADDITION,
+      page: () => AdditionManagePage(),
+      binding: AdditionManageBinding(),
     ),
     GetPage(
       name: Routes.MANAGE_MENU,

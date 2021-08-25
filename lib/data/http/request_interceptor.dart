@@ -23,12 +23,9 @@ class RequestInterceptor extends Interceptor {
 
     debugPrint('''
       *** Request ***
-      Url:
-      ${options.uri}
-      Data:
-      ${options.data}
-      Query:
-      ${options.queryParameters}
+      ${options.method}: ${options.uri}
+      Data: ${options.data}
+      Query: ${options.queryParameters}
       ***************
       ''');
 
@@ -49,7 +46,6 @@ class RequestInterceptor extends Interceptor {
       if (response.requestOptions.extra["showLoading"]) {
         LoadingBox.hide();
       }
-
       handler.next(response);
     } else if (statusCode == 401) {
       // refresh token
@@ -106,12 +102,20 @@ class RequestInterceptor extends Interceptor {
           $_response
           ****************
         ''');
+
           if (response.requestOptions.extra["showLoading"]) {
             LoadingBox.hide();
           }
-          handler.next(_response);
+
+          if (_response.statusCode! >= 200 && _response.statusCode! < 300) {
+            handler.next(_response);
+          } else {
+            MessageBox.error(_response.data);
+          }
         } catch (e) {
-          LoadingBox.hide();
+          if (response.requestOptions.extra["showLoading"]) {
+            LoadingBox.hide();
+          }
         }
       } else {
         GET.Get.offAllNamed(Routes.LOGIN);
@@ -123,19 +127,6 @@ class RequestInterceptor extends Interceptor {
       MessageBox.error(response.data);
     }
     // super.onResponse(response, handler);
-  }
-
-  refreshToken() async {
-    final dio = HttpClient().newInstance();
-    var response =
-        await dio.post(ServiceUrl.REFRESH, data: LocalStorage.getAuthToken());
-
-    if (response.statusCode == 200) {
-      LocalStorage.setAuthInfo(response.data);
-      return true;
-    } else {
-      return false;
-    }
   }
 
   @override

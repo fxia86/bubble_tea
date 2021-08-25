@@ -2,6 +2,18 @@ class BaseModel {
   String? id;
   // DateTime? addedOn;
   bool selected = false;
+
+  BaseModel({this.id});
+
+  BaseModel.fromJson(Map<String, dynamic> json) {
+    this.id = json['id'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['id'] = this.id;
+    return data;
+  }
 }
 
 // class Selections<T extends BaseModel> {

@@ -8,6 +8,7 @@ abstract class Routes {
   static const MANAGE_STAFF = "/manage/staff";
   static const MANAGE_SUPPLIER = "/manage/supplier";
   static const MANAGE_CATALOG = "/manage/catalog";
+  static const MANAGE_ADDITION = "/manage/addition";
   static const MANAGE_MENU = "/manage/menu";
   static const MANAGE_MATERIAL = "/manage/material";
   static const MANAGE_PRINTER = "/manage/printer";
