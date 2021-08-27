@@ -8,13 +8,14 @@ class DishService {
   }
 
   add(obj) async {
-    var response = await http.post(ServiceUrl.DISH, data: obj);
+    var response = await http.postForm(ServiceUrl.DISH, params: obj);
 
     return response;
   }
 
   edit(obj) async {
-    var response = await http.put('${ServiceUrl.DISH}/${obj.id}', data: obj);
+    var response =
+        await http.putForm('${ServiceUrl.DISH}/${obj["id"]}', params: obj);
 
     return response;
   }

@@ -1,35 +1,26 @@
 import 'dart:io';
 
 import 'package:bubble_tea/data/models/catalog_model.dart';
+import 'package:bubble_tea/modules/manage/menu/menu_manage_controller.dart';
 import 'package:bubble_tea/widgets/simple_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:menu_button/menu_button.dart';
 
-import 'dish_addition_page.dart';
-import 'menu_manage_controller.dart';
-import 'dish_material_page.dart';
-import 'dish_printer_page.dart';
+import 'dish_detail_controller.dart';
+import 'widgets/dish_addition.dart';
+import 'widgets/dish_material.dart';
+import 'widgets/dish_printer.dart';
 
-class DishDetail extends StatelessWidget {
-  final controller = Get.find<MenuManageController>();
-
+class DishDetailPage extends GetView<DishDetailController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          "Dish Detail",
-          style: Get.textTheme.headline5?.copyWith(fontWeight: FontWeight.w500),
-        ),
-        actions: [
-          IconButton(
-            onPressed: controller.save,
-            icon: Icon(Icons.save),
-            iconSize: 30,
-          ),
-        ],
-      ),
+          title: Text(
+        "Dish Detail",
+        style: Get.textTheme.headline5?.copyWith(fontWeight: FontWeight.w500),
+      )),
       body: Container(
         margin: EdgeInsets.only(top: 20),
         child: Row(
@@ -46,23 +37,17 @@ class DishDetail extends StatelessWidget {
                       children: [
                         CategoryButton(category: 1),
                         Container(
-                          color: Colors.black38,
+                          color: Get.theme.dividerColor,
                           height: 20,
                           width: 2,
                           margin: EdgeInsets.symmetric(horizontal: 20),
                         ),
                         CategoryButton(category: 2),
                         Container(
-                          color: Colors.black26,
+                          color: Get.theme.dividerColor,
                           height: 20,
                           width: 2,
                           margin: EdgeInsets.symmetric(horizontal: 20),
-                        ),
-                        Container(
-                          color: Colors.black26,
-                          child: VerticalDivider(
-                            color: Colors.red,
-                          ),
                         ),
                         CategoryButton(category: 3),
                       ],
@@ -76,9 +61,9 @@ class DishDetail extends StatelessWidget {
                         child: Obx(() {
                           switch (controller.category.value) {
                             case 1:
-                              return MaterialShuttle();
+                              return MaterialSelection();
                             case 2:
-                              return PrinterPicker();
+                              return PrinterSelection();
                             case 3:
                               return AdditionSelection();
                             default:
@@ -99,7 +84,7 @@ class DishDetail extends StatelessWidget {
 class CategoryButton extends StatelessWidget {
   CategoryButton({Key? key, required this.category}) : super(key: key);
 
-  final controller = Get.find<MenuManageController>();
+  final controller = Get.find<DishDetailController>();
   final int category;
 
   @override
@@ -141,7 +126,7 @@ class CategoryButton extends StatelessWidget {
 class DishForm extends StatelessWidget {
   DishForm({Key? key, this.enable = true}) : super(key: key);
 
-  final controller = Get.find<MenuManageController>();
+  final controller = Get.find<DishDetailController>();
   final bool enable;
   @override
   Widget build(BuildContext context) {
@@ -169,9 +154,10 @@ class DishForm extends StatelessWidget {
               SimpleTextInput(
                 initialValue: controller.editItem.value.desc,
                 labelText: "Description",
-                maxline: 3,
+                maxLines: 3,
+                maxLength: 200,
                 onChanged: (val) {
-                  controller.editItem.value.name = val.trim();
+                  controller.editItem.value.desc = val.trim();
                 },
               ),
               SizedBox(height: 20),
@@ -180,7 +166,7 @@ class DishForm extends StatelessWidget {
                 initialValue:
                     controller.editItem.value.price?.toStringAsFixed(2),
                 labelText: "Price",
-                suffixText: "€",
+                prefixText: "€  ",
                 keyboardType: TextInputType.number,
                 onChanged: (val) {
                   if (GetUtils.isNum(val)) {
@@ -223,7 +209,7 @@ class DishForm extends StatelessWidget {
 }
 
 class ImagePickerBox extends StatelessWidget {
-  final controller = Get.find<MenuManageController>();
+  final controller = Get.find<DishDetailController>();
 
   @override
   Widget build(BuildContext context) {
@@ -278,7 +264,8 @@ class ImagePickerBox extends StatelessWidget {
 }
 
 class CatalogSelect extends StatelessWidget {
-  final controller = Get.find<MenuManageController>();
+  final parent = Get.find<MenuManageController>();
+  final controller = Get.find<DishDetailController>();
 
   Widget childButton() => Container(
         height: 60,
@@ -292,7 +279,12 @@ class CatalogSelect extends StatelessWidget {
           children: <Widget>[
             Flexible(
               child: Obx(() => Text(
-                    controller.editItem.value.catalogName ?? "Catalog",
+                    parent.catalogs
+                            .firstWhere((element) =>
+                                element.id ==
+                                controller.editItem.value.catalogId)
+                            .name ??
+                        "Catalog",
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                         fontSize: 20,
@@ -317,7 +309,7 @@ class CatalogSelect extends StatelessWidget {
         border: Border.all(color: Colors.transparent),
       ),
       child: childButton(),
-      items: controller.catalogs.skip(1).toList(),
+      items: parent.catalogs.skip(1).toList(),
       itemBuilder: (item) => Container(
         height: 60,
         alignment: Alignment.centerLeft,

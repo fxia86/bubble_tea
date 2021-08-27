@@ -31,13 +31,6 @@ class PrinterManageController extends GetxController {
     items.value = await repository.getAll();
     shops = await Get.find<ShopRepository>().getAll();
 
-    // dataSource = ShopDataSource();
-  }
-
-  @override
-  void onClose() {
-    // dataSource.dispose();
-    super.onClose();
   }
 
   void initPrinters() async {

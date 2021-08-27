@@ -130,7 +130,7 @@ caption: 16 0.15
   static final TextTheme appTextTheme = TextTheme()
       .copyWith(
         headline3: //price
-            TextStyle(fontSize: 28, fontWeight: _bold, letterSpacing: 0),
+            TextStyle(fontSize: 28, fontWeight: _regular, letterSpacing: 0),
         headline5: //title/tab/button
             TextStyle(fontSize: 24, fontWeight: _regular, letterSpacing: 0),
         bodyText1: //bodytext

@@ -1,40 +1,59 @@
+import 'package:bubble_tea/data/models/addition_model.dart';
 import 'package:bubble_tea/data/models/base.dart';
+import 'package:bubble_tea/data/models/material_model.dart';
+import 'package:bubble_tea/data/models/printer_model.dart';
 
 class DishModel extends BaseModel {
   String? catalogId;
-  String? catalogName;
   String? name;
   int? price;
   String? img;
   String? desc;
   bool? isPopular;
 
+  List<MaterialModel> materials = <MaterialModel>[];
+  List<PrinterModel> printers = <PrinterModel>[];
+  List<AdditionOptionModel> options = <AdditionOptionModel>[];
+
   DishModel({
+    String? id,
     this.catalogId,
-    this.catalogName,
     this.name,
     this.price,
     this.img,
     this.desc,
     this.isPopular = false,
-  });
+  }):super(id: id);
 
   DishModel.fromJson(Map<String, dynamic> json) {
     this.id = json['id'];
-    this.catalogId = json['catagoryId'];
-    this.catalogName = json['catagoryName'];
+    this.catalogId = json['catalogId'];
     this.name = json['name'];
     this.price = json['price'];
     this.img = json['img'];
     this.desc = json['desc'];
     this.isPopular = json['isPopular'];
+    if (json['materials'] != null) {
+      this.materials = List.castFrom(json['materials'])
+          .map((v) => MaterialModel.fromJson(v))
+          .toList();
+    }
+    if (json['printers'] != null) {
+      this.printers = List.castFrom(json['printers'])
+          .map((v) => PrinterModel.fromJson(v))
+          .toList();
+    }
+    if (json['options'] != null) {
+      this.options = List.castFrom(json['options'])
+          .map((v) => AdditionOptionModel.fromJson(v))
+          .toList();
+    }
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['id'] = this.id;
-    data['catagoryId'] = this.catalogId;
-    data['catagoryName'] = this.catalogName;
+    data['catalogId'] = this.catalogId;
     data['name'] = this.name;
     data['price'] = this.price;
     data['img'] = this.img;

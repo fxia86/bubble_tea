@@ -10,9 +10,9 @@ import 'package:bubble_tea/data/services/material_service.dart';
 import 'package:bubble_tea/data/services/printer_service.dart';
 import 'package:get/get.dart';
 
-import 'menu_manage_controller.dart';
+import 'dish_detail_controller.dart';
 
-class MenuManageBinding implements Bindings {
+class DishDetailBinding implements Bindings {
   @override
   void dependencies() {
     Get.lazyPut(() => MaterialService());
@@ -25,6 +25,6 @@ class MenuManageBinding implements Bindings {
     Get.lazyPut(() => PrinterRepository());
     Get.lazyPut(() => DishRepository());
     Get.lazyPut(() => AdditionRepository());
-    Get.lazyPut<MenuManageController>(() => MenuManageController());
+    Get.lazyPut<DishDetailController>(() => DishDetailController());
   }
 }

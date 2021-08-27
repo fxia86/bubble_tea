@@ -2,10 +2,42 @@ import 'package:bubble_tea/data/models/printer_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import 'menu_manage_controller.dart';
+import '../dish_detail_controller.dart';
+
+class PrinterSelection extends StatelessWidget {
+  final controller = Get.find<DishDetailController>();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Expanded(
+          child: PrinterPicker(),
+        ),
+        ButtonBar(
+          children: [
+            ElevatedButton(
+              onPressed: controller.savePrinter,
+              child: Padding(
+                padding: EdgeInsets.all(10),
+                child: Text(
+                  'Save',
+                  style: Theme.of(context)
+                      .textTheme
+                      .headline5
+                      ?.copyWith(color: Colors.white),
+                ),
+              ),
+            ),
+          ],
+        )
+      ],
+    );
+  }
+}
 
 class PrinterPicker extends StatelessWidget {
-  final controller = Get.find<MenuManageController>();
+  final controller = Get.find<DishDetailController>();
 
   @override
   Widget build(BuildContext context) {
@@ -76,7 +108,7 @@ class PrinterPicker extends StatelessWidget {
                               value: value,
                               onChanged: (v) => updateFn(v!),
                             ),
-                            onUpdate: (value) => print('Value updated: $value'),
+                            onUpdate: (value) => controller.addPrinter(printers[j].id,value!),
                           ),
                         );
                       }),

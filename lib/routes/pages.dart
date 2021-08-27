@@ -6,6 +6,8 @@ import 'package:bubble_tea/modules/manage/catelog/catalog_manage_binding.dart';
 import 'package:bubble_tea/modules/manage/catelog/catalog_manage_page.dart';
 import 'package:bubble_tea/modules/manage/material/material_manage_binding.dart';
 import 'package:bubble_tea/modules/manage/material/material_manage_page.dart';
+import 'package:bubble_tea/modules/manage/menu/dish/dish_detail_binding.dart';
+import 'package:bubble_tea/modules/manage/menu/dish/dish_detail_page.dart';
 import 'package:bubble_tea/modules/manage/menu/menu_manage_binding.dart';
 import 'package:bubble_tea/modules/manage/menu/menu_manage_page.dart';
 import 'package:bubble_tea/modules/manage/printer/printer_manage_binding.dart';
@@ -46,7 +48,6 @@ class Pages {
       page: () => StaffManagePage(),
       binding: StaffManageBinding(),
     ),
-    
     GetPage(
       name: Routes.MANAGE_SUPPLIER,
       page: () => SupplierManagePage(),
@@ -63,10 +64,15 @@ class Pages {
       binding: AdditionManageBinding(),
     ),
     GetPage(
-      name: Routes.MANAGE_MENU,
-      page: () => MenuManagePage(),
-      binding: MenuManageBinding(),
-    ),
+        name: Routes.MANAGE_MENU,
+        page: () => MenuManagePage(),
+        binding: MenuManageBinding(),
+        ),
+        GetPage(
+            name: Routes.MANAGE_MENU_DISH,
+            page: () => DishDetailPage(),
+            binding: DishDetailBinding(),
+          ),
     GetPage(
       name: Routes.MANAGE_MATERIAL,
       page: () => MaterialManagePage(),

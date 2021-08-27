@@ -13,13 +13,14 @@ class DishRepository {
     return items;
   }
 
-  Future<DishModel> add(DishModel model) async {
+  Future<DishModel> add(Map<dynamic, dynamic> model) async {
     var data = await service.add(model);
     return DishModel.fromJson(data);
   }
 
-  Future<bool> edit(DishModel model) async {
-    return await service.edit(model);
+  Future<DishModel> edit(Map<dynamic, dynamic> model) async {
+    var data = await service.edit(model);
+    return DishModel.fromJson(data);
   }
 
   Future<bool> delete(String? id) async {

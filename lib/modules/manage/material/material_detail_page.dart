@@ -154,21 +154,20 @@ class MaterialForm extends StatelessWidget {
                 },
               ),
               SizedBox(height: 30),
-              enable
-                  ? ElevatedButton(
-                      onPressed: controller.save,
-                      child: Padding(
-                        padding: EdgeInsets.all(10),
-                        child: Text(
-                          'Save',
-                          style: Theme.of(context)
-                              .textTheme
-                              .headline5
-                              ?.copyWith(color: Colors.white),
-                        ),
-                      ),
-                    )
-                  : SizedBox(),
+              if (enable)
+                ElevatedButton(
+                  onPressed: controller.save,
+                  child: Padding(
+                    padding: EdgeInsets.all(10),
+                    child: Text(
+                      'Save',
+                      style: Theme.of(context)
+                          .textTheme
+                          .headline5
+                          ?.copyWith(color: Colors.white),
+                    ),
+                  ),
+                ),
             ],
           ),
         ),

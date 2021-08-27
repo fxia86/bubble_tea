@@ -16,11 +16,6 @@ class AdditionManageController extends GetxController {
   var keywords = "".obs;
 
   @override
-  void onInit() {
-    super.onInit();
-  }
-
-  @override
   void onReady() async {
     super.onReady();
 

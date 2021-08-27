@@ -2,10 +2,42 @@ import 'package:bubble_tea/data/models/material_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import 'menu_manage_controller.dart';
+import '../dish_detail_controller.dart';
+
+class MaterialSelection extends StatelessWidget {
+  final controller = Get.find<DishDetailController>();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Expanded(
+          child: MaterialShuttle(),
+        ),
+        ButtonBar(
+          children: [
+            ElevatedButton(
+              onPressed: controller.saveMaterial,
+              child: Padding(
+                padding: EdgeInsets.all(10),
+                child: Text(
+                  'Save',
+                  style: Theme.of(context)
+                      .textTheme
+                      .headline5
+                      ?.copyWith(color: Colors.white),
+                ),
+              ),
+            ),
+          ],
+        )
+      ],
+    );
+  }
+}
 
 class MaterialShuttle extends StatelessWidget {
-  final controller = Get.find<MenuManageController>();
+  final controller = Get.find<DishDetailController>();
 
   Widget _buildDragableItem(MaterialModel item) {
     return Draggable<MaterialModel>(
@@ -48,13 +80,13 @@ class MaterialShuttle extends StatelessWidget {
                     borderRadius: BorderRadius.circular(5),
                   ),
                   child: Scrollbar(
-                    child: ListView.builder(
+                    child: Obx(()=> ListView.builder(
                       itemCount: controller.materials.length,
                       itemBuilder: (c, i) => Padding(
                         padding: EdgeInsets.symmetric(horizontal: 20),
                         child: _buildDragableItem(controller.materials[i]),
                       ),
-                    ),
+                    )),
                   ),
                 ),
               ),

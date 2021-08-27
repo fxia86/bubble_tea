@@ -1,8 +1,9 @@
+import 'package:bubble_tea/r.dart';
+import 'package:bubble_tea/routes/pages.dart';
 import 'package:bubble_tea/widgets/body_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import 'dish_detail_page.dart';
 import 'menu_manage_controller.dart';
 
 class MenuManagePage extends GetView<MenuManageController> {
@@ -18,32 +19,14 @@ class MenuManagePage extends GetView<MenuManageController> {
                 children: [
                   Top(
                     "Menu Manage",
-                    add: () {
-                      controller.add();
-                      Get.dialog(DishDetail());
-                    },
+                    add: () => Get.toNamed(Routes.MANAGE_MENU_DISH),
                   ),
                   Expanded(
                     child: Container(
-                        padding: EdgeInsets.symmetric(horizontal: 24),
-                        child: Column(
-                          children: [
-                            Container(
-                                color: Colors.white,
-                                width: context.width,
-                                height: context.height * 0.35,
-                                child: Center()),
-                            SizedBox(height: 24),
-                            Expanded(
-                              child: Container(
-                                color: Colors.white,
-                                width: context.width,
-                                child: Center(),
-                              ),
-                            )
-                          ],
-                        )),
-                  )
+                      padding: EdgeInsets.symmetric(horizontal: 24),
+                      child: Menu(),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -54,8 +37,54 @@ class MenuManagePage extends GetView<MenuManageController> {
   }
 }
 
+class Menu extends StatelessWidget {
+  final controller = Get.find<MenuManageController>();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Container(
+          width: context.width,
+          height: 60,
+          color: Get.theme.accentColor,
+          child: Obx(() => TabBar(
+                controller: controller.tabController,
+                isScrollable: true,
+                labelColor: Colors.blue,
+                unselectedLabelColor: Colors.black87,
+                labelStyle: Get.textTheme.bodyText1
+                    ?.copyWith(fontWeight: FontWeight.w500, fontSize: 22),
+                unselectedLabelStyle: Get.textTheme.bodyText1,
+                indicatorWeight: 3,
+                tabs: [
+                  for (var item in controller.catalogs) Tab(text: item.name)
+                ],
+              )),
+        ),
+        Flexible(
+          child: Obx(() => TabBarView(
+                controller: controller.tabController,
+                children: [
+                  for (var i = 0; i < controller.catalogs.length; i++)
+                    i == 0
+                        ? MenuGrid(
+                            list: controller.items
+                                .where((element) => element.isPopular!))
+                        : MenuGrid(
+                            list: controller.items.where((element) =>
+                                element.catalogId == controller.catalogs[i].id),
+                          ),
+                ],
+              )),
+        ),
+      ],
+    );
+  }
+}
+
 class MenuGrid extends StatelessWidget {
-  MenuGrid({Key? key, required this.list, this.crossAxisCount = 2})
+  MenuGrid({Key? key, required this.list, this.crossAxisCount = 3})
       : super(key: key);
 
   final list;
@@ -63,76 +92,83 @@ class MenuGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GridView.count(
-      crossAxisCount: crossAxisCount,
-      mainAxisSpacing: 20,
-      crossAxisSpacing: 20,
-      childAspectRatio: 1.5,
-      padding: EdgeInsets.all(20),
-      children: [for (var item in list) MenuItem(item: item)],
+    return GridView.builder(
+      padding: EdgeInsets.symmetric(vertical: 20),
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: crossAxisCount,
+        mainAxisSpacing: 20,
+        crossAxisSpacing: 20,
+        // childAspectRatio: 0.9,
+      ),
+      itemCount: list.length,
+      itemBuilder: (c, i) => MenuItem(item: list.elementAt(i)),
     );
   }
 }
 
 class MenuItem extends StatelessWidget {
   MenuItem({Key? key, required this.item}) : super(key: key);
-
   final controller = Get.find<MenuManageController>();
 
   final item;
 
   @override
   Widget build(BuildContext context) {
-    return GridTile(
-      child: Material(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
-        clipBehavior: Clip.antiAlias,
-        child: Image.asset(
-          item.picture,
-          fit: BoxFit.cover,
-        ),
-      ),
-      footer: Material(
-        color: Colors.transparent,
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(bottom: Radius.circular(5))),
-        clipBehavior: Clip.antiAlias,
-        child: GridTileBar(
-          backgroundColor: Colors.black45,
-          title: MenuItemTitle(
-              text:
-                  "${item.materialName}     € ${(item.price / 100).toStringAsFixed(2)}",
-              fontSize: 28),
-          subtitle: 1 == 1 ? MenuItemTitle(text: item.desc) : null,
-          trailing: FloatingActionButton(
-            onPressed: () {},
-            child: Icon(
-              Icons.add,
-              size: 32,
+    return Card(
+      elevation: 5,
+      shadowColor: Get.theme.accentColor,
+      // This ensures that the Card's children (including the ink splash) are clipped correctly.
+      clipBehavior: Clip.antiAlias,
+      // shape: ShapeBorder(),
+      child: InkWell(
+        onTap: () => Get.toNamed(Routes.MANAGE_MENU_DISH, arguments: item.id),
+        onLongPress: () => controller.deleteConfirm(item.id),
+        // Generally, material cards use onSurface with 12% opacity for the pressed state.
+        splashColor: Get.theme.colorScheme.onSurface.withOpacity(0.12),
+        // Generally, material cards do not have a highlight overlay.
+        highlightColor: Colors.transparent,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(
+              height: Get.height * 0.25,
+              child: Ink.image(
+                image: NetworkImage(item.img),
+                fit: BoxFit.cover,
+                child: Container(),
+              ),
             ),
-            foregroundColor: Colors.white,
-            backgroundColor: Theme.of(context).primaryColor,
-          ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                      child: Padding(
+                    padding: const EdgeInsets.only(right: 10),
+                    child: Text(
+                      item.name,
+                      style: Get.textTheme.headline5
+                          ?.copyWith(fontWeight: FontWeight.w500),
+                    ),
+                  )),
+                  Text("€ ${(item.price / 100).toStringAsFixed(2)}",
+                      style: Get.textTheme.headline5),
+                ],
+              ),
+            ),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
+                child: Text(
+                  item.desc,
+                  style: Get.textTheme.subtitle1,
+                  overflow: TextOverflow.fade,
+                ),
+              ),
+            ),
+          ],
         ),
-      ),
-    );
-  }
-}
-
-class MenuItemTitle extends StatelessWidget {
-  const MenuItemTitle({Key? key, required this.text, this.fontSize = 20})
-      : super(key: key);
-  final String text;
-  final double fontSize;
-
-  @override
-  Widget build(BuildContext context) {
-    return FittedBox(
-      fit: BoxFit.scaleDown,
-      alignment: AlignmentDirectional.centerStart,
-      child: Text(
-        text,
-        style: TextStyle(fontSize: fontSize),
       ),
     );
   }

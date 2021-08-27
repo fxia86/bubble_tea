@@ -172,57 +172,55 @@ class Top extends StatelessWidget {
             style:
                 Get.textTheme.headline5?.copyWith(fontWeight: FontWeight.w500),
           ),
-          search == null
-              ? SizedBox()
-              : Container(
-                  width: Get.width * 0.375,
-                  height: Get.height * 0.481,
-                  margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                  padding: EdgeInsets.only(left: 20, top: 4),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: ValueBuilder<bool?>(
-                    initialValue: _textEditingController.text == "",
-                    builder: (value, updateFn) => TextFormField(
-                      controller: _textEditingController,
-                      focusNode: _focusNode,
-                      decoration: InputDecoration(
-                        icon: Icon(
-                          Icons.search,
-                          size: 32,
-                        ),
-                        // contentPadding: EdgeInsets.symmetric(horizontal: 5, vertical: 1),
-                        border: InputBorder.none,
-                        hintText: "Search",
-                        suffixIcon: value!
-                            ? null
-                            : IconButton(
-                                onPressed: () {
-                                  if (!_focusNode.hasFocus) {
-                                    _focusNode.canRequestFocus = false;
-                                    Future.delayed(Duration(milliseconds: 300),
-                                        () {
-                                      _focusNode.canRequestFocus = true;
-                                    });
-                                  }
-                                  updateFn(true);
-                                  search!("");
-                                  _textEditingController.clear();
-                                },
-                                icon: Icon(
-                                  Icons.close,
-                                )),
-                      ),
-                      style: Get.textTheme.bodyText1,
-                      onChanged: (val) {
-                        search!(val);
-                        updateFn(val == "");
-                      },
+          if (search != null)
+            Container(
+              width: Get.width * 0.375,
+              height: Get.height * 0.481,
+              margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              padding: EdgeInsets.only(left: 20, top: 4),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: ValueBuilder<bool?>(
+                initialValue: _textEditingController.text == "",
+                builder: (value, updateFn) => TextFormField(
+                  controller: _textEditingController,
+                  focusNode: _focusNode,
+                  decoration: InputDecoration(
+                    icon: Icon(
+                      Icons.search,
+                      size: 32,
                     ),
+                    // contentPadding: EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                    border: InputBorder.none,
+                    hintText: "Search",
+                    suffixIcon: value!
+                        ? null
+                        : IconButton(
+                            onPressed: () {
+                              if (!_focusNode.hasFocus) {
+                                _focusNode.canRequestFocus = false;
+                                Future.delayed(Duration(milliseconds: 300), () {
+                                  _focusNode.canRequestFocus = true;
+                                });
+                              }
+                              updateFn(true);
+                              search!("");
+                              _textEditingController.clear();
+                            },
+                            icon: Icon(
+                              Icons.close,
+                            )),
                   ),
+                  style: Get.textTheme.bodyText1,
+                  onChanged: (val) {
+                    search!(val);
+                    updateFn(val == "");
+                  },
                 ),
+              ),
+            ),
           Container(
             height: Get.height * 0.052,
             child: add == null

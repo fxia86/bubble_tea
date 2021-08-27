@@ -37,12 +37,9 @@ class MaterialManageController extends GetxController {
     print("material");
 
     items.value = await repository.getAll();
-    Get.find<ShopRepository>()
-        .getAll(showLoading: false)
-        .then((value) => shops = value);
-    Get.find<SupplierRepository>()
-        .getAll(showLoading: false)
-        .then((value) => suppliers = value);
+
+    shops = await Get.find<ShopRepository>().getAll(showLoading: false);
+    suppliers = await Get.find<SupplierRepository>().getAll(showLoading: false);
   }
 
   void pickImage(int source) async {
