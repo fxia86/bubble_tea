@@ -6,7 +6,7 @@ class MessageBox {
     _show(title, message);
   }
 
-  static void success([String title = "", String message = ""]) {
+  static void success([String title = "Success", String message = ""]) {
     _show(title, message, Colors.green);
   }
 

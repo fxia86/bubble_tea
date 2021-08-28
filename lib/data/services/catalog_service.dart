@@ -25,8 +25,7 @@ class CatalogService {
     return response;
   }
 
-  Future<bool> reorder(id, oldIndex, newIndex,
-      {bool showLoading = true}) async {
+  reorder(id, oldIndex, newIndex, {bool showLoading = true}) async {
     var response = await http.get('${ServiceUrl.CATALOG}/reorder',
         showLoading: showLoading,
         params: {"id": id, "oldIndex": oldIndex, "newIndex": newIndex});

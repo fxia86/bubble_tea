@@ -2,6 +2,7 @@ import 'package:bubble_tea/data/models/printer_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../menu_manage_controller.dart';
 import '../dish_detail_controller.dart';
 
 class PrinterSelection extends StatelessWidget {
@@ -38,17 +39,18 @@ class PrinterSelection extends StatelessWidget {
 
 class PrinterPicker extends StatelessWidget {
   final controller = Get.find<DishDetailController>();
+  final parent = Get.find<MenuManageController>();
 
   @override
   Widget build(BuildContext context) {
     return Scrollbar(
       child: ListView.builder(
           shrinkWrap: true,
-          itemCount: controller.printerMap.length,
+          itemCount: parent.printerMap.length,
           itemBuilder: (c, i) {
-            final String shop = controller.printerMap.keys.elementAt(i);
+            final String shop = parent.printerMap.keys.elementAt(i);
             final List<PrinterModel> printers =
-                controller.printerMap.values.elementAt(i);
+                parent.printerMap.values.elementAt(i);
 
             return Container(
               margin: EdgeInsets.only(top: 8, bottom: 24),
@@ -97,18 +99,24 @@ class PrinterPicker extends StatelessWidget {
                           crossAxisCount: 4, mainAxisExtent: 50),
                       itemCount: printers.length,
                       itemBuilder: (c, j) {
+                        final printer = printers[j];
+
+                        final selected = controller.dishPrinters
+                            .any((element) => element.printerId == printer.id);
+
                         return Container(
                           child: ValueBuilder<bool?>(
-                            initialValue: false,
+                            initialValue: selected,
                             builder: (value, updateFn) => CheckboxListTile(
                               contentPadding: EdgeInsets.only(left: 0),
-                              title: Text(printers[j].alias ?? "",
+                              title: Text(printer.alias ?? "",
                                   style: Get.textTheme.bodyText1),
                               controlAffinity: ListTileControlAffinity.leading,
                               value: value,
                               onChanged: (v) => updateFn(v!),
                             ),
-                            onUpdate: (value) => controller.addPrinter(printers[j].id,value!),
+                            onUpdate: (value) =>
+                                controller.addPrinter(printer.id, value!),
                           ),
                         );
                       }),

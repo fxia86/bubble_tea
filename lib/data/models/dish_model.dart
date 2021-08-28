@@ -1,7 +1,4 @@
-import 'package:bubble_tea/data/models/addition_model.dart';
 import 'package:bubble_tea/data/models/base.dart';
-import 'package:bubble_tea/data/models/material_model.dart';
-import 'package:bubble_tea/data/models/printer_model.dart';
 
 class DishModel extends BaseModel {
   String? catalogId;
@@ -11,9 +8,9 @@ class DishModel extends BaseModel {
   String? desc;
   bool? isPopular;
 
-  List<MaterialModel> materials = <MaterialModel>[];
-  List<PrinterModel> printers = <PrinterModel>[];
-  List<AdditionOptionModel> options = <AdditionOptionModel>[];
+  List<DishMaterialModel> materials = <DishMaterialModel>[];
+  List<DishPrinterModel> printers = <DishPrinterModel>[];
+  List<DishOptionModel> options = <DishOptionModel>[];
 
   DishModel({
     String? id,
@@ -23,7 +20,7 @@ class DishModel extends BaseModel {
     this.img,
     this.desc,
     this.isPopular = false,
-  }):super(id: id);
+  }) : super(id: id);
 
   DishModel.fromJson(Map<String, dynamic> json) {
     this.id = json['id'];
@@ -35,17 +32,17 @@ class DishModel extends BaseModel {
     this.isPopular = json['isPopular'];
     if (json['materials'] != null) {
       this.materials = List.castFrom(json['materials'])
-          .map((v) => MaterialModel.fromJson(v))
+          .map((v) => DishMaterialModel.fromJson(v))
           .toList();
     }
     if (json['printers'] != null) {
       this.printers = List.castFrom(json['printers'])
-          .map((v) => PrinterModel.fromJson(v))
+          .map((v) => DishPrinterModel.fromJson(v))
           .toList();
     }
     if (json['options'] != null) {
       this.options = List.castFrom(json['options'])
-          .map((v) => AdditionOptionModel.fromJson(v))
+          .map((v) => DishOptionModel.fromJson(v))
           .toList();
     }
   }
@@ -65,15 +62,19 @@ class DishModel extends BaseModel {
 
 class DishMaterialModel extends BaseModel {
   String? dishId;
+  String? materialId;
   String? materialName;
   int? qty;
 
-  DishMaterialModel({this.dishId, this.materialName, this.qty});
+  DishMaterialModel(
+      {String? id, this.dishId, this.materialId, this.materialName, this.qty})
+      : super(id: id);
 
   DishMaterialModel.fromJson(Map<String, dynamic> json) {
     this.id = json['id'];
     this.dishId = json['dishId'];
-    this.materialName = json['name'];
+    this.materialId = json['materialId'];
+    this.materialName = json['materialName'];
     this.qty = json['qty'];
   }
 
@@ -81,8 +82,69 @@ class DishMaterialModel extends BaseModel {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['id'] = this.id;
     data['dishId'] = this.dishId;
-    data['name'] = this.materialName;
+    data['materialId'] = this.materialId;
+    data['materialName'] = this.materialName;
     data['qty'] = this.qty;
+    return data;
+  }
+
+  // @override
+  // bool operator ==(Object other) =>
+  //     identical(this, other) ||
+  //     other is DishMaterialModel &&
+  //         this.id == other.id &&
+  //         this.dishId == other.materialName &&
+  //         this.qty == other.qty;
+
+  // int get hashCode => id.hashCode;
+}
+
+class DishPrinterModel extends BaseModel {
+  String? dishId;
+  String? printerId;
+
+  DishPrinterModel({String? id, this.dishId, this.printerId}) : super(id: id);
+
+  DishPrinterModel.fromJson(Map<String, dynamic> json) {
+    this.id = json['id'];
+    this.dishId = json['dishId'];
+    this.printerId = json['printerId'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['id'] = this.id;
+    data['dishId'] = this.dishId;
+    data['printerId'] = this.printerId;
+    return data;
+  }
+}
+
+class DishOptionModel extends BaseModel {
+  String? dishId;
+  String? additionId;
+  String? optionId;
+  int? price;
+
+  DishOptionModel(
+      {String? id, this.dishId, this.additionId, this.optionId, this.price = 0})
+      : super(id: id);
+
+  DishOptionModel.fromJson(Map<String, dynamic> json) {
+    this.id = json['id'];
+    this.dishId = json['dishId'];
+    this.additionId = json['additionId'];
+    this.optionId = json['optionId'];
+    this.price = json['price'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['id'] = this.id;
+    data['dishId'] = this.dishId;
+    data['additionId'] = this.additionId;
+    data['optionId'] = this.optionId;
+    data['price'] = this.price;
     return data;
   }
 }

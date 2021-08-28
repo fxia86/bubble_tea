@@ -81,7 +81,7 @@ class SupplierForm extends StatelessWidget {
             child: Column(
               children: [
                 SizedBox(height: 30),
-                SimpleTextInput(
+                SimpleTextField(
                   initialValue: controller.editItem.value.name,
                   labelText: "Name",
                   onChanged: (val) {
@@ -89,7 +89,7 @@ class SupplierForm extends StatelessWidget {
                   },
                 ),
                 SizedBox(height: 30),
-                SimpleTextInput(
+                SimpleTextField(
                   initialValue: controller.editItem.value.email,
                   labelText: "Email",
                   onChanged: (val) {
@@ -97,7 +97,7 @@ class SupplierForm extends StatelessWidget {
                   },
                 ),
                 SizedBox(height: 30),
-                SimpleTextInput(
+                SimpleTextField(
                   initialValue: controller.editItem.value.phone,
                   labelText: "Phone",
                   keyboardType: TextInputType.phone,

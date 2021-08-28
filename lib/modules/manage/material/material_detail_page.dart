@@ -121,7 +121,7 @@ class MaterialForm extends StatelessWidget {
             children: [
               ImagePickerBox(enable: enable),
               SizedBox(height: 30),
-              SimpleTextInput(
+              SimpleTextField(
                 enable: enable,
                 initialValue: controller.editItem.value.name,
                 labelText: "Name",
@@ -130,27 +130,21 @@ class MaterialForm extends StatelessWidget {
                 },
               ),
               SizedBox(height: 30),
-              SimpleTextInput(
+              IntegerTextField(
                 enable: enable,
                 initialValue: controller.editItem.value.delivery?.toString(),
                 labelText: "Delivery Days",
-                keyboardType: TextInputType.number,
                 onChanged: (val) {
-                  if (GetUtils.isNumericOnly(val)) {
-                    controller.editItem.value.delivery = int.parse(val);
-                  }
+                  controller.editItem.value.delivery = int.parse(val);
                 },
               ),
               SizedBox(height: 30),
-              SimpleTextInput(
+              IntegerTextField(
                 enable: enable,
                 initialValue: controller.editItem.value.warning?.toString(),
                 labelText: "Warning Days",
-                keyboardType: TextInputType.number,
                 onChanged: (val) {
-                  if (GetUtils.isNumericOnly(val)) {
-                    controller.editItem.value.warning = int.parse(val);
-                  }
+                  controller.editItem.value.warning = int.parse(val);
                 },
               ),
               SizedBox(height: 30),
@@ -285,7 +279,7 @@ class OrderForm extends StatelessWidget {
               SizedBox(height: 30),
               SupplierSelect(),
               SizedBox(height: 30),
-              SimpleTextInput(
+              SimpleTextField(
                 initialValue: controller.newOrder.value.qty?.toString(),
                 labelText: "QTY",
                 keyboardType: TextInputType.number,

@@ -113,7 +113,7 @@ class CatalogForm extends StatelessWidget {
             child: Column(
               children: [
                 SizedBox(height: 30),
-                SimpleTextInput(
+                SimpleTextField(
                   initialValue: controller.editItem.value.name,
                   labelText: "Name",
                   onChanged: (val) {

@@ -121,7 +121,7 @@ class PrinterForm extends StatelessWidget {
                         // ),
                         ShopSelect(),
                         SizedBox(height: 30),
-                        SimpleTextInput(
+                        SimpleTextField(
                           key: Key('alias_${controller.radioValue}'),
                           initialValue: controller.editItem.value.alias,
                           labelText: "Nick Name",

@@ -1,12 +1,7 @@
-import 'package:bubble_tea/data/models/addition_model.dart';
 import 'package:bubble_tea/data/models/catalog_model.dart';
 import 'package:bubble_tea/data/models/dish_model.dart';
 import 'package:bubble_tea/data/models/material_model.dart';
-import 'package:bubble_tea/data/models/printer_model.dart';
-import 'package:bubble_tea/data/repositories/addition_repository.dart';
 import 'package:bubble_tea/data/repositories/dish_repository.dart';
-import 'package:bubble_tea/data/repositories/materia_repository.dart';
-import 'package:bubble_tea/data/repositories/printer_repository.dart';
 import 'package:bubble_tea/modules/manage/menu/menu_manage_controller.dart';
 import 'package:bubble_tea/utils/message_box.dart';
 import 'package:flutter/material.dart';
@@ -20,16 +15,13 @@ class DishDetailController extends GetxController {
 
   final MenuManageController _parent = Get.find<MenuManageController>();
 
-  var id = Get.arguments;
+  var itemId;
 
   var category = 1.obs;
 
-  var materials = <MaterialModel>[].obs;
-  var printers = <PrinterModel>[];
-  var printerMap = {};
-  var additions = <AdditionModel>[];
   var dishMaterials = <DishMaterialModel>[].obs;
-  var dishPrinters = <PrinterModel>[].obs;
+  var dishPrinters = <DishPrinterModel>[].obs;
+  var dishOptions = <DishOptionModel>[].obs;
 
   var editItem = DishModel().obs;
 
@@ -51,36 +43,59 @@ class DishDetailController extends GetxController {
       }
     });
 
-    if (id != null) {
-      // edit
-      var item = _parent.items.singleWhere((element) => element.id == id);
-      editItem.value = DishModel(
-          id: id,
-          img: item.img,
-          catalogId: item.catalogId,
-          name: item.name,
-          desc: item.desc,
-          price: item.price,
-          isPopular: item.isPopular);
-    } else {
+    itemId = Get.arguments;
+
+    if (itemId == "") {
       // new
       imagePath.value = "";
       editItem.value = DishModel();
       dishMaterials.value = <DishMaterialModel>[];
+    } else {
+      // edit
+      var item = _parent.items.singleWhere((element) => element.id == itemId);
+      var materials = item.materials.map((e) => DishMaterialModel(
+            id: e.id,
+            dishId: e.dishId,
+            materialId: e.materialId,
+            materialName: _parent.materials
+                .firstWhere((element) => element.id == e.materialId)
+                .name,
+            qty: e.qty,
+          ));
+
+      var options = item.options.map((e) => DishOptionModel(
+            id: e.id,
+            dishId: e.dishId,
+            additionId: _parent.additions
+                .firstWhere((element) =>
+                    element.options.any((element) => element.id == e.optionId))
+                .id,
+            optionId: e.optionId,
+            price: e.price,
+          ));
+
+      editItem.value = DishModel(
+        id: itemId,
+        img: item.img,
+        catalogId: item.catalogId,
+        name: item.name,
+        desc: item.desc,
+        price: item.price,
+        isPopular: item.isPopular,
+      )
+        ..materials = materials.toList()
+        ..printers = item.printers
+        ..options = options.toList();
+
+      dishMaterials.value = List.from(materials);
+      dishPrinters.value = List.from(item.printers);
+      dishOptions.value = List.from(options);
     }
   }
 
   @override
   void onReady() async {
     super.onReady();
-
-    materials.value = await Get.find<MaterialRepository>().getAll();
-    materials.sort((a, b) => a.name!.compareTo(b.name!));
-
-    printers = await Get.find<PrinterRepository>().getAll(showLoading: false);
-
-    printerMap = groupBy(printers, (PrinterModel p) => p.shopName);
-    additions = await Get.find<AdditionRepository>().getAll(showLoading: false);
   }
 
   @override
@@ -128,13 +143,14 @@ class DishDetailController extends GetxController {
       if (imagePath.value.isNotEmpty) {
         data["file_img"] = await dio.MultipartFile.fromFile(imagePath.value);
       }
-      if (id == null) {
+      if (itemId == null) {
         if (imagePath.value.isEmpty) {
           MessageBox.error('No image found');
           return;
         }
         var item = await repository.add(data);
         _parent.items.insert(0, item);
+        itemId = item.id;
       } else {
         var item = _parent.items
             .singleWhere((element) => element.id == editItem.value.id);
@@ -154,8 +170,10 @@ class DishDetailController extends GetxController {
           ..desc = result.desc
           ..price = result.price
           ..isPopular = result.isPopular;
-        // _parent.items.refresh();
+        _parent.items.refresh();
       }
+      editItem.refresh();
+      MessageBox.success();
     }
   }
 
@@ -164,6 +182,8 @@ class DishDetailController extends GetxController {
       (element) => element.materialName == v.name,
       orElse: () {
         var item = DishMaterialModel(
+          dishId: itemId,
+          materialId: v.id,
           materialName: v.name,
           qty: 0,
         );
@@ -181,40 +201,73 @@ class DishDetailController extends GetxController {
   }
 
   saveMaterial() async {
-    if (_existDish() &&
-        dishMaterials.length > 0 &&
-        !_compareListByItemIds(dishMaterials, editItem.value.materials)) {
-      // if (await repository.saveDishMaterials(dishMaterials)) {
-      //   editItem.value.printers = [];
+    if (_existDish()) {
+      // if (dishMaterials.length == 0) {
+      //   MessageBox.error("No materials to save");
       // }
+      if (_notEqualList(dishMaterials, editItem.value.materials)) {
+        var result = await repository.saveDishMaterials(itemId, dishMaterials);
+        if (result) {
+          editItem.value.materials = List.from(dishMaterials);
+
+          var item =
+              _parent.items.singleWhere((element) => element.id == itemId);
+          item.materials = List.from(dishMaterials);
+
+          MessageBox.success();
+        }
+      }
     }
   }
 
   addPrinter(String? id, bool add) {
     if (add) {
-      // dishPrinters.add();
+      dishPrinters.add(DishPrinterModel(
+        dishId: itemId,
+        printerId: id,
+      ));
     } else {
-      dishPrinters.removeWhere((element) => element.id == id);
+      dishPrinters.removeWhere((element) => element.printerId == id);
     }
   }
 
   savePrinter() async {
-    if (_existDish() &&
-        dishPrinters.length > 0 &&
-        !_compareListByItemIds(dishPrinters, editItem.value.printers)) {
-      // if (await repository.saveDishPrinters(dishPrinters)) {
-      //   editItem.value.printers = [];
-      // }
+    if (_existDish() && _notEqualList(dishPrinters, editItem.value.printers)) {
+      var result = await repository.saveDishPrinters(itemId, dishPrinters);
+      if (result) {
+        editItem.value.printers = List.from(dishPrinters);
+
+        var item = _parent.items.singleWhere((element) => element.id == itemId);
+        item.printers = List.from(dishPrinters);
+
+        MessageBox.success();
+      }
+    }
+  }
+
+  addAddition(String? id, String? additionId, bool add) {
+    if (add) {
+      dishOptions.add(DishOptionModel(
+        dishId: itemId,
+        additionId: additionId,
+        optionId: id,
+      ));
+    } else {
+      dishOptions.removeWhere((element) => element.optionId == id);
     }
   }
 
   saveAddition() async {
-    if (_existDish() &&
-        dishPrinters.length > 0 &&
-        !_compareListByItemIds(dishPrinters, editItem.value.printers)) {
-      // if (await repository.saveDishPrinters(dishPrinters)) {
-      //   editItem.value.printers = [];
-      // }
+    if (_existDish() && _notEqualList(dishOptions, editItem.value.options)) {
+      var result = await repository.saveDishOptions(itemId, dishOptions);
+      if (result) {
+        editItem.value.options = List.from(dishOptions);
+
+        var item = _parent.items.singleWhere((element) => element.id == itemId);
+        item.options = List.from(dishOptions);
+
+        MessageBox.success();
+      }
     }
   }
 
@@ -226,12 +279,13 @@ class DishDetailController extends GetxController {
     return true;
   }
 
-  bool _compareListByItemIds(List list1, List list2) {
-    var list3 = list1.map((e) => e["id"]).toList();
-    list3.sort();
-    var list4 = list1.map((e) => e["id"]).toList();
-    list4.sort();
+  bool _notEqualList(List list1, List list2) {
+    if (list1.length == list2.length) {
+      if (DeepCollectionEquality.unordered().equals(list1, list2)) {
+        return false;
+      }
+    }
 
-    return list3.join() == list4.join();
+    return true;
   }
 }

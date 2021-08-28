@@ -90,7 +90,7 @@ class ShopForm extends StatelessWidget {
                 //       )
                 //     : SizedBox()),
                 SizedBox(height: 30),
-                SimpleTextInput(
+                SimpleTextField(
                   initialValue: controller.editItem.value.name,
                   labelText: "Name",
                   onChanged: (val) {
@@ -98,7 +98,7 @@ class ShopForm extends StatelessWidget {
                   },
                 ),
                 SizedBox(height: 30),
-                SimpleTextInput(
+                SimpleTextField(
                   initialValue: controller.editItem.value.address,
                   labelText: "Address",
                   onChanged: (val) {
@@ -106,7 +106,7 @@ class ShopForm extends StatelessWidget {
                   },
                 ),
                 SizedBox(height: 30),
-                SimpleTextInput(
+                SimpleTextField(
                   initialValue: controller.editItem.value.phone,
                   labelText: "Phone",
                   keyboardType: TextInputType.phone,

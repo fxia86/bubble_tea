@@ -136,7 +136,7 @@ class AdditionForm extends StatelessWidget {
             child: Column(
               children: [
                 SizedBox(height: 30),
-                SimpleTextInput(
+                SimpleTextField(
                   initialValue: controller.editItem.value.name,
                   labelText: "Name",
                   onChanged: (val) {
@@ -178,7 +178,7 @@ class OptionForm extends StatelessWidget {
           padding: EdgeInsets.fromLTRB(20, 20, 20, 0),
           child: Column(
             children: [
-              SimpleTextInput(
+              SimpleTextField(
                 initialValue: controller.editOptionItem.value.name,
                 labelText: "Option Name",
                 onChanged: (val) {

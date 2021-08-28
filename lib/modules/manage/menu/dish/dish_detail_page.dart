@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:bubble_tea/data/models/catalog_model.dart';
 import 'package:bubble_tea/modules/manage/menu/menu_manage_controller.dart';
+import 'package:bubble_tea/utils/common_utils.dart';
 import 'package:bubble_tea/widgets/simple_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -17,10 +18,11 @@ class DishDetailPage extends GetView<DishDetailController> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          title: Text(
-        "Dish Detail",
-        style: Get.textTheme.headline5?.copyWith(fontWeight: FontWeight.w500),
-      )),
+        title: Text(
+          "Dish Detail",
+          style: Get.textTheme.headline5?.copyWith(fontWeight: FontWeight.w500),
+        ),
+      ),
       body: Container(
         margin: EdgeInsets.only(top: 20),
         child: Row(
@@ -128,6 +130,7 @@ class DishForm extends StatelessWidget {
 
   final controller = Get.find<DishDetailController>();
   final bool enable;
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -143,7 +146,7 @@ class DishForm extends StatelessWidget {
               SizedBox(height: 20),
               CatalogSelect(),
               SizedBox(height: 20),
-              SimpleTextInput(
+              SimpleTextField(
                 initialValue: controller.editItem.value.name,
                 labelText: "Name",
                 onChanged: (val) {
@@ -151,30 +154,39 @@ class DishForm extends StatelessWidget {
                 },
               ),
               SizedBox(height: 20),
-              SimpleTextInput(
+              SimpleTextField(
                 initialValue: controller.editItem.value.desc,
                 labelText: "Description",
                 maxLines: 3,
-                maxLength: 200,
                 onChanged: (val) {
                   controller.editItem.value.desc = val.trim();
                 },
               ),
               SizedBox(height: 20),
-              SimpleTextInput(
-                enable: enable,
-                initialValue:
-                    controller.editItem.value.price?.toStringAsFixed(2),
+              MoneyTextField(
+                initialValue: controller.editItem.value.price == 0
+                    ? ""
+                    : "${(controller.editItem.value.price! / 100).toString()}",
                 labelText: "Price",
-                prefixText: "€  ",
-                keyboardType: TextInputType.number,
                 onChanged: (val) {
-                  if (GetUtils.isNum(val)) {
-                    controller.editItem.value.price =
-                        (double.parse(val) * 100).toInt();
-                  }
+                  controller.editItem.value.price = CommonUtils.getMoney(val);
                 },
               ),
+              // SimpleTextInput(
+              //   enable: enable,
+              //   initialValue: controller.editItem.value.price == null
+              //       ? ""
+              //       : "${(controller.editItem.value.price! / 100).toString()}",
+              //   labelText: "Price",
+              //   prefixText: "€  ",
+              //   keyboardType: TextInputType.number,
+              //   onChanged: (val) {
+              //     if (GetUtils.isNum(val)) {
+              //       controller.editItem.value.price =
+              //           (double.parse(val) * 100).ceil();
+              //     }
+              //   },
+              // ),
               Obx(() => CheckboxListTile(
                     contentPadding: EdgeInsets.only(left: 0),
                     title: Text("Popular List", style: Get.textTheme.bodyText1),

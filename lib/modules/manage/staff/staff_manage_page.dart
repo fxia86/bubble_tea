@@ -87,7 +87,7 @@ class StaffForm extends StatelessWidget {
                 SizedBox(height: 30),
                 ShopSelect(),
                 SizedBox(height: 30),
-                SimpleTextInput(
+                SimpleTextField(
                   initialValue: controller.editItem.value.name,
                   labelText: "Name",
                   onChanged: (val) {
@@ -95,7 +95,7 @@ class StaffForm extends StatelessWidget {
                   },
                 ),
                 SizedBox(height: 30),
-                SimpleTextInput(
+                SimpleTextField(
                   initialValue: controller.editItem.value.email,
                   labelText: "Email",
                   onChanged: (val) {
@@ -103,7 +103,7 @@ class StaffForm extends StatelessWidget {
                   },
                 ),
                 SizedBox(height: 30),
-                SimpleTextInput(
+                SimpleTextField(
                   initialValue: controller.editItem.value.phone,
                   labelText: "Phone",
                   keyboardType: TextInputType.phone,

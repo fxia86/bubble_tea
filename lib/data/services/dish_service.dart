@@ -26,11 +26,31 @@ class DishService {
     return response;
   }
 
-  Future<bool> reorder(id, oldIndex, newIndex,
-      {bool showLoading = true}) async {
+  reorder(id, oldIndex, newIndex, {bool showLoading = true}) async {
     var response = await http.get('${ServiceUrl.DISH}/reorder',
         showLoading: showLoading,
         params: {"id": id, "oldIndex": oldIndex, "newIndex": newIndex});
+
+    return response;
+  }
+
+  saveDishMaterials(id, dishMaterials) async {
+    var response =
+        await http.post('${ServiceUrl.DISH}/$id/material', data: dishMaterials);
+
+    return response;
+  }
+
+  saveDishPrinters(id, dishPrinters) async {
+    var response =
+        await http.post('${ServiceUrl.DISH}/$id/printer', data: dishPrinters);
+
+    return response;
+  }
+  
+  saveDishOptions(id, dishOptions) async {
+    var response =
+        await http.post('${ServiceUrl.DISH}/$id/option', data: dishOptions);
 
     return response;
   }
