@@ -11,40 +11,18 @@ import 'staff_manage_controller.dart';
 class StaffManagePage extends GetView<StaffManageController> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: Stack(
-          children: [
-            Row(
-              children: [
-                Left(),
-                Expanded(
-                  child: Column(
-                    children: [
-                      Top(
-                        "Staff Manage",
-                        search: (val) => controller.keywords(val),
-                        add: controller.add,
-                      ),
-                      Expanded(
-                        child: Container(
-                          padding: EdgeInsets.symmetric(horizontal: 24),
-                          child: Scrollbar(
-                            child: ListView(
-                              children: [StaffTable()],
-                            ),
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            Obx(() => controller.showForm.value ? StaffForm() : SizedBox())
-          ],
+    return BodyLayout(
+      top: Top(
+        "Staff Manage",
+        search: (val) => controller.keywords(val),
+        add: controller.add,
+      ),
+      body: Scrollbar(
+        child: ListView(
+          children: [StaffTable()],
         ),
       ),
+      other: Obx(() => controller.showForm.value ? StaffForm() : SizedBox()),
     );
   }
 }

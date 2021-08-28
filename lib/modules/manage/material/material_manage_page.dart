@@ -9,44 +9,21 @@ import 'material_manage_controller.dart';
 class MaterialManagePage extends GetView<MaterialManageController> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: Stack(
-          children: [
-            Row(
-              children: [
-                Left(),
-                Expanded(
-                  child: Column(
-                    children: [
-                      Top(
-                        "Material Manage",
-                        search: (val) => controller.keywords(val),
-                        add: controller.add,
-                      ),
-                      Expanded(
-                        child: Container(
-                          padding: EdgeInsets.symmetric(horizontal: 24),
-                          child: Scrollbar(
-                            child: ListView(
-                              children: [MaterialTable()],
-                            ),
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            Obx(() => controller.showForm.value
-                ? DialogForm(
-                    onWillPop: () => controller.showForm(false),
-                    form: MaterialForm())
-                : SizedBox())
-          ],
+    return BodyLayout(
+      top: Top(
+        "Material Manage",
+        search: (val) => controller.keywords(val),
+        add: controller.add,
+      ),
+      body: Scrollbar(
+        child: ListView(
+          children: [MaterialTable()],
         ),
       ),
+      other: Obx(() => controller.showForm.value
+          ? DialogForm(
+              onWillPop: () => controller.showForm(false), form: MaterialForm())
+          : SizedBox()),
     );
   }
 }

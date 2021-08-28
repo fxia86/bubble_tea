@@ -9,36 +9,14 @@ import 'addition_manage_controller.dart';
 class AdditionManagePage extends GetView<AdditionManageController> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: Stack(
-          children: [
-            Row(
-              children: [
-                Left(),
-                Expanded(
-                  child: Column(
-                    children: [
-                      Top(
-                        "Addition Manage",
-                        search: (val) => controller.keywords(val),
-                        add: controller.add,
-                      ),
-                      Expanded(
-                        child: Container(
-                          padding: EdgeInsets.symmetric(horizontal: 24),
-                          child: AdditionList(),
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            Obx(() => controller.showForm.value ? AdditionForm() : SizedBox())
-          ],
-        ),
+    return BodyLayout(
+      top: Top(
+        "Addition Manage",
+        search: (val) => controller.keywords(val),
+        add: controller.add,
       ),
+      body: AdditionList(),
+      other: Obx(() => controller.showForm.value ? AdditionForm() : SizedBox()),
     );
   }
 }

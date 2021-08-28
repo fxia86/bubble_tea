@@ -9,40 +9,18 @@ import 'supplier_manage_controller.dart';
 class SupplierManagePage extends GetView<SupplierManageController> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: Stack(
-          children: [
-            Row(
-              children: [
-                Left(),
-                Expanded(
-                  child: Column(
-                    children: [
-                      Top(
-                        "Supplier Manage",
-                        search: (val) => controller.keywords(val),
-                        add: controller.add,
-                      ),
-                      Expanded(
-                        child: Container(
-                          padding: EdgeInsets.symmetric(horizontal: 24),
-                          child: Scrollbar(
-                            child: ListView(
-                              children: [SupplierTable()],
-                            ),
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            Obx(() => controller.showForm.value ? SupplierForm() : SizedBox())
-          ],
+    return BodyLayout(
+      top: Top(
+        "Supplier Manage",
+        search: (val) => controller.keywords(val),
+        add: controller.add,
+      ),
+      body: Scrollbar(
+        child: ListView(
+          children: [SupplierTable()],
         ),
       ),
+      other: Obx(() => controller.showForm.value ? SupplierForm() : SizedBox()),
     );
   }
 }

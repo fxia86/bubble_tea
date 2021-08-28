@@ -9,40 +9,18 @@ import 'shop_manage_controller.dart';
 class ShopManagePage extends GetView<ShopManageController> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: Stack(
-          children: [
-            Row(
-              children: [
-                Left(),
-                Expanded(
-                  child: Column(
-                    children: [
-                      Top(
-                        "Shop Manage",
-                        search: (val) => controller.keywords(val),
-                        add: controller.add,
-                      ),
-                      Expanded(
-                        child: Container(
-                          padding: EdgeInsets.symmetric(horizontal: 24),
-                          child: Scrollbar(
-                            child: ListView(
-                              children: [ShopTable()],
-                            ),
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            Obx(() => controller.showForm.value ? ShopForm() : SizedBox())
-          ],
+    return BodyLayout(
+      top: Top(
+        "Shop Manage",
+        search: (val) => controller.keywords(val),
+        add: controller.add,
+      ),
+      body: Scrollbar(
+        child: ListView(
+          children: [ShopTable()],
         ),
       ),
+      other: Obx(() => controller.showForm.value ? ShopForm() : SizedBox()),
     );
   }
 }

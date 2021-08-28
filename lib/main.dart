@@ -2,11 +2,9 @@ import 'package:bubble_tea/app_theme.dart';
 import 'package:bubble_tea/init.dart';
 import 'package:bubble_tea/modules/login/login_binding.dart';
 import 'package:bubble_tea/modules/login/login_page.dart';
-import 'package:bubble_tea/modules/manage/printer/printer_manage_binding.dart';
-import 'package:bubble_tea/modules/manage/printer/printer_manage_page.dart';
 import 'package:bubble_tea/routes/pages.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+// import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
 void main() async {

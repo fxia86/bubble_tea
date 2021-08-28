@@ -1,4 +1,3 @@
-import 'package:bubble_tea/r.dart';
 import 'package:bubble_tea/routes/pages.dart';
 import 'package:bubble_tea/widgets/body_layout.dart';
 import 'package:flutter/material.dart';
@@ -9,30 +8,12 @@ import 'menu_manage_controller.dart';
 class MenuManagePage extends GetView<MenuManageController> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: Row(
-          children: [
-            Left(),
-            Expanded(
-              child: Column(
-                children: [
-                  Top(
-                    "Menu Manage",
-                    add: () => Get.toNamed(Routes.MANAGE_MENU_DISH),
-                  ),
-                  Expanded(
-                    child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 24),
-                      child: Menu(),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
+    return BodyLayout(
+      top: Top(
+        "Menu Manage",
+        add: () => Get.toNamed(Routes.MANAGE_MENU_DISH),
       ),
+      body: Menu(),
     );
   }
 }

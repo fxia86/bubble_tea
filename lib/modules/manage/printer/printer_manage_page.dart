@@ -10,43 +10,26 @@ import 'printer_manage_controller.dart';
 class PrinterManagePage extends GetView<PrinterManageController> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: Row(
-          children: [
-            Left(),
-            Expanded(
-              child: Column(
-                children: [
-                  Top(
-                    "Printer Manage",
-                  ),
-                  Expanded(
-                    child: Container(
-                        padding: EdgeInsets.symmetric(horizontal: 24),
-                        child: Column(
-                          children: [
-                            Container(
-                                color: Colors.white,
-                                width: context.width,
-                                height: context.height * 0.35,
-                                child: PrinterForm()),
-                            SizedBox(height: 24),
-                            Expanded(
-                              child: Container(
-                                color: Colors.white,
-                                width: context.width,
-                                child: PrinterTable(),
-                              ),
-                            )
-                          ],
-                        )),
-                  )
-                ],
-              ),
+    return BodyLayout(
+      top: Top(
+        "Printer Manage",
+      ),
+      body: Column(
+        children: [
+          Container(
+              color: Colors.white,
+              width: context.width,
+              height: context.height * 0.35,
+              child: PrinterForm()),
+          SizedBox(height: 24),
+          Expanded(
+            child: Container(
+              color: Colors.white,
+              width: context.width,
+              child: PrinterTable(),
             ),
-          ],
-        ),
+          )
+        ],
       ),
     );
   }

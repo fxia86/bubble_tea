@@ -3,43 +3,20 @@ import 'package:bubble_tea/widgets/dialog_form.dart';
 import 'package:bubble_tea/widgets/simple_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:reorderables/reorderables.dart';
 
 import 'catalog_manage_controller.dart';
 
 class CatalogManagePage extends GetView<CatalogManageController> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: Stack(
-          children: [
-            Row(
-              children: [
-                Left(),
-                Expanded(
-                  child: Column(
-                    children: [
-                      Top(
-                        "Catalog Manage",
-                        search: (val) => controller.keywords(val),
-                        add: controller.add,
-                      ),
-                      Expanded(
-                        child: Container(
-                          padding: EdgeInsets.symmetric(horizontal: 24),
-                          child: CatalogTable(),
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            Obx(() => controller.showForm.value ? CatalogForm() : SizedBox())
-          ],
-        ),
+    return BodyLayout(
+      top: Top(
+        "Catalog Manage",
+        search: (val) => controller.keywords(val),
+        add: controller.add,
       ),
+      body: CatalogTable(),
+      other: Obx(() => controller.showForm.value ? CatalogForm() : SizedBox()),
     );
   }
 }

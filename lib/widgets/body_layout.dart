@@ -3,6 +3,48 @@ import 'package:bubble_tea/routes/pages.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+class BodyLayout extends StatelessWidget {
+  BodyLayout({Key? key, required this.top, required this.body, this.other})
+      : super(key: key);
+
+  final Top top;
+  final Widget body;
+  final Widget? other;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: SafeArea(
+        child: Stack(
+          children: [
+            Row(
+              children: [
+                Left(),
+                Expanded(
+                  child: Column(
+                    children: [
+                      top,
+                      Expanded(
+                        child: Container(
+                          padding: EdgeInsets.symmetric(horizontal: 24),
+                          child: body,
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            Container(
+              child: other,
+            )
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class Left extends StatelessWidget {
   const Left({Key? key}) : super(key: key);
 
