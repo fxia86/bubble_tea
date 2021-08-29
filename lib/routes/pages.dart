@@ -14,6 +14,9 @@ import 'package:bubble_tea/modules/manage/printer/printer_manage_binding.dart';
 import 'package:bubble_tea/modules/manage/printer/printer_manage_page.dart';
 import 'package:bubble_tea/modules/manage/shop/shop_manage_binding.dart';
 import 'package:bubble_tea/modules/manage/shop/shop_manage_page.dart';
+import 'package:bubble_tea/modules/manage/special/bundle/bundle_page.dart';
+import 'package:bubble_tea/modules/manage/special/discount/discount_page.dart';
+import 'package:bubble_tea/modules/manage/special/price/price_page.dart';
 import 'package:bubble_tea/modules/manage/special/special_manage_binding.dart';
 import 'package:bubble_tea/modules/manage/special/special_manage_page.dart';
 import 'package:bubble_tea/modules/manage/staff/staff_manage_binding.dart';
@@ -64,15 +67,15 @@ class Pages {
       binding: AdditionManageBinding(),
     ),
     GetPage(
-        name: Routes.MANAGE_MENU,
-        page: () => MenuManagePage(),
-        binding: MenuManageBinding(),
-        ),
-        GetPage(
-            name: Routes.MANAGE_MENU_DISH,
-            page: () => DishDetailPage(),
-            binding: DishDetailBinding(),
-          ),
+      name: Routes.MANAGE_MENU,
+      page: () => MenuManagePage(),
+      binding: MenuManageBinding(),
+    ),
+    GetPage(
+      name: Routes.MANAGE_MENU_DISH,
+      page: () => DishDetailPage(),
+      binding: DishDetailBinding(),
+    ),
     GetPage(
       name: Routes.MANAGE_MATERIAL,
       page: () => MaterialManagePage(),
@@ -84,9 +87,24 @@ class Pages {
       binding: PrinterManageBinding(),
     ),
     GetPage(
-      name: Routes.MANAGE_SPECIALOFFER,
+      name: Routes.MANAGE_SPECIAL,
       page: () => SpecialManagePage(),
       binding: SpecialManageBinding(),
-    )
+    ),
+    GetPage(
+      name: Routes.MANAGE_SPECIAL_DISCOUNT,
+      page: () => DiscountPage(),
+      binding: SpecialManageBinding(),
+    ),
+    GetPage(
+      name: Routes.MANAGE_SPECIAL_BUNDLE,
+      page: () => BundlePage(),
+      binding: SpecialManageBinding(),
+    ),
+    GetPage(
+      name: Routes.MANAGE_SPECIAL_PRICE,
+      page: () => PricePage(),
+      binding: SpecialManageBinding(),
+    ),
   ];
 }

@@ -79,11 +79,11 @@ class SupplierManageController extends GetxController {
       MessageBox.error('Invalid name');
     } else if (editItem.value.email == null ||
         editItem.value.email!.isEmpty ||
-        !GetUtils.isEmail(editItem.value.email!)) {
+        !editItem.value.email!.isEmail) {
       MessageBox.error('Invalid email');
     } else if (editItem.value.phone == null ||
         editItem.value.phone!.isEmpty ||
-        !GetUtils.isPhoneNumber(editItem.value.phone!)) {
+        !editItem.value.phone!.isPhoneNumber) {
       MessageBox.error('Invalid phone');
     } else {
       final idx = items.indexWhere((element) =>

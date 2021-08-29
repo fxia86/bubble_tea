@@ -181,7 +181,7 @@ class DishForm extends StatelessWidget {
               //   prefixText: "€  ",
               //   keyboardType: TextInputType.number,
               //   onChanged: (val) {
-              //     if (GetUtils.isNum(val)) {
+              //     if (val.isNum) {
               //       controller.editItem.value.price =
               //           (double.parse(val) * 100).ceil();
               //     }

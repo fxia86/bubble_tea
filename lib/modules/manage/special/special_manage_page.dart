@@ -1,4 +1,6 @@
-import 'package:bubble_tea/widgets/navi_bar.dart';
+import 'package:bubble_tea/routes/pages.dart';
+import 'package:bubble_tea/widgets/body_layout.dart';
+import 'package:bubble_tea/widgets/my_icon_button.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -7,16 +9,189 @@ import 'special_manage_controller.dart';
 class SpecialManagePage extends GetView<SpecialManageController> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Special Manage"),
+    return BodyLayout(
+      top: Top(
+        "Shop Manage",
+        // search: (val) => controller.keywords(val),
+        add: () {
+          switch (controller.category.value) {
+            case 1:
+              Get.toNamed(Routes.MANAGE_SPECIAL_DISCOUNT);
+              break;
+            case 2:
+              Get.toNamed(Routes.MANAGE_SPECIAL_BUNDLE);
+              break;
+            case 3:
+              Get.toNamed(Routes.MANAGE_SPECIAL_PRICE);
+              break;
+            default:
+              return;
+          }
+        },
       ),
-      drawer: Drawer(
-        child: NaviBar(),
-      ),
-      body: Center(
-        child: Text("Special Manage"),
+      body: Column(
+        children: [
+          Row(
+            children: [
+              CategoryButton(category: 1),
+              Container(
+                color: Get.theme.dividerColor,
+                height: 20,
+                width: 2,
+                margin: EdgeInsets.symmetric(horizontal: 20),
+              ),
+              CategoryButton(category: 2),
+              Container(
+                color: Get.theme.dividerColor,
+                height: 20,
+                width: 2,
+                margin: EdgeInsets.symmetric(horizontal: 20),
+              ),
+              CategoryButton(category: 3),
+            ],
+          ),
+          Expanded(
+            child: Scrollbar(
+              child: ListView(
+                children: [
+                  Container(
+                    color: Colors.white,
+                    child: Obx(() {
+                      switch (controller.category.value) {
+                        case 1:
+                          return DiscountTable();
+                        case 2:
+                          return DiscountTable();
+                        case 3:
+                          return PriceTable();
+                        default:
+                          return SizedBox();
+                      }
+                    }),
+                  )
+                ],
+              ),
+            ),
+          )
+        ],
       ),
     );
+  }
+}
+
+class CategoryButton extends StatelessWidget {
+  CategoryButton({Key? key, required this.category}) : super(key: key);
+
+  final controller = Get.find<SpecialManageController>();
+  final int category;
+
+  @override
+  Widget build(BuildContext context) {
+    return Obx(() {
+      var text = "";
+      switch (category) {
+        case 1:
+          text = "Buy 1 get 1";
+          break;
+        case 2:
+          text = "Bundle";
+          break;
+        case 3:
+          text = "Price";
+          break;
+        default:
+      }
+
+      final selected = controller.category.value == category;
+      return Container(
+        child: TextButton(
+            onPressed: selected ? null : () => controller.category(category),
+            child: Text(
+              text,
+              style: Get.textTheme.headline5?.copyWith(
+                  fontWeight: FontWeight.w500,
+                  color: selected ? Get.theme.primaryColor : Colors.black87),
+            )),
+      );
+    });
+  }
+}
+
+class DiscountTable extends StatelessWidget {
+  final controller = Get.find<SpecialManageController>();
+
+  @override
+  Widget build(BuildContext context) {
+    return Obx(() => DataTable(
+          columns: [
+            DataColumn(label: Text('Name')),
+            DataColumn(label: Text('Discount')),
+            DataColumn(label: Text('')),
+          ],
+          rows: [
+            for (var item in controller.discounts)
+              DataRow(cells: [
+                DataCell(Text(item.dishName ?? "")),
+                DataCell(Text("${item.discount}%")),
+                DataCell(Row(
+                  children: [
+                    ScaleIconButton(
+                      onPressed: () => Get.toNamed(
+                          Routes.MANAGE_SPECIAL_DISCOUNT,
+                          arguments: item),
+                      icon: Icon(Icons.edit),
+                      color: Colors.orange,
+                    ),
+                    ScaleIconButton(
+                      onPressed: () => controller.deleteConfirm(item.id),
+                      icon: Icon(Icons.delete),
+                      color: Colors.red,
+                    ),
+                  ],
+                )),
+              ])
+          ],
+        ));
+  }
+}
+
+class PriceTable extends StatelessWidget {
+  final controller = Get.find<SpecialManageController>();
+
+  @override
+  Widget build(BuildContext context) {
+    return Obx(() => DataTable(
+          columns: [
+            DataColumn(label: Text('Name')),
+            DataColumn(label: Text('Original Price')),
+            DataColumn(label: Text('Special Price')),
+            DataColumn(label: Text('Available Date')),
+            DataColumn(label: Text('')),
+          ],
+          rows: [
+            for (var item in controller.prices)
+              DataRow(cells: [
+                DataCell(Text(item.dishName ?? "")),
+                DataCell(Text("€  ${item.oriPrice}")),
+                DataCell(Text("€  ${item.offerPrice}")),
+                DataCell(Text("${item.start} - ${item.end}")),
+                DataCell(Row(
+                  children: [
+                    ScaleIconButton(
+                      onPressed: () => Get.toNamed(Routes.MANAGE_SPECIAL_PRICE,
+                          arguments: item),
+                      icon: Icon(Icons.edit),
+                      color: Colors.orange,
+                    ),
+                    ScaleIconButton(
+                      onPressed: () => controller.deleteConfirm(item.id),
+                      icon: Icon(Icons.delete),
+                      color: Colors.red,
+                    ),
+                  ],
+                )),
+              ])
+          ],
+        ));
   }
 }

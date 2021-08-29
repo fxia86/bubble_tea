@@ -284,7 +284,7 @@ class OrderForm extends StatelessWidget {
                 labelText: "QTY",
                 keyboardType: TextInputType.number,
                 onChanged: (val) {
-                  if (GetUtils.isNumericOnly(val)) {
+                  if (val.isNumericOnly) {
                     controller.newOrder.value.qty = int.parse(val);
                   }
                 },

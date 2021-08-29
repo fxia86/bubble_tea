@@ -59,7 +59,7 @@ class NaviBar extends StatelessWidget {
           _item(Icon(Icons.ac_unit), "Printer",
               () => Get.offNamed(Routes.MANAGE_PRINTER)),
           _item(Icon(Icons.ac_unit), "Special Offer",
-              () => Get.offNamed(Routes.MANAGE_SPECIALOFFER)),
+              () => Get.offNamed(Routes.MANAGE_SPECIAL)),
               
         ],
       ),

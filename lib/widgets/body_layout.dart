@@ -128,7 +128,7 @@ class Left extends StatelessWidget {
                     iconData: Icons.print),
                 NaviItem(
                     text: "Special Offer",
-                    routeName: Routes.MANAGE_SPECIALOFFER,
+                    routeName: Routes.MANAGE_SPECIAL,
                     iconData: Icons.local_offer),
               ],
             ),

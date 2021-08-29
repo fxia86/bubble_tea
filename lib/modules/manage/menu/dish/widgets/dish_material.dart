@@ -156,8 +156,7 @@ class MaterialShuttle extends StatelessWidget {
                                               focusNode:
                                                   controller.qtyFocusNode,
                                               onChanged: (val) {
-                                                if (GetUtils.isNumericOnly(
-                                                    val)) {
+                                                if (val.isNumericOnly) {
                                                   controller.dishMaterials[i]
                                                       .qty = int.parse(val);
                                                   // controller.dishMaterials[i]

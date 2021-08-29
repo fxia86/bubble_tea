@@ -46,7 +46,7 @@ class SimpleTextField extends StatelessWidget {
         labelText: labelText,
         labelStyle: TextStyle(fontSize: enable! ? 20 : 24),
         suffixText: suffixText,
-        suffixStyle: TextStyle(fontSize: 20),
+        suffixStyle: TextStyle(fontSize: 20, color: Colors.black87),
       ),
       inputFormatters: formatter,
       // validator: (val) {
@@ -125,12 +125,14 @@ class IntegerTextField extends StatelessWidget {
     Key? key,
     this.initialValue,
     this.labelText,
+    this.suffixText,
     this.enable = true,
     this.onChanged,
   }) : super(key: key);
 
   final String? initialValue;
   final String? labelText;
+  final String? suffixText;
   final bool? enable;
   final ValueChanged<String>? onChanged;
 
@@ -140,6 +142,7 @@ class IntegerTextField extends StatelessWidget {
       enable: enable,
       initialValue: initialValue,
       labelText: labelText,
+      suffixText: suffixText,
       keyboardType: TextInputType.number,
       onChanged: onChanged,
       inputFormatters: [

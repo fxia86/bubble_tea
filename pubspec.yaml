@@ -35,6 +35,7 @@ dependencies:
   reorderables: ^0.4.1
   google_fonts: ^2.1.0
   blue_thermal_printer: ^1.1.4
+  syncfusion_flutter_datepicker: ^19.2.57
   # shared_preferences: ^2.0.6
   # connectivity_plus: ^1.0.6
 

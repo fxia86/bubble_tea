@@ -38,7 +38,7 @@ class LoginController extends GetxController {
   }
 
   void onLogin() async {
-    if (!GetUtils.isEmail(email)) {
+    if (!email.isEmail) {
       MessageBox.error('Invalid email');
     } else if (password.isEmpty) {
       MessageBox.error("Invalid password");

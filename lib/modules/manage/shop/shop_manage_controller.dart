@@ -84,7 +84,7 @@ class ShopManageController extends GetxController {
       MessageBox.error('Invalid address');
     } else if (editItem.value.phone == null ||
         editItem.value.phone!.isEmpty ||
-        !GetUtils.isPhoneNumber(editItem.value.phone!)) {
+        !editItem.value.phone!.isPhoneNumber) {
       MessageBox.error('Invalid phone');
     } else {
       final idx = items.indexWhere((element) =>

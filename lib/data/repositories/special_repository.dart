@@ -1,27 +1,44 @@
-import 'package:bubble_tea/data/services/shop/shop_service.dart';
+import 'package:bubble_tea/data/models/special_model.dart';
+import 'package:bubble_tea/data/services/special_service.dart';
 import 'package:get/get.dart';
 
+class SpecialDiscountRepository {
+  final SpecialDiscountService service = Get.find<SpecialDiscountService>();
 
-class SpecialRepository {
-  final ShopService service = Get.find<ShopService>();
+  Future<List<SpecialDiscountModel>> getAll({bool showLoading = true}) async {
+    var data = await service.getAll(showLoading: showLoading);
+    var items = List.castFrom(data)
+        .map((v) => SpecialDiscountModel.fromJson(v))
+        .toList();
+    return items;
+  }
 
-  // getAll() {
-  //   return api.getAll();
-  // }
+  Future<SpecialDiscountModel> save(SpecialDiscountModel model) async {
+    var data = await service.save(model);
+    return SpecialDiscountModel.fromJson(data);
+  }
 
-  // getId(id) {
-  //   return api.getId(id);
-  // }
+  Future<bool> delete(String? id) async {
+    return await service.delete(id);
+  }
+}
 
-  // delete(id) {
-  //   return api.delete(id);
-  // }
+class SpecialPriceRepository {
+  final SpecialPriceService service = Get.find<SpecialPriceService>();
 
-  // edit(obj) {
-  //   return api.edit(obj);
-  // }
+  Future<List<SpecialPriceModel>> getAll({bool showLoading = true}) async {
+    var data = await service.getAll(showLoading: showLoading);
+    var items =
+        List.castFrom(data).map((v) => SpecialPriceModel.fromJson(v)).toList();
+    return items;
+  }
 
-  // add(obj) {
-  //   return api.add(obj);
-  // }
+  Future<SpecialPriceModel> save(SpecialPriceModel model) async {
+    var data = await service.save(model);
+    return SpecialPriceModel.fromJson(data);
+  }
+
+  Future<bool> delete(String? id) async {
+    return await service.delete(id);
+  }
 }
