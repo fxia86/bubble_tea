@@ -1,4 +1,5 @@
 import 'package:bubble_tea/data/models/material_model.dart';
+import 'package:bubble_tea/widgets/my_icon_button.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -189,7 +190,7 @@ class MaterialShuttle extends StatelessWidget {
                                                           .theme.primaryColor),
                                             ),
                                           )),
-                                    IconButton(
+                                    ScaleIconButton(
                                       onPressed: () =>
                                           controller.removeMaterial(i),
                                       icon: Icon(Icons.close),

@@ -1,5 +1,6 @@
 import 'package:bubble_tea/widgets/body_layout.dart';
 import 'package:bubble_tea/widgets/dialog_form.dart';
+import 'package:bubble_tea/widgets/my_icon_button.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -69,7 +70,7 @@ class MaterialTable extends StatelessWidget {
                 DataCell(
                   Row(
                     children: [
-                      IconButton(
+                      ScaleIconButton(
                         onPressed: () async {
                           await controller.detail(item.id);
                           Get.dialog(MaterialDetail());
@@ -77,12 +78,12 @@ class MaterialTable extends StatelessWidget {
                         icon: Icon(Icons.view_sidebar),
                         color: Colors.green,
                       ),
-                      IconButton(
+                      ScaleIconButton(
                         onPressed: () => controller.edit(item.id),
                         icon: Icon(Icons.edit),
                         color: Colors.amber,
                       ),
-                      IconButton(
+                      ScaleIconButton(
                         onPressed: () => controller.deleteConfirm(item.id),
                         icon: Icon(Icons.delete),
                         color: Colors.redAccent,

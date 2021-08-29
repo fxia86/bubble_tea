@@ -1,5 +1,6 @@
 import 'package:bubble_tea/widgets/body_layout.dart';
 import 'package:bubble_tea/widgets/dialog_form.dart';
+import 'package:bubble_tea/widgets/my_icon_button.dart';
 import 'package:bubble_tea/widgets/simple_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -59,13 +60,13 @@ class CatalogTable extends StatelessWidget {
                             style: Get.textTheme.bodyText1),
                         ButtonBar(
                           children: [
-                            IconButton(
+                            ScaleIconButton(
                               onPressed: () =>
                                   controller.edit(controller.items[index].id),
                               icon: Icon(Icons.edit),
                               color: Colors.orange,
                             ),
-                            IconButton(
+                            ScaleIconButton(
                               onPressed: () => controller
                                   .deleteConfirm(controller.items[index].id),
                               icon: Icon(Icons.delete),

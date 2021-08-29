@@ -3,6 +3,8 @@ import 'package:bubble_tea/routes/pages.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import 'my_icon_button.dart';
+
 class BodyLayout extends StatelessWidget {
   BodyLayout({Key? key, required this.top, required this.body, this.other})
       : super(key: key);
@@ -232,14 +234,14 @@ class Top extends StatelessWidget {
                   decoration: InputDecoration(
                     icon: Icon(
                       Icons.search,
-                      size: 32,
+                      size: Get.theme.iconTheme.size! * 1.5,
                     ),
                     // contentPadding: EdgeInsets.symmetric(horizontal: 5, vertical: 1),
                     border: InputBorder.none,
                     hintText: "Search",
                     suffixIcon: value!
                         ? null
-                        : IconButton(
+                        : ScaleIconButton(
                             onPressed: () {
                               if (!_focusNode.hasFocus) {
                                 _focusNode.canRequestFocus = false;

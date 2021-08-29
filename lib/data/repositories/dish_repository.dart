@@ -25,8 +25,8 @@ class DishRepository {
     return await service.delete(id);
   }
 
-  Future<bool> reorder(String? id, int oldIndex, int newIndex) async {
-    return await service.reorder(id, oldIndex, newIndex);
+  Future<bool> reorder(String? id, int oldIndex, int newIndex,{bool showLoading = true}) async {
+    return await service.reorder(id, oldIndex, newIndex,showLoading: showLoading);
   }
 
   Future<bool> saveDishMaterials(

@@ -7,6 +7,7 @@ class DishModel extends BaseModel {
   String? img;
   String? desc;
   bool? isPopular;
+  int? serial;
 
   List<DishMaterialModel> materials = <DishMaterialModel>[];
   List<DishPrinterModel> printers = <DishPrinterModel>[];
@@ -16,10 +17,11 @@ class DishModel extends BaseModel {
     String? id,
     this.catalogId,
     this.name,
-    this.price,
+    this.price = 0,
     this.img,
     this.desc,
     this.isPopular = false,
+    this.serial = 0,
   }) : super(id: id);
 
   DishModel.fromJson(Map<String, dynamic> json) {
@@ -30,6 +32,7 @@ class DishModel extends BaseModel {
     this.img = json['img'];
     this.desc = json['desc'];
     this.isPopular = json['isPopular'];
+    this.serial = json['serial'];
     if (json['materials'] != null) {
       this.materials = List.castFrom(json['materials'])
           .map((v) => DishMaterialModel.fromJson(v))
@@ -56,6 +59,7 @@ class DishModel extends BaseModel {
     data['img'] = this.img;
     data['desc'] = this.desc;
     data['isPopular'] = this.isPopular;
+    data['serial'] = this.serial;
     return data;
   }
 }

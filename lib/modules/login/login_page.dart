@@ -1,3 +1,4 @@
+import 'package:bubble_tea/widgets/my_icon_button.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:bubble_tea/r.dart';
@@ -78,7 +79,7 @@ class EmailField extends StatelessWidget {
         // keyboardType: TextInputType.emailAddress,
         decoration: InputDecoration(
           hintText: "Email",
-          icon: Icon(Icons.email),
+          icon: Icon(Icons.email,size: Get.theme.iconTheme.size),
           border: InputBorder.none,
         ),
         onChanged: onChanged,
@@ -106,8 +107,8 @@ class PasswordField extends StatelessWidget {
           obscureText: value!,
           decoration: InputDecoration(
             hintText: "Password",
-            icon: Icon(Icons.lock),
-            suffixIcon: IconButton(
+            icon: Icon(Icons.lock, size: Get.theme.iconTheme.size),
+            suffixIcon: ScaleIconButton(
               onPressed: () => updateFn(!value),
               icon: Icon(value ? Icons.visibility : Icons.visibility_off),
             ),

@@ -1,5 +1,6 @@
 import 'package:bubble_tea/widgets/body_layout.dart';
 import 'package:bubble_tea/widgets/dialog_form.dart';
+import 'package:bubble_tea/widgets/my_icon_button.dart';
 import 'package:bubble_tea/widgets/simple_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -31,6 +32,96 @@ class AdditionList extends StatelessWidget {
           .where((e) => e.name!.contains(controller.keywords))
           .toList();
 
+      // return SingleChildScrollView(
+      //   child: Wrap(
+      //     spacing: 10,
+      //     runSpacing: 10,
+      //     children: [
+      //       for (var item in items)
+      //         Container(
+      //           width: Get.width * 0.22,
+      //           child: Card(
+      //             child: Column(
+      //               crossAxisAlignment: CrossAxisAlignment.start,
+      //               children: [
+      //                 Padding(
+      //                   padding: EdgeInsets.symmetric(horizontal: 20),
+      //                   child: Row(
+      //                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      //                     children: [
+      //                       Text(
+      //                         item.name ?? "",
+      //                         style: Get.textTheme.bodyText1
+      //                             ?.copyWith(fontWeight: FontWeight.w500),
+      //                       ),
+      //                       PopupMenuButton(
+      //                         // offset: Offset(-30,30),
+      //                         iconSize: Get.theme.iconTheme.size,
+      //                         onSelected: (v) {
+      //                           switch (v) {
+      //                             case 1:
+      //                               //add option
+      //                               controller.addOption(item.id);
+      //                               Get.dialog(OptionForm());
+      //                               break;
+      //                             case 2:
+      //                               //edit
+      //                               controller.edit(item.id);
+      //                               break;
+      //                             case 3:
+      //                               controller.deleteConfirm(item.id);
+      //                               break;
+      //                             default:
+      //                           }
+      //                         },
+      //                         itemBuilder: (c) => <PopupMenuEntry<int>>[
+      //                           PopupMenuItem(
+      //                               value: 1, child: Text("Add Option")),
+      //                           PopupMenuItem(value: 2, child: Text("Edit")),
+      //                           PopupMenuItem(value: 3, child: Text("Delete")),
+      //                         ],
+      //                       )
+      //                     ],
+      //                   ),
+      //                 ),
+      //                 Divider(),
+      //                 for (var option in item.options)
+      //                   Padding(
+      //                     padding: EdgeInsets.symmetric(horizontal: 20),
+      //                     child: Row(
+      //                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      //                       children: [
+      //                         Text(
+      //                           option.name ?? "",
+      //                           style: Get.textTheme.bodyText1,
+      //                         ),
+      //                         ButtonBar(
+      //                           buttonPadding:
+      //                               EdgeInsets.symmetric(horizontal: 0),
+      //                           children: [
+      //                             ScaleIconButton(
+      //                                 onPressed: () {
+      //                                   controller.editOption(option.id);
+      //                                   Get.dialog(OptionForm());
+      //                                 },
+      //                                 icon: Icon(Icons.edit)),
+      //                             ScaleIconButton(
+      //                                 onPressed: () => controller
+      //                                     .deleteOptionConfirm(option.id),
+      //                                 icon: Icon(Icons.close))
+      //                           ],
+      //                         )
+      //                       ],
+      //                     ),
+      //                   )
+      //               ],
+      //             ),
+      //           ),
+      //         )
+      //     ],
+      //   ),
+      // );
+
       return GridView.builder(
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 3,
@@ -56,6 +147,7 @@ class AdditionList extends StatelessWidget {
                         ),
                         PopupMenuButton(
                           // offset: Offset(-30,30),
+                          iconSize: Get.theme.iconTheme.size,
                           onSelected: (v) {
                             switch (v) {
                               case 1:
@@ -96,16 +188,16 @@ class AdditionList extends StatelessWidget {
                           ButtonBar(
                             buttonPadding: EdgeInsets.symmetric(horizontal: 0),
                             children: [
-                              IconButton(
+                              ScaleIconButton(
                                   onPressed: () {
                                     controller.editOption(option.id);
                                     Get.dialog(OptionForm());
                                   },
-                                  icon: Icon(Icons.edit,size: 20,)),
-                              IconButton(
+                                  icon: Icon(Icons.edit)),
+                              ScaleIconButton(
                                   onPressed: () =>
                                       controller.deleteOptionConfirm(option.id),
-                                  icon: Icon(Icons.close,size: 20))
+                                  icon: Icon(Icons.close))
                             ],
                           )
                         ],

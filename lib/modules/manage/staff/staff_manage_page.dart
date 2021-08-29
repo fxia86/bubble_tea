@@ -1,6 +1,7 @@
 import 'package:bubble_tea/data/models/shop_model.dart';
 import 'package:bubble_tea/widgets/body_layout.dart';
 import 'package:bubble_tea/widgets/dialog_form.dart';
+import 'package:bubble_tea/widgets/my_icon_button.dart';
 import 'package:bubble_tea/widgets/simple_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -50,12 +51,12 @@ class StaffTable extends StatelessWidget {
                 DataCell(Text(item.shopName ?? "")),
                 DataCell(Row(
                   children: [
-                    IconButton(
+                    ScaleIconButton(
                       onPressed: () => controller.edit(item.id),
                       icon: Icon(Icons.edit),
                       color: Colors.orange,
                     ),
-                    IconButton(
+                    ScaleIconButton(
                       onPressed: () => controller.deleteConfirm(item.id),
                       icon: Icon(Icons.delete),
                       color: Colors.red,

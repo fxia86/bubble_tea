@@ -1,4 +1,5 @@
 import 'package:bubble_tea/modules/shop/shop_controller.dart';
+import 'package:bubble_tea/widgets/my_icon_button.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -156,8 +157,8 @@ class OrderItem extends StatelessWidget {
           children: [
             Row(
               children: [
-                IconButton(
-                  padding: EdgeInsets.all(0),
+                ScaleIconButton(
+                  // padding: EdgeInsets.all(0),
                   icon: Icon(Icons.remove_circle_outline),
                   onPressed: () => controller.remove(item),
                 ),
@@ -166,7 +167,7 @@ class OrderItem extends StatelessWidget {
                   child: Obx(() => Text(item.count.toString(),
                       style: TextStyle(fontSize: 30))),
                 ),
-                IconButton(
+                ScaleIconButton(
                   icon: Icon(Icons.add_circle_outline),
                   onPressed: () => controller.add(item),
                 ),

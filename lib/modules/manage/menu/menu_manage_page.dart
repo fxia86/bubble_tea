@@ -2,6 +2,7 @@ import 'package:bubble_tea/routes/pages.dart';
 import 'package:bubble_tea/widgets/body_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:reorderables/reorderables.dart';
 
 import 'menu_manage_controller.dart';
 
@@ -52,7 +53,7 @@ class Menu extends StatelessWidget {
                         ? MenuGrid(
                             list: controller.items
                                 .where((element) => element.isPopular!))
-                        : MenuGrid(
+                        : ReorderMenu(
                             list: controller.items.where((element) =>
                                 element.catalogId == controller.catalogs[i].id),
                           ),
@@ -60,6 +61,42 @@ class Menu extends StatelessWidget {
               )),
         ),
       ],
+    );
+  }
+}
+
+class ReorderMenu extends StatelessWidget {
+  ReorderMenu({Key? key, required this.list}) : super(key: key);
+  final list;
+  final controller = Get.find<MenuManageController>();
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      child: ReorderableWrap(
+        spacing: 12,
+        runSpacing: 12,
+        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 20),
+        children: [
+          for (var item in list)
+            Container(
+                width: Get.width * 0.245,
+                height: Get.width * 0.245,
+                child: MenuItem(item: item))
+        ],
+        onReorder: (int oldIndex, int newIndex) =>
+            controller.reorder(oldIndex, newIndex, list.toList()[0].catalogId),
+        // onNoReorder: (int index) {
+        //   //this callback is optional
+        //   debugPrint(
+        //       '${DateTime.now().toString().substring(5, 22)} reorder cancelled. index:$index');
+        // },
+        // onReorderStarted: (int index) {
+        //   //this callback is optional
+        //   debugPrint(
+        //       '${DateTime.now().toString().substring(5, 22)} reorder started: index:$index');
+        // },
+      ),
     );
   }
 }
@@ -74,11 +111,11 @@ class MenuGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GridView.builder(
-      padding: EdgeInsets.symmetric(vertical: 20),
+      padding: EdgeInsets.symmetric(horizontal: 5, vertical: 20),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: crossAxisCount,
-        mainAxisSpacing: 20,
-        crossAxisSpacing: 20,
+        mainAxisSpacing: 12,
+        crossAxisSpacing: 12,
         // childAspectRatio: 0.9,
       ),
       itemCount: list.length,
@@ -103,7 +140,7 @@ class MenuItem extends StatelessWidget {
       // shape: ShapeBorder(),
       child: InkWell(
         onTap: () => Get.toNamed(Routes.MANAGE_MENU_DISH, arguments: item.id),
-        onLongPress: () => controller.deleteConfirm(item.id),
+        // onLongPress: () => controller.deleteConfirm(item.id),
         // Generally, material cards use onSurface with 12% opacity for the pressed state.
         splashColor: Get.theme.colorScheme.onSurface.withOpacity(0.12),
         // Generally, material cards do not have a highlight overlay.

@@ -15,7 +15,7 @@ class DishDetailController extends GetxController {
 
   final MenuManageController _parent = Get.find<MenuManageController>();
 
-  var itemId;
+  String? dishId;
 
   var category = 1.obs;
 
@@ -43,16 +43,16 @@ class DishDetailController extends GetxController {
       }
     });
 
-    itemId = Get.arguments;
+    dishId = Get.arguments;
 
-    if (itemId == "") {
+    if (dishId == null) {
       // new
       imagePath.value = "";
       editItem.value = DishModel();
       dishMaterials.value = <DishMaterialModel>[];
     } else {
       // edit
-      var item = _parent.items.singleWhere((element) => element.id == itemId);
+      var item = _parent.items.singleWhere((element) => element.id == dishId);
       var materials = item.materials.map((e) => DishMaterialModel(
             id: e.id,
             dishId: e.dishId,
@@ -75,7 +75,7 @@ class DishDetailController extends GetxController {
           ));
 
       editItem.value = DishModel(
-        id: itemId,
+        id: dishId,
         img: item.img,
         catalogId: item.catalogId,
         name: item.name,
@@ -143,14 +143,20 @@ class DishDetailController extends GetxController {
       if (imagePath.value.isNotEmpty) {
         data["file_img"] = await dio.MultipartFile.fromFile(imagePath.value);
       }
-      if (itemId == null) {
+      if (dishId == null) {
         if (imagePath.value.isEmpty) {
           MessageBox.error('No image found');
           return;
         }
+        data["serial"] = _parent.items
+                .where((e) => e.catalogId == editItem.value.catalogId)
+                .length +
+            1;
         var item = await repository.add(data);
-        _parent.items.insert(0, item);
-        itemId = item.id;
+        _parent.items.add(item);
+        _parent.sortItems();
+        editItem.value.id = item.id;
+        dishId = item.id;
       } else {
         var item = _parent.items
             .singleWhere((element) => element.id == editItem.value.id);
@@ -182,7 +188,7 @@ class DishDetailController extends GetxController {
       (element) => element.materialName == v.name,
       orElse: () {
         var item = DishMaterialModel(
-          dishId: itemId,
+          dishId: dishId,
           materialId: v.id,
           materialName: v.name,
           qty: 0,
@@ -206,12 +212,12 @@ class DishDetailController extends GetxController {
       //   MessageBox.error("No materials to save");
       // }
       if (_notEqualList(dishMaterials, editItem.value.materials)) {
-        var result = await repository.saveDishMaterials(itemId, dishMaterials);
+        var result = await repository.saveDishMaterials(dishId, dishMaterials);
         if (result) {
           editItem.value.materials = List.from(dishMaterials);
 
           var item =
-              _parent.items.singleWhere((element) => element.id == itemId);
+              _parent.items.singleWhere((element) => element.id == dishId);
           item.materials = List.from(dishMaterials);
 
           MessageBox.success();
@@ -223,7 +229,7 @@ class DishDetailController extends GetxController {
   addPrinter(String? id, bool add) {
     if (add) {
       dishPrinters.add(DishPrinterModel(
-        dishId: itemId,
+        dishId: dishId,
         printerId: id,
       ));
     } else {
@@ -233,11 +239,11 @@ class DishDetailController extends GetxController {
 
   savePrinter() async {
     if (_existDish() && _notEqualList(dishPrinters, editItem.value.printers)) {
-      var result = await repository.saveDishPrinters(itemId, dishPrinters);
+      var result = await repository.saveDishPrinters(dishId, dishPrinters);
       if (result) {
         editItem.value.printers = List.from(dishPrinters);
 
-        var item = _parent.items.singleWhere((element) => element.id == itemId);
+        var item = _parent.items.singleWhere((element) => element.id == dishId);
         item.printers = List.from(dishPrinters);
 
         MessageBox.success();
@@ -248,7 +254,7 @@ class DishDetailController extends GetxController {
   addAddition(String? id, String? additionId, bool add) {
     if (add) {
       dishOptions.add(DishOptionModel(
-        dishId: itemId,
+        dishId: dishId,
         additionId: additionId,
         optionId: id,
       ));
@@ -259,11 +265,11 @@ class DishDetailController extends GetxController {
 
   saveAddition() async {
     if (_existDish() && _notEqualList(dishOptions, editItem.value.options)) {
-      var result = await repository.saveDishOptions(itemId, dishOptions);
+      var result = await repository.saveDishOptions(dishId, dishOptions);
       if (result) {
         editItem.value.options = List.from(dishOptions);
 
-        var item = _parent.items.singleWhere((element) => element.id == itemId);
+        var item = _parent.items.singleWhere((element) => element.id == dishId);
         item.options = List.from(dishOptions);
 
         MessageBox.success();
@@ -272,7 +278,7 @@ class DishDetailController extends GetxController {
   }
 
   bool _existDish() {
-    if (editItem.value.id == null || editItem.value.id!.isEmpty) {
+    if (dishId == null || dishId!.isEmpty) {
       MessageBox.warn("Fill in the Basic Information Form fisrt");
       return false;
     }

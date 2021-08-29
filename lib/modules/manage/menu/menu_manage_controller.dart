@@ -40,14 +40,28 @@ class MenuManageController extends GetxController
     catalogs.insert(0, CatalogModel(name: "Popular"));
     tabController = TabController(length: catalogs.length, vsync: this);
     items.value = await repository.getAll(showLoading: false);
+    sortItems();
 
     materials = await Get.find<MaterialRepository>().getAll(showLoading: false);
-    materials.sort((a, b) => a.name!.compareTo(b.name!));
 
     printers = await Get.find<PrinterRepository>().getAll(showLoading: false);
     printerMap = groupBy(printers, (PrinterModel p) => p.shopName);
 
     additions = await Get.find<AdditionRepository>().getAll(showLoading: false);
+  }
+
+  sortItems() {
+    items.sort((x, y) {
+      final i = x.serial!.compareTo(y.serial!);
+      if (i == 0) {
+        final catalogX =
+            catalogs.firstWhere((element) => element.id == x.catalogId).serial;
+        final catalogY =
+            catalogs.firstWhere((element) => element.id == y.catalogId).serial;
+        return catalogX!.compareTo(catalogY!);
+      }
+      return i;
+    });
   }
 
   void deleteConfirm(String? id) {
@@ -65,13 +79,19 @@ class MenuManageController extends GetxController
     }
   }
 
-  void reorder(int oldIndex, int newIndex) {
-    var item = items.elementAt(oldIndex);
-    repository.reorder(item.id, oldIndex + 1, newIndex + 1).then((value) {
-      if (value) {
-        items.remove(item);
-        items.insert(newIndex, item);
-      }
-    });
+  void reorder(int oldIndex, int newIndex, String? catalogId) {
+    final list = items.where((e) => e.catalogId == catalogId).toList();
+
+    final _oldIndex =
+        items.indexWhere((element) => element.id == list[oldIndex].id);
+    final _newIndex =
+        items.indexWhere((element) => element.id == list[newIndex].id);
+
+    final item = items.removeAt(_oldIndex);
+    item.serial = newIndex + 1;
+    items.insert(_newIndex, item);
+
+    sortItems();
+    repository.reorder(item.id, oldIndex + 1, newIndex + 1, showLoading: false);
   }
 }

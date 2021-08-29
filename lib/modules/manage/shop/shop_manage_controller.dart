@@ -154,14 +154,14 @@ class ShopManageController extends GetxController {
 //       ),
 //       DataCell(Row(
 //         children: [
-//           IconButton(
+//           ScaleIconButton(
 //             onPressed: () {
 //               controller.edit(controller.shops[index].id!);
 //             },
 //             icon: Icon(Icons.edit),
 //             color: Colors.orange,
 //           ),
-//           IconButton(
+//           ScaleIconButton(
 //             onPressed: () {
 //               controller.edit(controller.shops[index].id!);
 //             },
