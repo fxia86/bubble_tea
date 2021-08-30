@@ -17,10 +17,12 @@ class SpecialManageBinding implements Bindings {
     Get.lazyPut(() => CatalogService());
     Get.lazyPut(() => DishService());
     Get.lazyPut(() => SpecialDiscountService());
+    Get.lazyPut(() => SpecialBundleService());
     Get.lazyPut(() => SpecialPriceService());
     Get.lazyPut(() => CatalogRepository());
     Get.lazyPut(() => DishRepository());
     Get.lazyPut(() => SpecialDiscountRepository());
+    Get.lazyPut(() => SpecialBundleRepository());
     Get.lazyPut(() => SpecialPriceRepository());
     Get.lazyPut<SpecialManageController>(() => SpecialManageController());
     Get.lazyPut<DiscountController>(() => DiscountController());

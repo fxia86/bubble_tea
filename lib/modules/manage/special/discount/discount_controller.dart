@@ -16,8 +16,8 @@ class DiscountController extends GetxController {
   var discount = 0.obs;
 
   @override
-  void onReady() async {
-    super.onReady();
+  void onInit() {
+    super.onInit();
 
     if (Get.arguments is SpecialDiscountModel) {
       dishId(Get.arguments.dishId);
@@ -37,7 +37,6 @@ class DiscountController extends GetxController {
     } else {
       final result = await repository.save(SpecialDiscountModel(
         dishId: dishId.value,
-        dishName: dishName.value,
         discount: discount.value,
       ))
         ..dishName = dishName.value;

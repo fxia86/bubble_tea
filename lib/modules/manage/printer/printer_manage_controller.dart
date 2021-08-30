@@ -13,8 +13,12 @@ class PrinterManageController extends GetxController {
 
   var shops = <ShopModel>[];
   var items = <PrinterModel>[].obs;
-  var editItem = PrinterModel().obs;
   var radioValue = 0.obs;
+  var shopId = "".obs;
+  var shopName = "".obs;
+  String? name;
+  String? address;
+  var alias = "".obs;
 
   BlueThermalPrinter bluetooth = BlueThermalPrinter.instance;
 
@@ -26,19 +30,17 @@ class PrinterManageController extends GetxController {
 
     initPrinters();
 
-    ever(radioValue, (_) => edit());
+    // ever(radioValue, (_) => edit());
 
     items.value = await repository.getAll();
     shops = await Get.find<ShopRepository>().getAll();
-
   }
 
   void initPrinters() async {
     try {
       final devices = await bluetooth.getBondedDevices();
-      // pairedPrinters.value = devices;
       pairedPrinters.value = devices
-          .where((element) => element.name!.toLowerCase().contains("print"))
+          // .where((element) => element.name!.toLowerCase().contains("print"))
           .toList();
     } catch (e) {
       PlatformException exception = e as PlatformException;
@@ -46,26 +48,9 @@ class PrinterManageController extends GetxController {
     }
   }
 
-  void edit() {
-    var printer = pairedPrinters[radioValue.value - 1];
-
-    var item = items.singleWhere(
-        (element) => element.address == printer.address, orElse: () {
-      return PrinterModel(name: printer.name, address: printer.address);
-    });
-
-    editItem.value = PrinterModel(
-        name: item.name,
-        address: item.address,
-        alias: item.alias,
-        shopId: item.shopId,
-        shopName: item.shopName);
-    editItem.value.id = item.id;
-  }
-
   void deleteConfirm(String? id) {
     final item = items.singleWhere((element) => element.id == id);
-    ConfirmBox.show(item.name, () => delete(id));
+    ConfirmBox.show("${item.shopName} - ${item.alias}", () => delete(id));
   }
 
   void delete(String? id) async {
@@ -78,48 +63,41 @@ class PrinterManageController extends GetxController {
     }
   }
 
+  void selectPrinter(int? val) {
+    radioValue(val);
+    var printer = pairedPrinters[radioValue.value - 1];
+    name = printer.name;
+    address = printer.address;
+  }
+
   void selectShop(ShopModel item) {
-    editItem.value.shopId = item.id;
-    editItem.value.shopName = item.name;
-    editItem.refresh();
+    shopId(item.id);
+    shopName(item.name);
   }
 
   void save() async {
-    if (editItem.value.shopId == null || editItem.value.shopId!.isEmpty) {
+    if (shopId.value.isEmpty) {
       MessageBox.error('Please select a shop');
-    } else if (editItem.value.alias == null || editItem.value.alias!.isEmpty) {
+    } else if (alias.isEmpty) {
       MessageBox.error('Invalid name');
     } else {
       final idx = items.indexWhere((element) =>
-          element.alias == editItem.value.alias &&
-          element.id != editItem.value.id);
+          (element.alias == alias.value && element.shopId == shopId.value) ||
+          element.address == address);
       if (idx > -1) {
-        MessageBox.error('Duplicated Name');
+        MessageBox.error('Duplicated', 'this printer was already added');
         return;
       }
 
-      if (editItem.value.id == null) {
-        var item = await repository.add(editItem.value);
-        items.insert(0, item);
-      } else {
-        var item =
-            items.singleWhere((element) => element.id == editItem.value.id);
+      var item = PrinterModel(
+          name: name,
+          address: address,
+          shopId: shopId.value,
+          shopName: shopName.value,
+          alias: alias.value);
 
-        if (item.shopId == editItem.value.shopId &&
-            item.name == editItem.value.name &&
-            item.address == editItem.value.address &&
-            item.alias == editItem.value.alias) {
-          return;
-        }
-
-        var result = await repository.edit(editItem.value);
-        if (result) {
-          item
-            ..shopName = editItem.value.shopName
-            ..alias = editItem.value.alias;
-          items.refresh();
-        }
-      }
+      var result = await repository.add(item);
+      items.insert(0, item..id = result.id);
     }
   }
 }

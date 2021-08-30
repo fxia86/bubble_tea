@@ -1,4 +1,5 @@
 import 'package:bubble_tea/routes/pages.dart';
+import 'package:bubble_tea/utils/common_utils.dart';
 import 'package:bubble_tea/widgets/body_layout.dart';
 import 'package:bubble_tea/widgets/my_icon_button.dart';
 import 'package:flutter/material.dart';
@@ -11,7 +12,7 @@ class SpecialManagePage extends GetView<SpecialManageController> {
   Widget build(BuildContext context) {
     return BodyLayout(
       top: Top(
-        "Shop Manage",
+        "Special Offer Manage",
         // search: (val) => controller.keywords(val),
         add: () {
           switch (controller.category.value) {
@@ -61,7 +62,7 @@ class SpecialManagePage extends GetView<SpecialManageController> {
                         case 1:
                           return DiscountTable();
                         case 2:
-                          return DiscountTable();
+                          return BundleTable();
                         case 3:
                           return PriceTable();
                         default:
@@ -108,7 +109,7 @@ class CategoryButton extends StatelessWidget {
             onPressed: selected ? null : () => controller.category(category),
             child: Text(
               text,
-              style: Get.textTheme.headline5?.copyWith(
+              style: Get.textTheme.bodyText1?.copyWith(
                   fontWeight: FontWeight.w500,
                   color: selected ? Get.theme.primaryColor : Colors.black87),
             )),
@@ -155,6 +156,45 @@ class DiscountTable extends StatelessWidget {
   }
 }
 
+class BundleTable extends StatelessWidget {
+  final controller = Get.find<SpecialManageController>();
+
+  @override
+  Widget build(BuildContext context) {
+    return Obx(() => DataTable(
+          columns: [
+            DataColumn(label: Text('Items')),
+            DataColumn(label: Text('Offer Price')),
+            DataColumn(label: Text('')),
+          ],
+          rows: [
+            for (var item in controller.bundles)
+              DataRow(cells: [
+                DataCell(Text(item.dishes.map((e) => "${e.dishName} * ${e.qty}").join(", "))),
+                DataCell(
+                    Text("€  ${(item.offerPrice! / 100).toStringAsFixed(2)}")),
+                DataCell(Row(
+                  children: [
+                    ScaleIconButton(
+                      onPressed: () => Get.toNamed(
+                          Routes.MANAGE_SPECIAL_BUNDLE,
+                          arguments: item),
+                      icon: Icon(Icons.edit),
+                      color: Colors.orange,
+                    ),
+                    ScaleIconButton(
+                      onPressed: () => controller.deleteConfirm(item.id),
+                      icon: Icon(Icons.delete),
+                      color: Colors.red,
+                    ),
+                  ],
+                )),
+              ])
+          ],
+        ));
+  }
+}
+
 class PriceTable extends StatelessWidget {
   final controller = Get.find<SpecialManageController>();
 
@@ -164,7 +204,7 @@ class PriceTable extends StatelessWidget {
           columns: [
             DataColumn(label: Text('Name')),
             DataColumn(label: Text('Original Price')),
-            DataColumn(label: Text('Special Price')),
+            DataColumn(label: Text('Offer Price')),
             DataColumn(label: Text('Available Date')),
             DataColumn(label: Text('')),
           ],
@@ -172,9 +212,12 @@ class PriceTable extends StatelessWidget {
             for (var item in controller.prices)
               DataRow(cells: [
                 DataCell(Text(item.dishName ?? "")),
-                DataCell(Text("€  ${item.oriPrice}")),
-                DataCell(Text("€  ${item.offerPrice}")),
-                DataCell(Text("${item.start} - ${item.end}")),
+                DataCell(Text(
+                    "€  ${(item.originalPrice! / 100).toStringAsFixed(2)}")),
+                DataCell(
+                    Text("€  ${(item.offerPrice! / 100).toStringAsFixed(2)}")),
+                DataCell(Text(
+                    "${CommonUtils.toDateString(item.start!)}\n        to\n${CommonUtils.toDateString(item.end!)}")),
                 DataCell(Row(
                   children: [
                     ScaleIconButton(

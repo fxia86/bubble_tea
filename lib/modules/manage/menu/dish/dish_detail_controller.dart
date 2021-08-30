@@ -171,6 +171,7 @@ class DishDetailController extends GetxController {
         var result = await repository.edit(data);
 
         item
+          ..catalogId = result.catalogId
           ..name = result.name
           ..img = result.img
           ..desc = result.desc
@@ -178,6 +179,7 @@ class DishDetailController extends GetxController {
           ..isPopular = result.isPopular;
         _parent.items.refresh();
       }
+      
       editItem.refresh();
       MessageBox.success();
     }

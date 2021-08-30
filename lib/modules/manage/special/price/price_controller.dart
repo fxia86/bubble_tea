@@ -6,25 +6,28 @@ import 'package:get/get.dart';
 import '../special_manage_controller.dart';
 
 class PriceController extends GetxController {
-  final SpecialPriceRepository discountRepository = Get.find();
-
-  final SpecialPriceRepository repository =
-      Get.find<SpecialPriceRepository>();
+  final SpecialPriceRepository repository = Get.find<SpecialPriceRepository>();
   final SpecialManageController _parent = Get.find<SpecialManageController>();
 
   var catalogId = "".obs;
   var dishId = "".obs;
   var dishName = "".obs;
   var offerPrice = 0.obs;
+  var originalPrice = 0.obs;
+  var start = "".obs;
+  var end = "".obs;
 
   @override
-  void onReady() async {
-    super.onReady();
+  void onInit() {
+    super.onInit();
 
     if (Get.arguments is SpecialPriceModel) {
       dishId(Get.arguments.dishId);
       dishName(Get.arguments.dishName);
+      originalPrice(Get.arguments.originalPrice);
       offerPrice(Get.arguments.offerPrice);
+      start(Get.arguments.start);
+      end(Get.arguments.end);
       final dish = _parent.dishes
           .firstWhere((element) => element.id == Get.arguments.dishId);
       catalogId(dish.catalogId);
@@ -34,15 +37,19 @@ class PriceController extends GetxController {
   void save() async {
     if (dishId.isEmpty) {
       MessageBox.error('No item selected');
-    } else if (offerPrice < 1 || offerPrice > 99) {
-      MessageBox.error('Invalid discount');
+    }else if (start.isEmpty||end.isEmpty ) {
+      MessageBox.error('Please select available date');
+    }  else if (offerPrice < 1 ) {
+      MessageBox.error('Invalid offer price');
     } else {
       final result = await repository.save(SpecialPriceModel(
         dishId: dishId.value,
-        dishName: dishName.value,
         offerPrice: offerPrice.value,
+        start: start.value,
+        end: end.value,
       ))
-        ..dishName = dishName.value;
+        ..dishName = dishName.value
+        ..originalPrice = originalPrice.value;
 
       final idx =
           _parent.prices.indexWhere((element) => element.id == result.id);

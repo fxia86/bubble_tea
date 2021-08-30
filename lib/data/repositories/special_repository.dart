@@ -42,3 +42,24 @@ class SpecialPriceRepository {
     return await service.delete(id);
   }
 }
+
+
+class SpecialBundleRepository {
+  final SpecialBundleService service = Get.find<SpecialBundleService>();
+
+  Future<List<SpecialBundleModel>> getAll({bool showLoading = true}) async {
+    var data = await service.getAll(showLoading: showLoading);
+    var items =
+        List.castFrom(data).map((v) => SpecialBundleModel.fromJson(v)).toList();
+    return items;
+  }
+
+  Future<SpecialBundleModel> save(Map<dynamic, dynamic> model) async {
+    var data = await service.save(model);
+    return SpecialBundleModel.fromJson(data);
+  }
+
+  Future<bool> delete(String? id) async {
+    return await service.delete(id);
+  }
+}

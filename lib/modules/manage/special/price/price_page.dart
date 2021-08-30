@@ -1,4 +1,5 @@
 import 'package:bubble_tea/modules/manage/special/special_manage_controller.dart';
+import 'package:bubble_tea/utils/common_utils.dart';
 import 'package:bubble_tea/widgets/simple_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -159,12 +160,17 @@ class DishList extends StatelessWidget {
                 onPressed: () {
                   controller.dishId(dish.id);
                   controller.dishName(dish.name);
-                  final idx = _parent.discounts
+                  controller.originalPrice(dish.price);
+                  final idx = _parent.prices
                       .indexWhere((element) => element.dishId == dish.id);
                   if (idx > -1) {
-                    controller.offerPrice(_parent.discounts[idx].discount);
+                    controller.offerPrice(_parent.prices[idx].offerPrice);
+                    controller.start(_parent.prices[idx].start);
+                    controller.end(_parent.prices[idx].end);
                   } else {
                     controller.offerPrice(0);
+                    controller.start("");
+                    controller.end("");
                   }
                 },
                 child: Text(
@@ -187,72 +193,85 @@ class PriceForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                "Available Date",
-                style: Get.textTheme.bodyText1
-                    ?.copyWith(fontWeight: FontWeight.w500),
-              ),
-              SfDateRangePicker(
-                selectionMode: DateRangePickerSelectionMode.range,
-                rangeSelectionColor: Get.theme.accentColor,
-                startRangeSelectionColor: Get.theme.primaryColor,
-                endRangeSelectionColor: Get.theme.primaryColor,
-                onSelectionChanged: (DateRangePickerSelectionChangedArgs args) {
-                  if (args.value is PickerDateRange) {
-                    final DateTime rangeStartDate = args.value.startDate;
-                    final DateTime rangeEndDate = args.value.endDate;
-                  } else if (args.value is DateTime) {
-                    final DateTime selectedDate = args.value;
-                  } else if (args.value is List<DateTime>) {
-                    final List<DateTime> selectedDates = args.value;
-                  } else {
-                    final List<PickerDateRange> selectedRanges = args.value;
-                  }
-                },
-                initialSelectedRange: PickerDateRange(
-                  DateTime.now().subtract(Duration(days: 4)),
-                  DateTime.now().add(Duration(days: 3)),
+    return Container(
+      height: 343,
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  padding: EdgeInsets.symmetric(vertical: 10),
+                  child: Text(
+                    "Available Date",
+                    style: Get.textTheme.bodyText1
+                        ?.copyWith(fontWeight: FontWeight.w500),
+                  ),
                 ),
-              ),
-            ],
+                Container(
+                  decoration: BoxDecoration(
+                      border: Border.all(color: Get.theme.dividerColor)),
+                  child: Obx(() => SfDateRangePicker(
+                        key: Key("date_${controller.dishId}"),
+                        selectionMode: DateRangePickerSelectionMode.range,
+                        todayHighlightColor: Get.theme.primaryColor,
+                        rangeSelectionColor: Get.theme.accentColor,
+                        startRangeSelectionColor: Get.theme.primaryColor,
+                        endRangeSelectionColor: Get.theme.primaryColor,
+                        initialSelectedRange: PickerDateRange(
+                          CommonUtils.toDateTime(controller.start.value),
+                          CommonUtils.toDateTime(controller.end.value),
+                        ),
+                        onSelectionChanged:
+                            (DateRangePickerSelectionChangedArgs args) {
+                          controller.start(args.value.startDate.toString());
+                          controller.end(args.value.endDate.toString());
+                        },
+                      )),
+                ),
+              ],
+            ),
           ),
-        ),
-        SizedBox(width: 50),
-        Container(
-          width: Get.width * 0.2,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              MoneyTextField(
-                key: Key('originPrice_${controller.dishId}'),
-                enable: false,
-                initialValue: controller.offerPrice.toString(),
-                labelText: "Original Price",
-                onChanged: (val) {
-                  controller.offerPrice(int.parse(val));
-                },
-              ),
-              SizedBox(height: 50),
-              Obx(() => MoneyTextField(
-                    key: Key('price_${controller.dishId}'),
-                    initialValue: controller.offerPrice.value == 0
-                        ? ""
-                        : controller.offerPrice.toString(),
-                    labelText: "Offer Price",
-                    onChanged: (val) {
-                      controller.offerPrice(int.parse(val));
-                    },
-                  )),
-            ],
-          ),
-        )
-      ],
+          SizedBox(width: 50),
+          Container(
+            width: Get.width * 0.2,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  padding: EdgeInsets.symmetric(vertical: 10),
+                  child: Text(
+                    "Price",
+                    style: Get.textTheme.bodyText1
+                        ?.copyWith(fontWeight: FontWeight.w500),
+                  ),
+                ),
+                SizedBox(height: 50),
+                Obx(() => MoneyTextField(
+                      key: Key('oriPrice_${controller.dishId}'),
+                      enable: false,
+                      initialValue: controller.originalPrice.value == 0
+                          ? ""
+                          : "${(controller.originalPrice / 100).toStringAsFixed(2)}",
+                      labelText: "Original Price",
+                    )),
+                SizedBox(height: 50),
+                Obx(() => MoneyTextField(
+                      key: Key('price_${controller.dishId}'),
+                      initialValue: controller.offerPrice.value == 0
+                          ? ""
+                          : "${(controller.offerPrice / 100).toStringAsFixed(2)}",
+                      labelText: "Offer Price",
+                      onChanged: (val) {
+                        controller.offerPrice(CommonUtils.getMoney(val));
+                      },
+                    )),
+              ],
+            ),
+          )
+        ],
+      ),
     );
 
     // return Container(

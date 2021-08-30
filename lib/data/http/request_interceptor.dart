@@ -15,7 +15,6 @@ class RequestInterceptor extends Interceptor {
       LoadingBox.show();
     }
     // set token
-    //TODO login without token
     if (LocalStorage.hasData("authToken")) {
       final token = LocalStorage.getAuthToken();
       options.headers["Authorization"] = 'Bearer ${token.accessToken}';
@@ -110,7 +109,7 @@ class RequestInterceptor extends Interceptor {
           if (_response.statusCode! >= 200 && _response.statusCode! < 300) {
             handler.next(_response);
           } else {
-            MessageBox.error(_response.data);
+            MessageBox.error(response.data ?? "Some error occurred ");
           }
         } catch (e) {
           if (response.requestOptions.extra["showLoading"]) {
@@ -124,7 +123,7 @@ class RequestInterceptor extends Interceptor {
       if (response.requestOptions.extra["showLoading"]) {
         LoadingBox.hide();
       }
-      MessageBox.error(response.data);
+      MessageBox.error(response.data ?? "Some error occurred ");
     }
     // super.onResponse(response, handler);
   }

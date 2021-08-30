@@ -75,9 +75,7 @@ class PrinterForm extends StatelessWidget {
                             RadioListTile(
                               value: index + 1,
                               groupValue: controller.radioValue.value,
-                              onChanged: (int? val) {
-                                controller.radioValue(val);
-                              },
+                              onChanged: (int? val) => controller.selectPrinter(val),
                               title: Text(
                                 controller.pairedPrinters[index].name ?? "",
                                 style: controller.radioValue.value == index + 1
@@ -111,23 +109,14 @@ class PrinterForm extends StatelessWidget {
                     child: Column(
                       children: [
                         SizedBox(height: 30),
-                        // SimpleTextInput(
-                        //   key: Key('address_${controller.radioValue}'),
-                        //   enable: false,
-                        //   initialValue: controller.editItem.value.address,
-                        //   labelText: "MAC Address",
-                        //   onChanged: (val) {
-                        //     controller.editItem.value.address = val.trim();
-                        //   },
-                        // ),
                         ShopSelect(),
                         SizedBox(height: 30),
                         SimpleTextField(
                           key: Key('alias_${controller.radioValue}'),
-                          initialValue: controller.editItem.value.alias,
+                          initialValue: controller.alias.value,
                           labelText: "Nick Name",
                           onChanged: (val) {
-                            controller.editItem.value.alias = val.trim();
+                            controller.alias(val.trim());
                           },
                         ),
                         SizedBox(height: 30),
@@ -205,11 +194,13 @@ class ShopSelect extends StatelessWidget {
           children: <Widget>[
             Flexible(
               child: Obx(() => Text(
-                    controller.editItem.value.shopName ?? "Shop",
+                    controller.shopName.value == ""
+                        ? "Shop"
+                        : controller.shopName.value,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                         fontSize: 20,
-                        color: controller.editItem.value.shopId == null
+                        color: controller.shopId.value == ""
                             ? Colors.grey
                             : Colors.black),
                   )),

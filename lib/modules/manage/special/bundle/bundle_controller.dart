@@ -1,79 +1,107 @@
+import 'package:bubble_tea/data/models/dish_model.dart';
 import 'package:bubble_tea/data/models/special_model.dart';
 import 'package:bubble_tea/data/repositories/special_repository.dart';
-import 'package:bubble_tea/utils/confirm_box.dart';
+import 'package:bubble_tea/utils/message_box.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../special_manage_controller.dart';
+
 class BundleController extends GetxController {
-  final SpecialDiscountRepository discountRepository = Get.find();
+  final SpecialBundleRepository repository =
+      Get.find<SpecialBundleRepository>();
+  final SpecialManageController _parent = Get.find<SpecialManageController>();
 
-  var category = 1.obs;
+  var catalogId = "".obs;
+  var id = "".obs;
+  var offerPrice = 0.obs;
+  var dishes = <BundleDishModel>[].obs;
+  var total = 0.obs;
+  var availableDishes = <DishModel>[].obs;
 
-  var discounts = <SpecialDiscountModel>[].obs;
-  var editItem = SpecialDiscountModel().obs;
+  FocusNode qtyFocusNode = FocusNode();
 
   @override
-  void onReady() async {
-    super.onReady();
+  void onInit() {
+    super.onInit();
 
-    discounts.value = await discountRepository.getAll();
-  }
+    if (Get.arguments is SpecialBundleModel) {
+      id(Get.arguments.id);
+      offerPrice(Get.arguments.offerPrice);
+      dishes(Get.arguments.dishes);
+      calculateTotal();
+    }
 
-  void deleteConfirm(String? id) {
-    final item = discounts.singleWhere((element) => element.id == id);
-    ConfirmBox.show(item.dishName, () => delete(id));
-  }
-
-  void delete(String? id) async {
-    final idx = discounts.indexWhere((element) => element.id == id);
-    if (idx > -1) {
-      var result = await discountRepository.delete(id);
-      if (result) {
-        discounts.removeAt(idx);
+    qtyFocusNode.addListener(() {
+      if (qtyFocusNode.hasFocus) {
+      } else {
+        for (var item in dishes) {
+          item.selected = false;
+        }
+        dishes.refresh();
       }
+    });
+  }
+
+  calculateTotal() {
+    var sum = 0;
+    for (var item in dishes) {
+      final price = _parent.dishes
+          .firstWhere((element) => element.id == item.dishId)
+          .price;
+      sum += item.qty! * price!;
+    }
+    total(sum);
+  }
+
+  selectCatalog(String? id) {
+    catalogId(id);
+    availableDishes.value =
+        _parent.dishes.where((element) => element.catalogId == id).toList();
+  }
+
+  addDish(DishModel v) {
+    var item = dishes.singleWhere(
+      (element) => element.dishId == v.id,
+      orElse: () {
+        var item = BundleDishModel(
+          dishId: v.id,
+          dishName: v.name,
+          qty: 0,
+        );
+        dishes.add(item);
+        return item;
+      },
+    );
+
+    item.qty = item.qty! + 1;
+    dishes.refresh();
+    calculateTotal();
+  }
+
+  void save() async {
+    if (dishes.isEmpty) {
+      MessageBox.error('No item selected');
+    } else if (offerPrice < 1) {
+      MessageBox.error('Invalid offer price');
+    } else {
+      var item = SpecialBundleModel(
+        id: id.value,
+        offerPrice: offerPrice.value,
+      )..dishes = List.from(dishes);
+      final result = await repository.save(item.toJson());
+      id(item.id);
+      item.id = result.id;
+
+      final idx =
+          _parent.bundles.indexWhere((element) => element.id == result.id);
+      if (idx > -1) {
+        _parent.bundles[idx] = item..id = result.id;
+      } else {
+        _parent.bundles.add(item..id = result.id);
+      }
+      _parent.bundles.sort((a, b) => b.offerPrice!.compareTo(a.offerPrice!));
+      MessageBox.success();
     }
   }
-
-  // void save() async {
-  //   if (editItem.value.name == null || editItem.value.name!.isEmpty) {
-  //     MessageBox.error('Invalid name');
-  //   } else if (editItem.value.email == null ||
-  //       editItem.value.email!.isEmpty ||
-  //       !GetUtils.isEmail(editItem.value.email!)) {
-  //     MessageBox.error('Invalid email');
-  //   } else if (editItem.value.phone == null ||
-  //       editItem.value.phone!.isEmpty ||
-  //       !GetUtils.isPhoneNumber(editItem.value.phone!)) {
-  //     MessageBox.error('Invalid phone');
-  //   } else {
-  //     final idx = items.indexWhere((element) =>
-  //         element.name == editItem.value.name &&
-  //         element.id != editItem.value.id);
-  //     if (idx > -1) {
-  //       MessageBox.error('Duplicated Name');
-  //       return;
-  //     }
-  //     if (isNew.value) {
-  //       var item = await repository.add(editItem.value);
-  //       items.insert(0, item);
-  //     } else {
-  //       var item =
-  //           items.singleWhere((element) => element.id == editItem.value.id);
-  //       if (item.name == editItem.value.name &&
-  //           item.email == editItem.value.email &&
-  //           item.phone == editItem.value.phone) {
-  //         showForm.value = false;
-  //         return;
-  //       }
-  //       var result = await repository.edit(editItem.value);
-  //       if (result) {
-  //         item
-  //           ..name = editItem.value.name
-  //           ..email = editItem.value.email
-  //           ..phone = editItem.value.phone;
-  //         items.refresh();
-  //       }
-  //     }
-  //     showForm.value = false;
-  //   }
-  // }
 }

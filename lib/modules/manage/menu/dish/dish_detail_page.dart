@@ -291,12 +291,13 @@ class CatalogSelect extends StatelessWidget {
           children: <Widget>[
             Flexible(
               child: Obx(() => Text(
-                    parent.catalogs
+                    controller.editItem.value.catalogId == null
+                        ? "Catalog"
+                        : parent.catalogs
                             .firstWhere((element) =>
                                 element.id ==
                                 controller.editItem.value.catalogId)
-                            .name ??
-                        "Catalog",
+                            .name!,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                         fontSize: 20,

@@ -1,5 +1,6 @@
 import 'package:bubble_tea/routes/pages.dart';
 import 'package:bubble_tea/widgets/body_layout.dart';
+import 'package:bubble_tea/widgets/my_icon_button.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:reorderables/reorderables.dart';
@@ -82,7 +83,7 @@ class ReorderMenu extends StatelessWidget {
             Container(
                 width: Get.width * 0.245,
                 height: Get.width * 0.245,
-                child: MenuItem(item: item))
+                child: MenuItem(item: item, deletable: true))
         ],
         onReorder: (int oldIndex, int newIndex) =>
             controller.reorder(oldIndex, newIndex, list.toList()[0].catalogId),
@@ -125,10 +126,12 @@ class MenuGrid extends StatelessWidget {
 }
 
 class MenuItem extends StatelessWidget {
-  MenuItem({Key? key, required this.item}) : super(key: key);
+  MenuItem({Key? key, required this.item, this.deletable = false})
+      : super(key: key);
   final controller = Get.find<MenuManageController>();
 
   final item;
+  final bool deletable;
 
   @override
   Widget build(BuildContext context) {
@@ -177,11 +180,23 @@ class MenuItem extends StatelessWidget {
             ),
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-                child: Text(
-                  item.desc,
-                  style: Get.textTheme.subtitle1,
-                  overflow: TextOverflow.fade,
+                padding: const EdgeInsets.fromLTRB(10, 5, 0, 5),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        item.desc,
+                        style: Get.textTheme.subtitle1,
+                        overflow: TextOverflow.fade,
+                      ),
+                    ),
+                    if (deletable)
+                      ScaleIconButton(
+                        onPressed: () => controller.deleteConfirm(item.id),
+                        icon: Icon(Icons.delete),
+                        color: Colors.red,
+                      ),
+                  ],
                 ),
               ),
             ),
