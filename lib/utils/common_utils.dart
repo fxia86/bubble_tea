@@ -14,7 +14,7 @@ class CommonUtils {
     return 0;
   }
 
-  static DateTime? toDateTime(String val) {
+  static DateTime toDateTime(String val) {
     if (val.isDateTime) {
       return DateTime.parse(val);
     } else if (RegExp(
@@ -27,15 +27,12 @@ class CommonUtils {
       final ms = arr.length > 2 ? arr[3] : "000";
       return DateTime.parse("$ymd $hms.$ms");
     }
-    return null;
+    return DateTime.now();
   }
 
-  static DateTime? toDate(String val) {
+  static DateTime toDate(String val) {
     var datetime = toDateTime(val);
-    if (datetime != null) {
-      return DateUtils.dateOnly(datetime);
-    }
-    return datetime;
+    return DateUtils.dateOnly(datetime);
   }
 
   static String? toDateString(String val) {

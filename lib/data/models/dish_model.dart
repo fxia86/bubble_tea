@@ -127,7 +127,9 @@ class DishPrinterModel extends BaseModel {
 class DishOptionModel extends BaseModel {
   String? dishId;
   String? additionId;
+  String? additionName;
   String? optionId;
+  String? optionName;
   int? price;
 
   DishOptionModel(
@@ -138,7 +140,9 @@ class DishOptionModel extends BaseModel {
     this.id = json['id'];
     this.dishId = json['dishId'];
     this.additionId = json['additionId'];
+    this.additionName = json['additionName'];
     this.optionId = json['optionId'];
+    this.optionName = json['optionName'];
     this.price = json['price'];
   }
 
@@ -147,7 +151,9 @@ class DishOptionModel extends BaseModel {
     data['id'] = this.id;
     data['dishId'] = this.dishId;
     data['additionId'] = this.additionId;
+    data['additionName'] = this.additionName;
     data['optionId'] = this.optionId;
+    data['optionName'] = this.optionName;
     data['price'] = this.price;
     return data;
   }

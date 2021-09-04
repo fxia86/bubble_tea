@@ -19,6 +19,7 @@ class AppThemeData {
 
   static ThemeData themeData(ColorScheme colorScheme, Color focusColor) {
     return ThemeData().copyWith(
+      colorScheme: colorScheme,
       primaryColor: const Color(0xFF2196F3),
       accentColor: const Color(0xFFE3F2FD),
       scaffoldBackgroundColor: const Color(0xFFF4F9FC),

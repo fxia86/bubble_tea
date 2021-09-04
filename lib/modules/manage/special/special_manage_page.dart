@@ -170,14 +170,15 @@ class BundleTable extends StatelessWidget {
           rows: [
             for (var item in controller.bundles)
               DataRow(cells: [
-                DataCell(Text(item.dishes.map((e) => "${e.dishName} * ${e.qty}").join(", "))),
+                DataCell(Text(item.dishes
+                    .map((e) => "${e.dishName} * ${e.qty}")
+                    .join(", "))),
                 DataCell(
                     Text("€  ${(item.offerPrice! / 100).toStringAsFixed(2)}")),
                 DataCell(Row(
                   children: [
                     ScaleIconButton(
-                      onPressed: () => Get.toNamed(
-                          Routes.MANAGE_SPECIAL_BUNDLE,
+                      onPressed: () => Get.toNamed(Routes.MANAGE_SPECIAL_BUNDLE,
                           arguments: item),
                       icon: Icon(Icons.edit),
                       color: Colors.orange,
@@ -216,8 +217,14 @@ class PriceTable extends StatelessWidget {
                     "€  ${(item.originalPrice! / 100).toStringAsFixed(2)}")),
                 DataCell(
                     Text("€  ${(item.offerPrice! / 100).toStringAsFixed(2)}")),
-                DataCell(Text(
-                    "${CommonUtils.toDateString(item.start!)}\n        to\n${CommonUtils.toDateString(item.end!)}")),
+                DataCell(Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text("${CommonUtils.toDateString(item.start!)}"),
+                    Text("to"),
+                    Text("${CommonUtils.toDateString(item.end!)}")
+                  ],
+                )),
                 DataCell(Row(
                   children: [
                     ScaleIconButton(

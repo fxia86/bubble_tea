@@ -23,8 +23,8 @@ import 'package:bubble_tea/modules/manage/staff/staff_manage_binding.dart';
 import 'package:bubble_tea/modules/manage/staff/staff_manage_page.dart';
 import 'package:bubble_tea/modules/manage/supplier/supplier_manage_binding.dart';
 import 'package:bubble_tea/modules/manage/supplier/supplier_manage_page.dart';
-import 'package:bubble_tea/modules/shop/shop_binding.dart';
-import 'package:bubble_tea/modules/shop/shop_page.dart';
+import 'package:bubble_tea/modules/reception/reception_binding.dart';
+import 'package:bubble_tea/modules/reception/reception_page.dart';
 import 'package:get/get.dart';
 
 part 'routes.dart';
@@ -37,9 +37,9 @@ class Pages {
       binding: LoginBinding(),
     ),
     GetPage(
-      name: Routes.SHOP,
-      page: () => ShopPage(),
-      binding: ShopBinding(),
+      name: Routes.RECEPTION,
+      page: () => ReceptionPage(),
+      binding: ReceptionBinding(),
     ),
     GetPage(
       name: Routes.MANAGE_SHOP,

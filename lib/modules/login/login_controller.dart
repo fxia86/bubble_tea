@@ -57,7 +57,7 @@ class LoginController extends GetxController {
         Get.offAllNamed(Routes.MANAGE_SHOP);
         break;
       case 4:
-        Get.offAllNamed(Routes.SHOP);
+        Get.offAllNamed(Routes.RECEPTION);
         break;
       default:
     }

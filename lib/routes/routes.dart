@@ -3,7 +3,7 @@ part of './pages.dart';
 abstract class Routes {
   static const INITIAL = "/";
   static const LOGIN = "/login";
-  static const SHOP = "/shop";
+  static const RECEPTION = "/reception";
   static const MANAGE_SHOP = "/manage/shop";
   static const MANAGE_STAFF = "/manage/staff";
   static const MANAGE_SUPPLIER = "/manage/supplier";

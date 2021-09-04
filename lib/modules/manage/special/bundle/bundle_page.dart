@@ -341,7 +341,6 @@ class OfferList extends StatelessWidget {
 class DiscountForm extends StatelessWidget {
   DiscountForm({Key? key}) : super(key: key);
   final controller = Get.find<BundleController>();
-  final _parent = Get.find<SpecialManageController>();
 
   @override
   Widget build(BuildContext context) {
