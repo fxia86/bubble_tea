@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'package:crypto/crypto.dart';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -47,4 +50,11 @@ class CommonUtils {
     }
     return null;
   }
+
+   static String md5Crypto(String data) {
+    var content = new Utf8Encoder().convert(data);
+    var digest = md5.convert(content);
+    return digest.toString();
+  }
+
 }

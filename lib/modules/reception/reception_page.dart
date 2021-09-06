@@ -1,5 +1,7 @@
 import 'package:bubble_tea/data/local/local_storage.dart';
+import 'package:bubble_tea/r.dart';
 import 'package:bubble_tea/routes/pages.dart';
+import 'package:bubble_tea/widgets/modify_password.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -89,7 +91,22 @@ class Logo extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          FlutterLogo(),
+          Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: Image.asset(
+              R.LOGO_WHITE,
+              width: 48,
+            ),
+          ),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 15),
+              child: Text(
+                controller.shopName ?? "",
+                style: Get.textTheme.headline5?.copyWith(color: Colors.white),
+              ),
+            ),
+          ),
           PopupMenuButton(
             offset: Offset(-70, 50),
             icon: const Icon(
@@ -105,6 +122,7 @@ class Logo extends StatelessWidget {
                   break;
                 case 2:
                   //modify
+                  Get.dialog(ModifyPassword());
                   break;
                 case 3:
                   //log out
@@ -149,7 +167,6 @@ class Logo extends StatelessWidget {
     );
   }
 }
-
 
 class MenuGrid extends StatelessWidget {
   MenuGrid({Key? key, required this.list, this.crossAxisCount = 3})

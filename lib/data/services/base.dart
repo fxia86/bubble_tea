@@ -4,8 +4,7 @@ import 'package:get/get.dart';
 final http = Get.find<HttpClient>();
 
 class ServiceUrl {
-  static const LOGIN = "/api/auth/login";
-  static const REFRESH = "/api/auth/refresh";
+  static const AUTH = "/api/auth";
 
   static const SHOP = "/api/shop";
   static const STAFF = "/api/staff";
@@ -19,4 +18,5 @@ class ServiceUrl {
   static const SPECIAL_DISCOUNT = "/api/special/discount";
   static const SPECIAL_BUNDLE = "/api/special/bundle";
   static const SPECIAL_PRICE = "/api/special/price";
+  static const ORDER = "/api/order";
 }

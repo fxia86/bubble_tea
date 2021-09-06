@@ -19,7 +19,7 @@ class AppThemeData {
 
   static ThemeData themeData(ColorScheme colorScheme, Color focusColor) {
     return ThemeData().copyWith(
-      colorScheme: colorScheme,
+      // colorScheme: colorScheme,
       primaryColor: const Color(0xFF2196F3),
       accentColor: const Color(0xFFE3F2FD),
       scaffoldBackgroundColor: const Color(0xFFF4F9FC),
@@ -90,6 +90,7 @@ class AppThemeData {
   static const _semiBold = FontWeight.w600;
   static const _bold = FontWeight.w700;
 
+  // ignore: unused_field
   static final TextTheme _textTheme = TextTheme(
     headline4: GoogleFonts.montserrat(fontWeight: _bold, fontSize: 20.0),
     caption: GoogleFonts.oswald(fontWeight: _semiBold, fontSize: 16.0),

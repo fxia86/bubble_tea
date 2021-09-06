@@ -1,14 +1,17 @@
 import 'package:bubble_tea/data/models/base.dart';
 
 class OrderModel extends BaseModel {
+  String? shopId;
   int? payment;
   String? sn;
   String? date;
   int? originalPrice;
   int? offerPrice;
+  List<OrderDishModel> dishes = <OrderDishModel>[];
 
   OrderModel({
     String? id,
+    this.shopId,
     this.payment,
     this.sn,
     this.date,
@@ -18,21 +21,29 @@ class OrderModel extends BaseModel {
 
   OrderModel.fromJson(Map<String, dynamic> json) {
     this.id = json['id'];
+    this.shopId = json['shopId'];
     this.payment = json['payment'];
     this.sn = json['sn'];
     this.date = json['date'];
     this.originalPrice = json['originalPrice'];
     this.offerPrice = json['offerPrice'];
+    if (json['dishes'] != null) {
+      this.dishes = List.castFrom(json['dishes'])
+          .map((v) => OrderDishModel.fromJson(v))
+          .toList();
+    }
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['id'] = this.id;
+    data['shopId'] = this.shopId;
     data['payment'] = this.payment;
     data['sn'] = this.sn;
     data['date'] = this.date;
     data['originalPrice'] = this.originalPrice;
     data['offerPrice'] = this.offerPrice;
+    data['dishes'] = List.castFrom(this.dishes.map((e) => e.toJson()).toList());
     return data;
   }
 }

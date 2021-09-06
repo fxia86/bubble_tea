@@ -1,8 +1,10 @@
 import 'package:bubble_tea/data/local/local_storage.dart';
+import 'package:bubble_tea/r.dart';
 import 'package:bubble_tea/routes/pages.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import 'modify_password.dart';
 import 'my_icon_button.dart';
 
 class BodyLayout extends StatelessWidget {
@@ -80,14 +82,39 @@ class Left extends StatelessWidget {
           //   ),
           //   // onDetailsPressed: (){ print("object");},
           // ),
-          FlutterLogo(),
-          Text(
-            user.name!,
-            style: Get.textTheme.bodyText1,
+          Padding(
+            padding: const EdgeInsets.only(left: 15, top: 15),
+            child: Row(
+              children: [
+                Image.asset(
+                  R.LOGO_BLUE,
+                  width: 48,
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Text(
+                      user.merchantName??"E-POS",
+                      style: Get.textTheme.headline5?.copyWith(
+                          color: Get.theme.primaryColor.withAlpha(160)),
+                    ),
+                  ),
+                )
+              ],
+            ),
           ),
-          Text(
-            user.email!,
-            style: Get.textTheme.subtitle1,
+          ListTile(
+            title: Text(
+              user.name!,
+              style: Get.textTheme.bodyText1,
+            ),
+            subtitle: Text(
+              user.email!,
+              style: Get.textTheme.subtitle1,
+            ),
+            trailing: IconButton(onPressed: (){
+              Get.dialog(ModifyPassword());
+            }, icon: Icon(Icons.person)),
           ),
           Divider(),
           Expanded(

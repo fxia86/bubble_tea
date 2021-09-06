@@ -11,10 +11,9 @@ class LoginPage extends GetView<LoginController> {
       body: Stack(
         alignment: AlignmentDirectional.bottomStart,
         children: [
-          Image.asset(R.ImageLoginBg,
-              width: context.width, fit: BoxFit.fitWidth),
+          Image.asset(R.LOGIN_BG, width: context.width, fit: BoxFit.fitWidth),
           Container(
-            color: Colors.black45,
+            // color: Colors.black45,
             width: context.width,
             height: context.height,
             child: Column(
@@ -22,17 +21,25 @@ class LoginPage extends GetView<LoginController> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Text(
-                  'Welcome',
-                  style: Get.textTheme.headline2?.copyWith(color: Colors.white),
+                  'WELCOME',
+                  style: TextStyle(fontSize: 48, letterSpacing: 5),
                 ),
-                SizedBox(height: 40),
+                SizedBox(height: 70),
                 EmailField(onChanged: controller.onEmailChanged),
-                SizedBox(height: 10),
+                SizedBox(height: 40),
                 PasswordField(onChanged: controller.onPasswordChanged),
-                SizedBox(height: 30),
+                SizedBox(height: 70),
                 LoginButton(
                   onLogin: controller.onLogin,
                 ),
+                SizedBox(height: 10),
+                TextButton(
+                    onPressed: () {},
+                    child: Text(
+                      "Forgot password?",
+                      style: Get.textTheme.bodyText1
+                          ?.copyWith(color: Colors.white),
+                    ))
               ],
             ),
           ),
@@ -52,13 +59,12 @@ class TextFieldContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.symmetric(vertical: 10),
-      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-      width: context.width * 0.4,
+      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+      width: context.width * 0.3,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        color: Colors.white,
-      ),
+          borderRadius: BorderRadius.circular(50),
+          // color: Colors.white,
+          border: Border.all(color: Colors.white)),
       child: child,
     );
   }
@@ -76,10 +82,16 @@ class EmailField extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextFieldContainer(
       child: TextField(
+        style: Get.textTheme.headline5?.copyWith(color: Colors.white),
         // keyboardType: TextInputType.emailAddress,
         decoration: InputDecoration(
+          contentPadding: EdgeInsets.symmetric(vertical: 0),
           hintText: "Email",
-          icon: Icon(Icons.email,size: Get.theme.iconTheme.size),
+          hintStyle: Get.textTheme.bodyText1?.copyWith(color: Colors.white),
+          icon: Icon(
+            Icons.email,
+            size: Get.theme.iconTheme.size,
+          ),
           border: InputBorder.none,
         ),
         onChanged: onChanged,
@@ -105,8 +117,10 @@ class PasswordField extends StatelessWidget {
         initialValue: true,
         builder: (value, updateFn) => TextField(
           obscureText: value!,
+          style: Get.textTheme.headline5?.copyWith(color: Colors.white),
           decoration: InputDecoration(
             hintText: "Password",
+            hintStyle: Get.textTheme.bodyText1?.copyWith(color: Colors.white),
             icon: Icon(Icons.lock, size: Get.theme.iconTheme.size),
             suffixIcon: ScaleIconButton(
               onPressed: () => updateFn(!value),
@@ -131,18 +145,19 @@ class LoginButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton(
-      onPressed: onLogin,
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
+    return Container(
+      width: Get.width * 0.3,
+      height: 60,
+      child: ElevatedButton(
+        onPressed: onLogin,
+        child: Center(
+          child: Text(
+            "Sign in",
+            style: Get.textTheme.headline5?.copyWith(color: Colors.white),
+          ),
         ),
-        padding: EdgeInsets.symmetric(
-          horizontal: 30,
-          vertical: 10,
-        ),
-        child: Text(
-          "Sign in",
+        style: ButtonStyle(
+          shape: MaterialStateProperty.all(StadiumBorder()),
         ),
       ),
     );

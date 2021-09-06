@@ -3,5 +3,5 @@ class AppConfig {
       ? _BASE_URL_PRODUCT
       : _BASE_URL_DEVELOPMENT;
   static const _BASE_URL_DEVELOPMENT = "http://192.168.0.88:5000/";
-  static const _BASE_URL_PRODUCT = "";
+  static const _BASE_URL_PRODUCT = "http://192.168.0.88:5000/";
 }

@@ -2,7 +2,8 @@ import 'package:bubble_tea/data/services/base.dart';
 
 class PrinterService {
   getAll({bool showLoading = true, String? shopId}) async {
-    var response = await http.get(ServiceUrl.PRINTER, showLoading: showLoading, params: {"shopId":shopId});
+    var response = await http.get(ServiceUrl.PRINTER,
+        showLoading: showLoading, params: {"shopId": shopId});
 
     return response;
   }

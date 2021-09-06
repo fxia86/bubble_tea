@@ -1,15 +1,25 @@
 class AuthUserModel {
   String? name;
   String? email;
-  String? password;
+  String? shopId;
+  String? shopName;
+  String? merchantName;
   int? role;
 
-  AuthUserModel({this.name, this.email, this.password, this.role});
+  AuthUserModel(
+      {this.name,
+      this.email,
+      this.shopId,
+      this.shopName,
+      this.merchantName,
+      this.role});
 
   AuthUserModel.fromJson(Map<String, dynamic> json) {
     this.name = json['name'];
     this.email = json['email'];
-    this.password = json['password'];
+    this.shopId = json['shopId'];
+    this.shopName = json['shopName'];
+    this.merchantName = json['merchantName'];
     this.role = json['role'];
   }
 
@@ -17,7 +27,9 @@ class AuthUserModel {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['name'] = this.name;
     data['email'] = this.email;
-    data['password'] = this.password;
+    data['shopId'] = this.shopId;
+    data['shopName'] = this.shopName;
+    data['merchantName'] = this.merchantName;
     data['role'] = this.role;
     return data;
   }

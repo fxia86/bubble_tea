@@ -1,8 +1,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.bubble_tea">
+   <uses-permission android:name="android.permission.INTERNET"/>
    <application
-        android:label="Bubble Tea"
-        android:icon="@mipmap/ic_launcher">
+        android:label="E-POS"
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"
             android:screenOrientation="landscape"

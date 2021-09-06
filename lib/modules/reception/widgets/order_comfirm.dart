@@ -17,7 +17,7 @@ class DishConfirm extends StatelessWidget {
     List<OrderDishModel> list = List.from(controller.orderList
         .map((element) => OrderDishModel.copyWith(element)));
 
-    var _confirmList = [];
+    var confirmList = [];
     var totalAmount = 0;
     var discountAmount = 0;
 
@@ -25,7 +25,9 @@ class DishConfirm extends StatelessWidget {
     controller.specialBundles.forEach((bundle) {
       var needed = true;
       while (needed) {
-        var _bundleList = <OrderDishModel>[];
+        var bundleList = <OrderDishModel>[];
+
+        var bundleName = bundle.dishes.map((e) => e.dishName).join(", ");
 
         for (var item in bundle.dishes) {
           var idx = list.indexWhere((element) => element.dishId == item.dishId);
@@ -37,21 +39,21 @@ class DishConfirm extends StatelessWidget {
 
           if (dish.qty! >= item.qty!) {
             dish
-              ..specialOffer = "Bundle"
+              ..specialOffer = "Bundle ($bundleName)"
               ..qty = item.qty
               ..originalPrice = (dish.originalPrice!).toInt()
               ..offerPrice = bundle.offerPrice;
 
-            _bundleList.add(dish);
+            bundleList.add(dish);
           }
         }
 
         // bundle founded
-        if (bundle.dishes.length == _bundleList.length) {
-          _confirmList.add(_bundleList);
+        if (bundle.dishes.length == bundleList.length) {
+          confirmList.add(bundleList);
 
           // remove bundle items from list
-          _bundleList.forEach((element) {
+          bundleList.forEach((element) {
             var dish = list.firstWhere((d) => d.dishId == element.dishId);
             dish.qty = dish.qty! - element.qty!;
             if (dish.qty! == 0) {
@@ -60,10 +62,10 @@ class DishConfirm extends StatelessWidget {
           });
 
           totalAmount += bundle.offerPrice!;
-          discountAmount += _bundleList.fold(
+          discountAmount += bundleList.fold(
                   0,
                   (int? previousValue, element) =>
-                      previousValue! + element.originalPrice!) -
+                      previousValue! + element.originalPrice! * element.qty!) -
               bundle.offerPrice!;
         } else {
           needed = false;
@@ -71,9 +73,9 @@ class DishConfirm extends StatelessWidget {
       }
     });
 
-    var _discountList = [];
-    var _priceList = [];
-    var _normalList = [];
+    var discountList = [];
+    var priceList = [];
+    var normalList = [];
 
     list.forEach((element) {
       var discountIdx = controller.specialDiscounts
@@ -85,15 +87,14 @@ class DishConfirm extends StatelessWidget {
           var discount = controller.specialDiscounts[discountIdx].discount!;
           var first = OrderDishModel.copyWith(element)
             ..qty = element.qty! - qty;
-          first.offerPrice =
-              (element.offerPrice! / element.qty! * first.qty!).toInt();
+
           var second = OrderDishModel.copyWith(element)
             ..offerPrice =
-                (element.originalPrice! * (1 - discount / 100) * qty).toInt()
+                (element.originalPrice! * (1 - discount / 100)).toInt()
             ..qty = qty
             ..specialOffer = "Buy 1 get 1 $discount% discount";
 
-          _discountList.add([first, second]);
+          discountList.add([first, second]);
 
           totalAmount += first.originalPrice! * first.qty!;
           totalAmount += second.offerPrice! * second.qty!;
@@ -102,17 +103,19 @@ class DishConfirm extends StatelessWidget {
               (second.originalPrice! - second.offerPrice!) * second.qty!;
         } else {
           // normal
-          _normalList.add([element]);
+          normalList.add([element]);
           totalAmount += element.offerPrice! * element.qty!;
         }
       } else {
         var priceIndex = controller.specialPrices
             .indexWhere((p) => p.dishId == element.dishId);
         if (priceIndex > -1 &&
+            CommonUtils.toDateTime(controller.specialPrices[priceIndex].start!)
+                .isBefore(DateTime.now()) &&
             CommonUtils.toDateTime(controller.specialPrices[priceIndex].end!)
                 .isAfter(DateTime.now())) {
           // special price
-          _priceList.add([
+          priceList.add([
             element
               ..offerPrice = controller.specialPrices[priceIndex].offerPrice!
               ..specialOffer = "Special Price"
@@ -124,17 +127,17 @@ class DishConfirm extends StatelessWidget {
               (element.originalPrice! - element.offerPrice!) * element.qty!;
         } else {
           // normal
-          _normalList.add([element]);
+          normalList.add([element]);
           totalAmount += element.offerPrice! * element.qty!;
         }
       }
     });
 
-    _confirmList.addAll(_discountList);
-    _confirmList.addAll(_priceList);
-    _confirmList.addAll(_normalList);
+    confirmList.addAll(discountList);
+    confirmList.addAll(priceList);
+    confirmList.addAll(normalList);
 
-    return Tuple3(_confirmList, totalAmount, discountAmount);
+    return Tuple3(confirmList, totalAmount, discountAmount);
   }
 
   @override
@@ -210,12 +213,13 @@ class DishConfirm extends StatelessWidget {
                       subDiscount =
                           (items[0].originalPrice! - items[0].offerPrice!) *
                               items[0].qty!;
-                    } else if (specialOffer == "Bundle") {
+                    } else if (specialOffer.contains("Bundle")) {
                       subtotal = items[0].offerPrice!;
                       subDiscount = items.fold(
                               0,
                               (int? previousValue, element) =>
-                                  previousValue! + element.originalPrice!) -
+                                  previousValue! +
+                                  element.originalPrice! * element.qty!) -
                           subtotal;
                     } else {
                       subtotal = items[0].originalPrice! * items[0].qty! +
@@ -300,7 +304,7 @@ class DishConfirm extends StatelessWidget {
                                           style: Get.textTheme.headline5,
                                         ),
                                       )
-                                    else if (specialOffer == "Bundle")
+                                    else if (specialOffer.contains("Bundle"))
                                       Container(
                                         width: Get.width * 0.15,
                                         child: Text(
@@ -377,11 +381,13 @@ class DishConfirm extends StatelessWidget {
                                     padding: EdgeInsets.symmetric(
                                         horizontal: 10, vertical: 5),
                                     decoration: BoxDecoration(
-                                      color: Get.theme.colorScheme.secondary,
+                                      color: Color(0xFFFF5128),
                                       borderRadius: BorderRadius.circular(5),
                                     ),
                                     child: Text(
-                                      specialOffer,
+                                      specialOffer.contains("Bundle")
+                                          ? "Bundle"
+                                          : specialOffer,
                                       style: Get.textTheme.subtitle1
                                           ?.copyWith(color: Colors.white),
                                     ),
@@ -401,7 +407,7 @@ class DishConfirm extends StatelessWidget {
                                   Text(
                                     "€ ${(subDiscount / 100).toStringAsFixed(2)}",
                                     style: Get.textTheme.headline5?.copyWith(
-                                      color: Get.theme.colorScheme.secondary,
+                                      color: Color(0xFFFF5128),
                                     ),
                                   ),
                                 SizedBox(
@@ -443,7 +449,7 @@ class DishConfirm extends StatelessWidget {
                   Text(
                     "€ ${(discountAmount / 100).toStringAsFixed(2)}",
                     style: Get.textTheme.headline3?.copyWith(
-                      color: Get.theme.colorScheme.secondary,
+                      color: Color(0xFFFF5128),
                     ),
                   ),
                   SizedBox(width: 20),

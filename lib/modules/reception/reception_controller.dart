@@ -1,13 +1,19 @@
+import 'package:blue_thermal_printer/blue_thermal_printer.dart';
 import 'package:bubble_tea/data/local/local_storage.dart';
 import 'package:bubble_tea/data/models/catalog_model.dart';
 import 'package:bubble_tea/data/models/dish_model.dart';
 import 'package:bubble_tea/data/models/order.dart';
+import 'package:bubble_tea/data/models/printer_model.dart';
 import 'package:bubble_tea/data/models/special_model.dart';
 import 'package:bubble_tea/data/repositories/catalog_repository.dart';
 import 'package:bubble_tea/data/repositories/dish_repository.dart';
+import 'package:bubble_tea/data/repositories/order_repository.dart';
+import 'package:bubble_tea/data/repositories/printer_repository.dart';
 import 'package:bubble_tea/data/repositories/special_repository.dart';
 import 'package:bubble_tea/routes/pages.dart';
+import 'package:bubble_tea/utils/message_box.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:collection/collection.dart';
 
@@ -15,11 +21,16 @@ class ReceptionController extends GetxController
     with SingleGetTickerProviderMixin {
   late TabController tabController;
 
+  var shopId = LocalStorage.getAuthUser().shopId;
+  var shopName = LocalStorage.getAuthUser().shopName;
+
   var catalogs = <CatalogModel>[].obs;
   var dishes = <DishModel>[].obs;
   var popularList = <DishModel>[].obs;
 
-  var printers = <DishPrinterModel>[];
+  BlueThermalPrinter bluetoothPrinter = BlueThermalPrinter.instance;
+  var pairedPrinters = <BluetoothDevice>[].obs;
+  var printers = <PrinterModel>[];
 
   var specialDiscounts = <SpecialDiscountModel>[];
   var specialBundles = <SpecialBundleModel>[];
@@ -46,12 +57,26 @@ class ReceptionController extends GetxController
   @override
   void onReady() async {
     await refresh();
+
+    initPrinters();
   }
 
   @override
   void onClose() {
     tabController.dispose();
     super.onClose();
+  }
+
+  void initPrinters() async {
+    try {
+      final devices = await bluetoothPrinter.getBondedDevices();
+      pairedPrinters.value = devices
+          .where((element) => element.name!.toLowerCase().contains("print"))
+          .toList();
+    } catch (e) {
+      PlatformException exception = e as PlatformException;
+      MessageBox.error(exception.code, exception.message ?? "");
+    }
   }
 
   Future<void> refresh() async {
@@ -79,6 +104,10 @@ class ReceptionController extends GetxController
     Get.find<SpecialBundleRepository>()
         .getAll()
         .then((value) => specialBundles = value);
+
+    Get.find<PrinterRepository>()
+        .getAll(shopId: shopId)
+        .then((value) => printers = value);
   }
 
   logout() {
@@ -168,14 +197,78 @@ class ReceptionController extends GetxController
 
   placeOrder() async {
     var order = OrderModel(
-        payment: payment.value,
-        sn: DateTime.now().toString(),
-        originalPrice: orderList
-            .fold(
-                0,
-                (int previousValue, element) =>
-                    previousValue + element.offerPrice! * element.qty!)
-            .toInt(),
-        offerPrice: totalAmount);
+      shopId: shopId,
+      payment: payment.value,
+      originalPrice: orderList
+          .fold(
+              0,
+              (int previousValue, element) =>
+                  previousValue + element.offerPrice! * element.qty!)
+          .toInt(),
+      offerPrice: totalAmount,
+    )..dishes = confirmList
+        .expand((element) => element as List<OrderDishModel>)
+        .toList();
+
+    var result = await Get.find<OrderRepository>().save(order.toJson());
+
+    //print
+    if (pairedPrinters.length > 0 && printers.length > 0) {
+      for (var item in printers) {
+        try {
+          var printer = pairedPrinters
+              .firstWhere((element) => element.address == item.address);
+          await bluetoothPrinter.connect(printer);
+          bluetoothPrinter.printNewLine();
+          bluetoothPrinter.printCustom(item.shopName!, 3, 1);
+          bluetoothPrinter.printNewLine();
+          bluetoothPrinter.printNewLine();
+          bluetoothPrinter.printCustom("Order SN:   ${result.sn}", 0, 0);
+          bluetoothPrinter.printCustom("Order Time: ${result.date}", 0, 0);
+          printDevider();
+          bluetoothPrinter.printLeftRight("Item", "Qty", 1);
+          bluetoothPrinter.printNewLine();
+          for (var orderItem in orderList) {
+            var dish =
+                dishes.firstWhere((element) => element.id == orderItem.dishId);
+            if (dish.printers.any((element) => element.printerId == item.id)) {
+              bluetoothPrinter.printLeftRight(
+                  dish.name!, orderItem.qty.toString(), 1);
+
+              var options = orderItem.desc!
+                  .split(" + ")
+                  .skip(1)
+                  .join(" ,  ")
+                  .replaceAll(RegExp(r" € \d[.]\d{2}"), "");
+              if (options.trim().length > 0) {
+                bluetoothPrinter.printCustom(options, 0, 0);
+              }
+              bluetoothPrinter.printNewLine();
+            }
+          }
+          printDevider();
+
+          bluetoothPrinter.printCustom("Thanks for your patronage!", 0, 1);
+          bluetoothPrinter.printNewLine();
+          bluetoothPrinter.printCustom("", 3, 1);
+          bluetoothPrinter.printNewLine();
+          bluetoothPrinter.printCustom("", 3, 1);
+          bluetoothPrinter.printNewLine();
+          bluetoothPrinter.paperCut();
+
+          await bluetoothPrinter.disconnect();
+
+          await Future.delayed(Duration(seconds: 1));
+          
+        } catch (e) {
+          print(e);
+        }
+      }
+    }
+  }
+
+  printDevider() {
+    bluetoothPrinter.printCustom(
+        "------------------------------------------------", 0, 1);
   }
 }

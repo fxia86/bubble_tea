@@ -91,10 +91,10 @@ class StaffManageController extends GetxController {
       MessageBox.error('Invalid phone');
     } else {
       final idx = items.indexWhere((element) =>
-          element.name == editItem.value.name &&
+          (element.email == editItem.value.email) &&
           element.id != editItem.value.id);
       if (idx > -1) {
-        MessageBox.error('Duplicated Name');
+        MessageBox.error('Duplicated Email');
         return;
       }
       if (isNew.value) {

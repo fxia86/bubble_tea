@@ -51,8 +51,8 @@ class RequestInterceptor extends Interceptor {
       HttpClient.instance.dio.lock();
 
       final dio = HttpClient().newInstance();
-      final refreshed =
-          await dio.post(ServiceUrl.REFRESH, data: LocalStorage.getAuthToken());
+      final refreshed = await dio.post("${ServiceUrl.AUTH}/refresh",
+          data: LocalStorage.getAuthToken());
 
       debugPrint('''
         *** Refresh ***

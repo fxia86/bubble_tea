@@ -40,7 +40,7 @@ class PrinterManageController extends GetxController {
     try {
       final devices = await bluetooth.getBondedDevices();
       pairedPrinters.value = devices
-          // .where((element) => element.name!.toLowerCase().contains("print"))
+          .where((element) => element.name!.toLowerCase().contains("print"))
           .toList();
     } catch (e) {
       PlatformException exception = e as PlatformException;
