@@ -9,6 +9,9 @@ class LoginController extends GetxController {
 
   String email = "";
   String password = "";
+  String verifyCode = "";
+  var forgot = false.obs;
+  var sended = false.obs;
 
   @override
   void onInit() {
@@ -51,7 +54,7 @@ class LoginController extends GetxController {
   void goto(int? role) {
     switch (role) {
       case 1:
-        // Get.offAllNamed(Routes.SHOP);
+        Get.offAllNamed(Routes.MERCHANT);
         break;
       case 2:
         Get.offAllNamed(Routes.MANAGE_SHOP);
@@ -60,6 +63,42 @@ class LoginController extends GetxController {
         Get.offAllNamed(Routes.RECEPTION);
         break;
       default:
+    }
+  }
+
+  void onSend() async {
+    if (!email.isEmail) {
+      MessageBox.error('Invalid email');
+    } else {
+      //send verifycode
+      await repository.verifycode(email);
+
+      sended(true);
+
+      MessageBox.success("The verification code has been sent",
+          "If you do not receive the email, try again after 120 seconds");
+
+      // 2分钟后可以再发
+      Future.delayed(Duration(minutes: 2)).then((value) {
+        sended(false);
+      });
+    }
+  }
+
+  void onCodeChanged(String value) {
+    verifyCode = value.trim();
+  }
+
+  void onModifyLogin() async {
+    if (!email.isEmail) {
+      MessageBox.error('Invalid email');
+    } else if (verifyCode.length != 6) {
+      MessageBox.error("Invalid verify code");
+    } else if (password.isEmpty) {
+      MessageBox.error("Invalid password");
+    } else {
+      var user = await repository.verifylogin(email, password, verifyCode);
+      goto(user.role);
     }
   }
 }

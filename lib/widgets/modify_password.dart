@@ -65,7 +65,7 @@ class _ModifyPasswordState extends State<ModifyPassword> {
                       MessageBox.error("Failed", "Incorrect original password");
                     }
                   } else {
-                    MessageBox.error("Password length must be greater than 6 ");
+                    MessageBox.error("Password must be >5 characters ");
                   }
                 },
                 child: Padding(

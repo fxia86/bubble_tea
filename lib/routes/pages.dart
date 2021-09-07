@@ -1,3 +1,7 @@
+import 'package:bubble_tea/modules/admin/merchant/manager/merchant_manager_binding.dart';
+import 'package:bubble_tea/modules/admin/merchant/manager/merchant_manager_page.dart';
+import 'package:bubble_tea/modules/admin/merchant/merchant_binding.dart';
+import 'package:bubble_tea/modules/admin/merchant/merchant_page.dart';
 import 'package:bubble_tea/modules/login/login_binding.dart';
 import 'package:bubble_tea/modules/login/login_page.dart';
 import 'package:bubble_tea/modules/manage/addition/addition_manage_binding.dart';
@@ -105,6 +109,16 @@ class Pages {
       name: Routes.MANAGE_SPECIAL_PRICE,
       page: () => PricePage(),
       binding: SpecialManageBinding(),
+    ),
+    GetPage(
+      name: Routes.MERCHANT,
+      page: () => MerchantPage(),
+      binding: MerchantBinding(),
+    ),
+    GetPage(
+      name: Routes.MERCHANT_MANAGER,
+      page: () => MerchantManagerPage(),
+      binding: MerchantManagerBinding(),
     ),
   ];
 }

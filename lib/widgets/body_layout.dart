@@ -52,6 +52,58 @@ class BodyLayout extends StatelessWidget {
 class Left extends StatelessWidget {
   const Left({Key? key}) : super(key: key);
 
+  List<NaviItem> _getNaviItems() {
+    final user = LocalStorage.getAuthUser();
+
+    if (user.role == 1) {
+      return [
+        NaviItem(
+            text: "Merchant",
+            routeName: Routes.MERCHANT,
+            iconData: Icons.groups),
+      ];
+    }
+
+    return [
+      NaviItem(
+          text: "Shop",
+          routeName: Routes.MANAGE_SHOP,
+          iconData: Icons.storefront),
+      NaviItem(
+          text: "Staff",
+          routeName: Routes.MANAGE_STAFF,
+          iconData: Icons.people),
+      NaviItem(
+          text: "Supplier",
+          routeName: Routes.MANAGE_SUPPLIER,
+          iconData: Icons.person_search),
+      NaviItem(
+          text: "Material",
+          routeName: Routes.MANAGE_MATERIAL,
+          iconData: Icons.category),
+      NaviItem(
+          text: "Catalog",
+          routeName: Routes.MANAGE_CATALOG,
+          iconData: Icons.dashboard),
+      NaviItem(
+          text: "Addition",
+          routeName: Routes.MANAGE_ADDITION,
+          iconData: Icons.fact_check),
+      NaviItem(
+          text: "Menu",
+          routeName: Routes.MANAGE_MENU,
+          iconData: Icons.restaurant_menu),
+      NaviItem(
+          text: "Printer",
+          routeName: Routes.MANAGE_PRINTER,
+          iconData: Icons.print),
+      NaviItem(
+          text: "Special Offer",
+          routeName: Routes.MANAGE_SPECIAL,
+          iconData: Icons.local_offer),
+    ];
+  }
+
   @override
   Widget build(BuildContext context) {
     final user = LocalStorage.getAuthUser();
@@ -94,7 +146,7 @@ class Left extends StatelessWidget {
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Text(
-                      user.merchantName??"E-POS",
+                      user.merchantName ?? "E-POS",
                       style: Get.textTheme.headline5?.copyWith(
                           color: Get.theme.primaryColor.withAlpha(160)),
                     ),
@@ -112,52 +164,17 @@ class Left extends StatelessWidget {
               user.email!,
               style: Get.textTheme.subtitle1,
             ),
-            trailing: IconButton(onPressed: (){
-              Get.dialog(ModifyPassword());
-            }, icon: Icon(Icons.person)),
+            trailing: IconButton(
+                onPressed: () {
+                  Get.dialog(ModifyPassword());
+                },
+                icon: Icon(Icons.person)),
           ),
           Divider(),
           Expanded(
             child: ListView(
               // padding: EdgeInsets.zero,
-              children: [
-                NaviItem(
-                    text: "Shop",
-                    routeName: Routes.MANAGE_SHOP,
-                    iconData: Icons.storefront),
-                NaviItem(
-                    text: "Staff",
-                    routeName: Routes.MANAGE_STAFF,
-                    iconData: Icons.people),
-                NaviItem(
-                    text: "Supplier",
-                    routeName: Routes.MANAGE_SUPPLIER,
-                    iconData: Icons.person_search),
-                NaviItem(
-                    text: "Material",
-                    routeName: Routes.MANAGE_MATERIAL,
-                    iconData: Icons.category),
-                NaviItem(
-                    text: "Catalog",
-                    routeName: Routes.MANAGE_CATALOG,
-                    iconData: Icons.dashboard),
-                NaviItem(
-                    text: "Addition",
-                    routeName: Routes.MANAGE_ADDITION,
-                    iconData: Icons.fact_check),
-                NaviItem(
-                    text: "Menu",
-                    routeName: Routes.MANAGE_MENU,
-                    iconData: Icons.restaurant_menu),
-                NaviItem(
-                    text: "Printer",
-                    routeName: Routes.MANAGE_PRINTER,
-                    iconData: Icons.print),
-                NaviItem(
-                    text: "Special Offer",
-                    routeName: Routes.MANAGE_SPECIAL,
-                    iconData: Icons.local_offer),
-              ],
+              children: _getNaviItems(),
             ),
           ),
           Divider(),

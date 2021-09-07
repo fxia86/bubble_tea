@@ -16,4 +16,16 @@ class AuthRepository {
     return await service.modify(
         CommonUtils.md5Crypto(originPwd), CommonUtils.md5Crypto(newPwd));
   }
+
+  Future<Null> verifycode(String email) async {
+    return await service.verifycode(email);
+  }
+
+  Future<AuthUserModel> verifylogin(
+      String email, String password, String verifyCode) async {
+    var data = await service.verifylogin(
+        email, CommonUtils.md5Crypto(password), verifyCode);
+    var user = AuthUserModel.fromJson(data["user"]);
+    return user;
+  }
 }

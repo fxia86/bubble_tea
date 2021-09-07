@@ -7,7 +7,7 @@ class ServiceUrl {
   static const AUTH = "/api/auth";
 
   static const SHOP = "/api/shop";
-  static const STAFF = "/api/staff";
+  static const USER = "/api/user";
   static const SUPPLIER = "/api/supplier";
   static const Material = "/api/material";
   static const CATALOG = "/api/catalog";
@@ -19,4 +19,5 @@ class ServiceUrl {
   static const SPECIAL_BUNDLE = "/api/special/bundle";
   static const SPECIAL_PRICE = "/api/special/price";
   static const ORDER = "/api/order";
+  static const MERCHANT = "/api/merchant";
 }

@@ -23,6 +23,26 @@ class AuthService {
     return response;
   }
 
+  verifycode(String email) async {
+    var response = await http.post(
+      "${ServiceUrl.AUTH}/verifycode",
+      data: {"email": email},
+    );
+
+    return response;
+  }
+
+  verifylogin(String email, String password, String verifyCode) async {
+    var response = await http.post(
+      "${ServiceUrl.AUTH}/verifylogin",
+      data: {"email": email, "password": password, "verifyCode": verifyCode},
+    );
+
+    LocalStorage.setAuthInfo(response);
+
+    return response;
+  }
+
   refreshToken() async {
     final dio = HttpClient().newInstance();
     var response = await dio.post("${ServiceUrl.AUTH}/refresh",

@@ -26,7 +26,7 @@ class OrderPayment extends StatelessWidget {
                     TextSpan(
                       text:
                           "  € ${(controller.totalAmount / 100).toStringAsFixed(2)}",
-                      style: Get.textTheme.headline5,
+                      style: Get.textTheme.headline5?.copyWith(color: Get.theme.primaryColor),
                     )
                   ])),
               Padding(
@@ -83,7 +83,7 @@ class OrderPayment extends StatelessWidget {
                                       controller.totalAmount
                                   ? "  € 0.00"
                                   : "  € ${((controller.amountPaid.value - controller.totalAmount) / 100).toStringAsFixed(2)}",
-                              style: Get.textTheme.headline5,
+                              style: Get.textTheme.headline5?.copyWith(color: Get.theme.primaryColor),
                             )
                           ]))
                     : SizedBox()),

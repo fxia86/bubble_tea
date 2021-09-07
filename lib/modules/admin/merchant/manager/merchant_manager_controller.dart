@@ -1,17 +1,15 @@
-import 'package:bubble_tea/data/models/shop_model.dart';
 import 'package:bubble_tea/data/models/user_model.dart';
-import 'package:bubble_tea/data/repositories/shop_repository.dart';
 import 'package:bubble_tea/data/repositories/user_repository.dart';
 import 'package:bubble_tea/utils/confirm_box.dart';
 import 'package:bubble_tea/utils/message_box.dart';
 import 'package:get/get.dart';
 
-class StaffManageController extends GetxController {
+class MerchantManagerController extends GetxController {
   final UserRepository repository = Get.find();
+
   var showForm = false.obs;
   var isNew = true.obs;
 
-  var shops = <ShopModel>[];
   var items = <UserModel>[].obs;
   var editItem = UserModel().obs;
   var keywords = "".obs;
@@ -20,8 +18,7 @@ class StaffManageController extends GetxController {
   void onReady() async {
     super.onReady();
 
-    items.value = await repository.getStaffs();
-    shops = await Get.find<ShopRepository>().getAll();
+    items.value = await repository.getManagers(merchantId: Get.arguments.id);
   }
 
   void add() {
@@ -42,12 +39,7 @@ class StaffManageController extends GetxController {
       isNew.value = false;
       var item = items.singleWhere((element) => element.id == id);
       editItem.value = UserModel(
-          id: id,
-          name: item.name,
-          email: item.email,
-          phone: item.phone,
-          shopId: item.shopId,
-          shopName: item.shopName);
+          id: id, name: item.name, email: item.email, phone: item.phone);
     }
   }
 
@@ -70,20 +62,10 @@ class StaffManageController extends GetxController {
     }
   }
 
-  void selectShop(ShopModel item) {
-    editItem.value.shopId = item.id;
-    editItem.value.shopName = item.name;
-    editItem.refresh();
-  }
-
   void save() async {
-    if (editItem.value.shopId == null || editItem.value.shopId!.isEmpty) {
-      MessageBox.error('Please select a shop');
-    } else if (editItem.value.name == null || editItem.value.name!.isEmpty) {
+    if (editItem.value.name == null || editItem.value.name!.isEmpty) {
       MessageBox.error('Invalid name');
-    } else if (editItem.value.email == null ||
-        editItem.value.email!.isEmpty ||
-        !editItem.value.email!.isEmail) {
+    } else if (editItem.value.email == null || !editItem.value.email!.isEmail) {
       MessageBox.error('Invalid email');
     } else if (editItem.value.phone == null ||
         editItem.value.phone!.isEmpty ||
@@ -91,30 +73,29 @@ class StaffManageController extends GetxController {
       MessageBox.error('Invalid phone');
     } else {
       final idx = items.indexWhere((element) =>
-          (element.email == editItem.value.email) &&
+          element.name == editItem.value.name &&
           element.id != editItem.value.id);
       if (idx > -1) {
-        MessageBox.error('Duplicated Email');
+        MessageBox.error('Duplicated Name');
         return;
       }
       if (isNew.value) {
-        var item = await repository.add(editItem.value..role = 4);
-        item.shopName = editItem.value.shopName;
+        var item = await repository.add(editItem.value
+          ..role = 2
+          ..merchantId = Get.arguments.id);
         items.insert(0, item);
       } else {
         var item =
             items.singleWhere((element) => element.id == editItem.value.id);
-        if (item.shopId == editItem.value.shopId &&
-            item.name == editItem.value.name &&
+        if (item.name == editItem.value.name &&
             item.email == editItem.value.email &&
             item.phone == editItem.value.phone) {
           showForm.value = false;
           return;
         }
-        var result = await repository.edit(editItem.value..role = 4);
+        var result = await repository.edit(editItem.value..role = 2);
         if (result) {
           item
-            ..shopName = editItem.value.shopName
             ..name = editItem.value.name
             ..email = editItem.value.email
             ..phone = editItem.value.phone;
