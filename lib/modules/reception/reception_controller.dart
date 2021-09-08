@@ -57,8 +57,6 @@ class ReceptionController extends GetxController
   @override
   void onReady() async {
     await refresh();
-
-    initPrinters();
   }
 
   @override
@@ -82,6 +80,7 @@ class ReceptionController extends GetxController
   Future<void> refresh() async {
     catalogs.value = await Get.find<CatalogRepository>().getAll();
     catalogs.insert(0, CatalogModel(name: "Popular"));
+    tabController.animateTo(0);
     tabController = TabController(length: catalogs.length, vsync: this);
 
     dishes.value = await Get.find<DishRepository>().getAll(showLoading: false);
@@ -108,6 +107,10 @@ class ReceptionController extends GetxController
     Get.find<PrinterRepository>()
         .getAll(shopId: shopId)
         .then((value) => printers = value);
+
+    initPrinters();
+
+    reset();
   }
 
   logout() {
@@ -259,16 +262,31 @@ class ReceptionController extends GetxController
           await bluetoothPrinter.disconnect();
 
           await Future.delayed(Duration(seconds: 1));
-          
         } catch (e) {
           print(e);
         }
       }
     }
+
+    reset();
   }
 
   printDevider() {
     bluetoothPrinter.printCustom(
         "------------------------------------------------", 0, 1);
+  }
+
+  reset() {
+    orderList.value = <OrderDishModel>[];
+    currentItem.value = DishModel();
+    currentOptions.value = <DishOptionModel>[];
+    currentPrice.value = 0;
+    currentQty.value = 1;
+    currentOptionMap = {};
+
+    confirmList = [];
+    totalAmount = 0;
+    payment.value = 1;
+    amountPaid.value = 0;
   }
 }
