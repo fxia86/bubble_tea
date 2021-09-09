@@ -1,8 +1,10 @@
 import 'package:bubble_tea/widgets/body_layout.dart';
 import 'package:bubble_tea/widgets/dialog_form.dart';
 import 'package:bubble_tea/widgets/my_icon_button.dart';
+import 'package:bubble_tea/widgets/qrcode_scanner.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import 'material_detail_page.dart';
 import 'material_manage_controller.dart';
@@ -15,6 +17,15 @@ class MaterialManagePage extends GetView<MaterialManageController> {
         "Material Manage",
         search: (val) => controller.keywords(val),
         add: controller.add,
+        scan: () async {
+          if (await Permission.camera.request().isGranted)
+            Get.dialog(QrcodeScanner(
+              onCapture: (data) {
+                Get.back();
+                controller.keywords(data);
+              },
+            ));
+        },
       ),
       body: Scrollbar(
         child: ListView(
@@ -23,7 +34,9 @@ class MaterialManagePage extends GetView<MaterialManageController> {
       ),
       other: Obx(() => controller.showForm.value
           ? DialogForm(
-              onWillPop: () => controller.showForm(false), form: MaterialForm())
+              onWillPop: () => controller.showForm(false),
+              form: MaterialForm(),
+            )
           : SizedBox()),
     );
   }
@@ -39,17 +52,19 @@ class MaterialTable extends StatelessWidget {
             DataColumn(
               label: Container(
                 padding: EdgeInsets.only(left: 20),
-                child: Text('Pic'),
+                child: Text('Image'),
               ),
             ),
             DataColumn(label: Text('Name')),
+            DataColumn(label: Text('Code')),
             DataColumn(label: Text('Delivery Days') /* , numeric: true */),
             DataColumn(label: Text('Warning Days') /* , numeric: true */),
             DataColumn(label: Text('')),
           ],
           rows: [
-            for (var item in controller.items
-                .where((item) => item.name!.contains(controller.keywords)))
+            for (var item in controller.items.where((item) =>
+                item.name!.toLowerCase().contains(controller.keywords.toLowerCase()) ||
+                item.code!.toLowerCase().contains(controller.keywords.toLowerCase())))
               DataRow(cells: [
                 DataCell(Padding(
                   padding: EdgeInsets.symmetric(vertical: 5),
@@ -65,6 +80,7 @@ class MaterialTable extends StatelessWidget {
                   //   Get.dialog(MaterialDetail());
                   // },
                 ),
+                DataCell(Text(item.code ?? "")),
                 DataCell(Text(item.delivery.toString())),
                 DataCell(Text(item.warning.toString())),
                 DataCell(

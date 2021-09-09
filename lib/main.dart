@@ -4,7 +4,7 @@ import 'package:bubble_tea/modules/login/login_binding.dart';
 import 'package:bubble_tea/modules/login/login_page.dart';
 import 'package:bubble_tea/routes/pages.dart';
 import 'package:flutter/material.dart';
-// import 'package:flutter/services.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
 void main() async {
@@ -14,6 +14,10 @@ void main() async {
   //状态栏透明
   // SystemChrome.setSystemUIOverlayStyle(
   //     SystemUiOverlayStyle(statusBarColor: Colors.transparent));
+
+  //横屏
+  SystemChrome.setPreferredOrientations(
+      [DeviceOrientation.landscapeLeft, DeviceOrientation.landscapeRight]);
 }
 
 class MyApp extends StatelessWidget {

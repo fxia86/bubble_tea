@@ -128,12 +128,18 @@ class MaterialManageController extends GetxController {
           'Invalid warning time', 'It should be a positive integer.');
     } else {
       final idx = items.indexWhere((element) =>
-          element.name == editItem.value.name &&
+          (element.name == editItem.value.name ||
+              element.code == editItem.value.code) &&
           element.id != editItem.value.id);
       if (idx > -1) {
-        MessageBox.error('Duplicated Name');
+        MessageBox.error('Duplicated Item');
         return;
       }
+      if (editItem.value.code == null || editItem.value.code!.isEmpty) {
+        final number = items.where((e) => e.code!.contains("AUTO-")).length + 1;
+        editItem.value.code = "AUTO-$number";
+      }
+
       var data = editItem.value.toJson();
       if (imagePath.value.isNotEmpty) {
         data["file_img"] = await dio.MultipartFile.fromFile(imagePath.value);

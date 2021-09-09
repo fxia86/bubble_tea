@@ -81,7 +81,7 @@ class ReorderMenu extends StatelessWidget {
         children: [
           for (var item in list)
             Container(
-                width: Get.width * 0.245,
+                width: Get.width * 0.228,
                 height: Get.width * 0.245,
                 child: MenuItem(item: item, deletable: true))
         ],
@@ -185,7 +185,7 @@ class MenuItem extends StatelessWidget {
                   children: [
                     Expanded(
                       child: Text(
-                        item.desc,
+                        item.desc ?? "",
                         style: Get.textTheme.subtitle1,
                         overflow: TextOverflow.fade,
                       ),

@@ -237,10 +237,12 @@ class NaviItem extends StatelessWidget {
 }
 
 class Top extends StatelessWidget {
-  Top(this.title, {Key? key, this.add, this.search}) : super(key: key);
+  Top(this.title, {Key? key, this.add, this.scan, this.search})
+      : super(key: key);
 
   final String title;
   final VoidCallback? add;
+  final VoidCallback? scan;
   final Function(String? val)? search;
 
   final TextEditingController _textEditingController = TextEditingController();
@@ -307,6 +309,20 @@ class Top extends StatelessWidget {
                     updateFn(val == "");
                   },
                 ),
+              ),
+            ),
+          if (scan != null)
+            Container(
+              height: Get.height * 0.052,
+              child: ElevatedButton(
+                onPressed: scan,
+                child: Icon(
+                  Icons.qr_code_scanner,
+                  size: Get.theme.iconTheme.size! * 1.25,
+                ),
+                style: ButtonStyle(
+                    backgroundColor:
+                        MaterialStateProperty.all(Colors.indigo[300])),
               ),
             ),
           Container(

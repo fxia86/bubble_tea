@@ -11,6 +11,7 @@ import 'package:bubble_tea/data/repositories/order_repository.dart';
 import 'package:bubble_tea/data/repositories/printer_repository.dart';
 import 'package:bubble_tea/data/repositories/special_repository.dart';
 import 'package:bubble_tea/routes/pages.dart';
+import 'package:bubble_tea/utils/loading_box.dart';
 import 'package:bubble_tea/utils/message_box.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -216,6 +217,7 @@ class ReceptionController extends GetxController
     var result = await Get.find<OrderRepository>().save(order.toJson());
 
     //print
+    // LoadingBox.show();
     if (pairedPrinters.length > 0 && printers.length > 0) {
       for (var item in printers) {
         try {
@@ -267,11 +269,22 @@ class ReceptionController extends GetxController
         }
       }
     }
+    // LoadingBox.hide();
 
     reset();
   }
 
   printDevider() {
+    //SIZE
+    // 0- normal size text
+    // 1- only bold text
+    // 2- bold with medium text
+    // 3- bold with large text
+    //ALIGN
+    // 0- ESC_ALIGN_LEFT
+    // 1- ESC_ALIGN_CENTER
+    // 2- ESC_ALIGN_RIGHT
+
     bluetoothPrinter.printCustom(
         "------------------------------------------------", 0, 1);
   }
