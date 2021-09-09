@@ -146,31 +146,32 @@ class MaterialForm extends StatelessWidget {
                           },
                         )),
                   ),
-                  Container(
-                    margin: EdgeInsets.symmetric(horizontal: 2),
-                    width: 50,
-                    height: 50,
-                    child: ElevatedButton(
-                      onPressed: () async {
-                        if (await Permission.camera.request().isGranted)
-                          Get.dialog(QrcodeScanner(
-                            onCapture: (data) {
-                              Get.back();
-                              controller.editItem.value.code = data;
-                              controller.editItem.refresh();
-                            },
-                          ));
-                      },
-                      child: Icon(
-                        Icons.qr_code_scanner,
-                        size: Get.theme.iconTheme.size! * 2,
+                  if (enable)
+                    Container(
+                      margin: EdgeInsets.symmetric(horizontal: 2),
+                      width: 50,
+                      height: 50,
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          if (await Permission.camera.request().isGranted)
+                            Get.dialog(QrcodeScanner(
+                              onCapture: (data) {
+                                Get.back();
+                                controller.editItem.value.code = data;
+                                controller.editItem.refresh();
+                              },
+                            ));
+                        },
+                        child: Icon(
+                          Icons.qr_code_scanner,
+                          size: Get.theme.iconTheme.size! * 1.25,
+                        ),
+                        style: ButtonStyle(
+                            padding: MaterialStateProperty.all(EdgeInsets.zero),
+                            backgroundColor:
+                                MaterialStateProperty.all(Colors.indigo[300])),
                       ),
-                      style: ButtonStyle(
-                          padding: MaterialStateProperty.all(EdgeInsets.zero),
-                          backgroundColor:
-                              MaterialStateProperty.all(Colors.indigo[300])),
-                    ),
-                  )
+                    )
                 ],
               ),
               SizedBox(height: 30),

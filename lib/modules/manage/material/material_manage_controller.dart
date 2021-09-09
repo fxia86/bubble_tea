@@ -75,22 +75,24 @@ class MaterialManageController extends GetxController {
       imagePath.value = "";
       var item = items.singleWhere((element) => element.id == id);
       editItem.value = MaterialModel(
+          id: id,
           name: item.name,
+          code: item.code,
           img: item.img,
           delivery: item.delivery,
           warning: item.warning);
-      editItem.value.id = item.id;
     }
   }
 
   detail(String? id) async {
     var item = items.singleWhere((element) => element.id == id);
     editItem.value = MaterialModel(
+        id: id,
         name: item.name,
+        code: item.code,
         img: item.img,
         delivery: item.delivery,
         warning: item.warning);
-    editItem.value.id = item.id;
 
     stocks.value = await repository.getStocks(item.id, showLoading: false);
 
@@ -136,7 +138,15 @@ class MaterialManageController extends GetxController {
         return;
       }
       if (editItem.value.code == null || editItem.value.code!.isEmpty) {
-        final number = items.where((e) => e.code!.contains("AUTO-")).length + 1;
+        var number = 1;
+        items.forEach((element) {
+          if (element.code!.contains("AUTO-")) {
+            var code = int.parse(element.code!.replaceFirst("AUTO-", ""));
+            if (code > number) {
+              number = code + 1;
+            }
+          }
+        });
         editItem.value.code = "AUTO-$number";
       }
 
@@ -156,6 +166,7 @@ class MaterialManageController extends GetxController {
             items.singleWhere((element) => element.id == editItem.value.id);
         if (imagePath.value.isEmpty &&
             item.name == editItem.value.name &&
+            item.code == editItem.value.code &&
             item.delivery == editItem.value.delivery &&
             item.warning == editItem.value.warning) {
           showForm.value = false;
@@ -165,6 +176,7 @@ class MaterialManageController extends GetxController {
 
         item
           ..name = result.name
+          ..code = result.code
           ..img = result.img
           ..delivery = result.delivery
           ..warning = result.warning;
