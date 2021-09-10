@@ -140,9 +140,10 @@ class MaterialManageController extends GetxController {
       if (editItem.value.code == null || editItem.value.code!.isEmpty) {
         var number = 1;
         items.forEach((element) {
-          if (element.code!.contains("AUTO-")) {
+          if (element.id != editItem.value.id &&
+              element.code!.contains("AUTO-")) {
             var code = int.parse(element.code!.replaceFirst("AUTO-", ""));
-            if (code > number) {
+            if (code >= number) {
               number = code + 1;
             }
           }
