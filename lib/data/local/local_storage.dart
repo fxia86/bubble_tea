@@ -34,4 +34,12 @@ class LocalStorage {
   static AuthUserModel getAuthUser() {
     return AuthUserModel.fromJson(box.read("authUser"));
   }
+
+  static void setNaviBarcollapsed(bool val) {
+    box.write("collapsed", val);
+  }
+
+  static bool getNaviBarcollapsed() {
+    return box.read("collapsed") ?? false;
+  }
 }

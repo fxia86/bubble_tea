@@ -49,149 +49,217 @@ class BodyLayout extends StatelessWidget {
   }
 }
 
-class Left extends StatelessWidget {
+class Left extends StatefulWidget {
   const Left({Key? key}) : super(key: key);
 
-  List<NaviItem> _getNaviItems() {
-    final user = LocalStorage.getAuthUser();
+  @override
+  _LeftState createState() => _LeftState();
+}
 
+class _LeftState extends State<Left> {
+  bool collapsed = LocalStorage.getNaviBarcollapsed();
+  final user = LocalStorage.getAuthUser();
+
+  List<NaviItem> _getNaviItems() {
     if (user.role == 1) {
       return [
         NaviItem(
-            text: "Merchant",
-            routeName: Routes.MERCHANT,
-            iconData: Icons.groups),
+          text: "Merchant",
+          routeName: Routes.MERCHANT,
+          iconData: Icons.groups,
+          collapsed: collapsed,
+        ),
       ];
     }
 
     return [
       NaviItem(
-          text: "Shop",
-          routeName: Routes.MANAGE_SHOP,
-          iconData: Icons.storefront),
+        text: "Shop",
+        routeName: Routes.MANAGE_SHOP,
+        iconData: Icons.storefront,
+        collapsed: collapsed,
+      ),
       NaviItem(
-          text: "Staff",
-          routeName: Routes.MANAGE_STAFF,
-          iconData: Icons.people),
+        text: "Staff",
+        routeName: Routes.MANAGE_STAFF,
+        iconData: Icons.people,
+        collapsed: collapsed,
+      ),
       NaviItem(
-          text: "Supplier",
-          routeName: Routes.MANAGE_SUPPLIER,
-          iconData: Icons.person_search),
+        text: "Supplier",
+        routeName: Routes.MANAGE_SUPPLIER,
+        iconData: Icons.person_search,
+        collapsed: collapsed,
+      ),
       NaviItem(
-          text: "Material",
-          routeName: Routes.MANAGE_MATERIAL,
-          iconData: Icons.category),
+        text: "Material",
+        routeName: Routes.MANAGE_MATERIAL,
+        iconData: Icons.category,
+        collapsed: collapsed,
+      ),
       NaviItem(
-          text: "Catalog",
-          routeName: Routes.MANAGE_CATALOG,
-          iconData: Icons.dashboard),
+        text: "Catalog",
+        routeName: Routes.MANAGE_CATALOG,
+        iconData: Icons.dashboard,
+        collapsed: collapsed,
+      ),
       NaviItem(
-          text: "Addition",
-          routeName: Routes.MANAGE_ADDITION,
-          iconData: Icons.fact_check),
+        text: "Addition",
+        routeName: Routes.MANAGE_ADDITION,
+        iconData: Icons.fact_check,
+        collapsed: collapsed,
+      ),
       NaviItem(
-          text: "Menu",
-          routeName: Routes.MANAGE_MENU,
-          iconData: Icons.restaurant_menu),
+        text: "Menu",
+        routeName: Routes.MANAGE_MENU,
+        iconData: Icons.restaurant_menu,
+        collapsed: collapsed,
+      ),
       NaviItem(
-          text: "Printer",
-          routeName: Routes.MANAGE_PRINTER,
-          iconData: Icons.print),
+        text: "Printer",
+        routeName: Routes.MANAGE_PRINTER,
+        iconData: Icons.print,
+        collapsed: collapsed,
+      ),
       NaviItem(
-          text: "Special Offer",
-          routeName: Routes.MANAGE_SPECIAL,
-          iconData: Icons.local_offer),
+        text: "Special Offer",
+        routeName: Routes.MANAGE_SPECIAL,
+        iconData: Icons.local_offer,
+        collapsed: collapsed,
+      ),
     ];
   }
 
   @override
   Widget build(BuildContext context) {
-    final user = LocalStorage.getAuthUser();
-
-    return Container(
-      color: Colors.white,
-      width: Get.width * 0.2,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // UserAccountsDrawerHeader(
-          //   decoration: BoxDecoration(
-          //       color: Colors.white,
-          //       border:
-          //           Border(bottom: BorderSide(color: Get.theme.dividerColor))),
-          //   accountName: Text(
-          //     user.name!,
-          //     style: Get.textTheme.bodyText1,
-          //   ),
-          //   accountEmail: Text(
-          //     user.email!,
-          //     style: Get.textTheme.subtitle1,
-          //   ),
-          //   currentAccountPicture: CircleAvatar(
-          //     child: FlutterLogo(
-          //       size: 42,
-          //     ),
-          //   ),
-          //   // onDetailsPressed: (){ print("object");},
-          // ),
-          Padding(
-            padding: const EdgeInsets.only(left: 15, top: 15),
-            child: Row(
+    return collapsed
+        ? Container(
+            color: Colors.white,
+            width: Get.width * 0.05,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Image.asset(
-                  R.LOGO_BLUE,
-                  width: 48,
+                ListTile(
+                  title: Icon(Icons.menu),
+                  onTap: () {
+                    LocalStorage.setNaviBarcollapsed(!collapsed);
+                    setState(() {
+                      collapsed = !collapsed;
+                    });
+                  },
                 ),
+                ListTile(
+                  title: Icon(Icons.person),
+                  onTap: () => Get.dialog(ModifyPassword()),
+                ),
+                Divider(),
                 Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Text(
-                      user.merchantName ?? "E-POS",
-                      style: Get.textTheme.headline5?.copyWith(
-                          color: Get.theme.primaryColor.withAlpha(160)),
-                    ),
+                  child: ListView(
+                    // padding: EdgeInsets.zero,
+                    children: _getNaviItems(),
                   ),
+                ),
+                Divider(),
+                ListTile(
+                  title: Icon(Icons.logout),
+                  onTap: () {
+                    LocalStorage.clearAuthInfo();
+                    Get.offNamed(Routes.LOGIN);
+                  },
+                )
+              ],
+            ))
+        : Container(
+            color: Colors.white,
+            width: Get.width * 0.2,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // UserAccountsDrawerHeader(
+                //   decoration: BoxDecoration(
+                //       color: Colors.white,
+                //       border:
+                //           Border(bottom: BorderSide(color: Get.theme.dividerColor))),
+                //   accountName: Text(
+                //     user.name!,
+                //     style: Get.textTheme.bodyText1,
+                //   ),
+                //   accountEmail: Text(
+                //     user.email!,
+                //     style: Get.textTheme.subtitle1,
+                //   ),
+                //   currentAccountPicture: CircleAvatar(
+                //     child: FlutterLogo(
+                //       size: 42,
+                //     ),
+                //   ),
+                //   // onDetailsPressed: (){ print("object");},
+                // ),
+                Padding(
+                  padding: const EdgeInsets.only(left: 15, top: 15),
+                  child: Row(
+                    children: [
+                      Image.asset(
+                        R.LOGO_BLUE,
+                        width: 48,
+                      ),
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          child: Text(
+                            user.merchantName ?? "E-POS",
+                            style: Get.textTheme.headline5?.copyWith(
+                                color: Get.theme.primaryColor.withAlpha(160)),
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () {
+                          LocalStorage.setNaviBarcollapsed(!collapsed);
+                          setState(() {
+                            collapsed = !collapsed;
+                          });
+                        },
+                        icon: Icon(Icons.menu),
+                      ),
+                    ],
+                  ),
+                ),
+                ListTile(
+                  title: Text(
+                    user.name!,
+                    style: Get.textTheme.bodyText1,
+                  ),
+                  subtitle: Text(
+                    user.email!,
+                    style: Get.textTheme.subtitle1,
+                  ),
+                  trailing: IconButton(
+                      onPressed: () => Get.dialog(ModifyPassword()),
+                      icon: Icon(Icons.person)),
+                ),
+                Divider(),
+                Expanded(
+                  child: ListView(
+                    // padding: EdgeInsets.zero,
+                    children: _getNaviItems(),
+                  ),
+                ),
+                Divider(),
+                ListTile(
+                  leading: Icon(Icons.logout),
+                  title: Text(
+                    "Log out",
+                    style: Get.textTheme.bodyText1,
+                  ),
+                  onTap: () {
+                    LocalStorage.clearAuthInfo();
+                    Get.offNamed(Routes.LOGIN);
+                  },
                 )
               ],
             ),
-          ),
-          ListTile(
-            title: Text(
-              user.name!,
-              style: Get.textTheme.bodyText1,
-            ),
-            subtitle: Text(
-              user.email!,
-              style: Get.textTheme.subtitle1,
-            ),
-            trailing: IconButton(
-                onPressed: () {
-                  Get.dialog(ModifyPassword());
-                },
-                icon: Icon(Icons.person)),
-          ),
-          Divider(),
-          Expanded(
-            child: ListView(
-              // padding: EdgeInsets.zero,
-              children: _getNaviItems(),
-            ),
-          ),
-          Divider(),
-          ListTile(
-            leading: Icon(Icons.logout),
-            title: Text(
-              "Log out",
-              style: Get.textTheme.bodyText1,
-            ),
-            onTap: () {
-              LocalStorage.clearAuthInfo();
-              Get.offNamed(Routes.LOGIN);
-            },
-          )
-        ],
-      ),
-    );
+          );
   }
 }
 
@@ -200,37 +268,44 @@ class NaviItem extends StatelessWidget {
       {Key? key,
       required this.text,
       required this.routeName,
-      required this.iconData})
+      required this.iconData,
+      this.collapsed = false})
       : super(key: key);
 
   final String text;
   final String routeName;
   final IconData iconData;
+  final bool collapsed;
 
   @override
   Widget build(BuildContext context) {
+    var selected = Get.currentRoute == routeName;
+    var row = collapsed
+        ? ListTile(
+            title: selected
+                ? Icon(iconData, color: Get.theme.primaryColor)
+                : Icon(iconData),
+          )
+        : ListTile(
+            leading: selected
+                ? Icon(iconData, color: Get.theme.primaryColor)
+                : Icon(iconData),
+            title: selected
+                ? Text(
+                    text,
+                    style: Get.textTheme.bodyText1
+                        ?.copyWith(color: Get.theme.primaryColor),
+                  )
+                : Text(
+                    text,
+                    style: Get.textTheme.bodyText1,
+                  ),
+          );
+
     return InkWell(
-      child: Get.currentRoute == routeName
-          ? Container(
-              color: Get.theme.accentColor,
-              child: ListTile(
-                leading: Icon(iconData, color: Get.theme.primaryColor),
-                title: Text(
-                  text,
-                  style: Get.textTheme.bodyText1
-                      ?.copyWith(color: Get.theme.primaryColor),
-                ),
-              ),
-            )
-          : Container(
-              child: ListTile(
-                leading: Icon(iconData),
-                title: Text(
-                  text,
-                  style: Get.textTheme.bodyText1,
-                ),
-              ),
-            ),
+      child: selected
+          ? Container(color: Get.theme.accentColor, child: row)
+          : Container(child: row),
       onTap: () => Get.offNamed(routeName),
     );
   }
