@@ -56,9 +56,9 @@ class MaterialTable extends StatelessWidget {
               ),
             ),
             DataColumn(label: Text('Name')),
-            DataColumn(label: Text('Code')),
-            DataColumn(label: Text('Delivery Days') /* , numeric: true */),
-            DataColumn(label: Text('Warning Days') /* , numeric: true */),
+            DataColumn(label: Text('Stock')),
+            DataColumn(label: Text('Delivery') /* , numeric: true */),
+            DataColumn(label: Text('Warning') /* , numeric: true */),
             DataColumn(label: Text('')),
           ],
           rows: [
@@ -80,7 +80,7 @@ class MaterialTable extends StatelessWidget {
                   //   Get.dialog(MaterialDetail());
                   // },
                 ),
-                DataCell(Text(item.code ?? "")),
+                DataCell(Text(item.stock.toString())),
                 DataCell(Text(item.delivery.toString())),
                 DataCell(Text(item.warning.toString())),
                 DataCell(

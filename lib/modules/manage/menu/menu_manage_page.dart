@@ -1,3 +1,4 @@
+import 'package:bubble_tea/data/local/local_storage.dart';
 import 'package:bubble_tea/routes/pages.dart';
 import 'package:bubble_tea/widgets/body_layout.dart';
 import 'package:bubble_tea/widgets/my_icon_button.dart';
@@ -73,6 +74,7 @@ class ReorderMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    bool collapsed = LocalStorage.getNaviBarcollapsed();
     return SingleChildScrollView(
       child: ReorderableWrap(
         spacing: 12,
@@ -81,8 +83,8 @@ class ReorderMenu extends StatelessWidget {
         children: [
           for (var item in list)
             Container(
-                width: Get.width * 0.228,
-                height: Get.width * 0.245,
+                width: Get.width * (collapsed ? 0.295 : 0.228),
+                height: Get.width * (collapsed ? 0.295 : 0.245),
                 child: MenuItem(item: item, deletable: true))
         ],
         onReorder: (int oldIndex, int newIndex) =>
@@ -122,6 +124,20 @@ class MenuGrid extends StatelessWidget {
       itemCount: list.length,
       itemBuilder: (c, i) => MenuItem(item: list.elementAt(i)),
     );
+    // DragAndDropGridView(
+    //         padding: EdgeInsets.symmetric(horizontal: 5, vertical: 20),
+    //         onWillAccept: (int oldIndex, int newIndex) => oldIndex != newIndex,
+    //         onReorder: (int oldIndex, int newIndex) => controller.reorder(
+    //             oldIndex, newIndex, list.toList()[0].catalogId),
+    //         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+    //           crossAxisCount: crossAxisCount,
+    //           mainAxisSpacing: 12,
+    //           crossAxisSpacing: 12,
+    //           // childAspectRatio: 0.9,
+    //         ),
+    //         itemCount: list.length,
+    //         itemBuilder: (c, i) => MenuItem(item: list.elementAt(i)),
+    //       );
   }
 }
 

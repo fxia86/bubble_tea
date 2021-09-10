@@ -217,8 +217,8 @@ class ReceptionController extends GetxController
     var result = await Get.find<OrderRepository>().save(order.toJson());
 
     //print
-    // LoadingBox.show();
     if (pairedPrinters.length > 0 && printers.length > 0) {
+      LoadingBox.show();
       for (var item in printers) {
         try {
           var printer = pairedPrinters
@@ -268,8 +268,8 @@ class ReceptionController extends GetxController
           print(e);
         }
       }
+      LoadingBox.hide();
     }
-    // LoadingBox.hide();
 
     reset();
   }

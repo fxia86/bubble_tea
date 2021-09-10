@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:bubble_tea/data/models/shop_model.dart';
 import 'package:bubble_tea/data/models/supplier_model.dart';
-import 'package:bubble_tea/widgets/my_icon_button.dart';
 import 'package:bubble_tea/widgets/qrcode_scanner.dart';
 import 'package:bubble_tea/widgets/simple_text_field.dart';
 import 'package:flutter/material.dart';

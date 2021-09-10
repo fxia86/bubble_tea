@@ -3,18 +3,26 @@ import 'package:bubble_tea/data/models/base.dart';
 class MaterialModel extends BaseModel {
   String? name;
   String? code;
+  int? stock;
   String? img;
   int? delivery;
   int? warning;
 
   MaterialModel(
-      {String? id, this.name, this.code, this.img, this.delivery, this.warning})
+      {String? id,
+      this.name,
+      this.code,
+      this.stock,
+      this.img,
+      this.delivery,
+      this.warning})
       : super(id: id);
 
   MaterialModel.fromJson(Map<String, dynamic> json) {
     this.id = json['id'];
     this.name = json['name'];
     this.code = json['code'];
+    this.stock = json['stock'];
     this.img = json['img'];
     this.delivery = json['delivery'];
     this.warning = json['warning'];
@@ -25,6 +33,7 @@ class MaterialModel extends BaseModel {
     data['id'] = this.id;
     data['name'] = this.name;
     data['code'] = this.code;
+    data['stock'] = this.stock;
     data['img'] = this.img;
     data['delivery'] = this.delivery;
     data['warning'] = this.warning;
