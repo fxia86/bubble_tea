@@ -18,7 +18,7 @@ class DishOptions extends StatelessWidget {
       onWillPop: Get.back,
       form: Container(
         color: Colors.white,
-        width: Get.width * 0.4,
+        width: Get.width * 0.5,
         height: Get.height,
         padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
         child: Column(

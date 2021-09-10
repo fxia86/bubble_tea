@@ -249,7 +249,7 @@ class MenuItem extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(10, 5, 0, 5),
                 child: Text(
-                  item.desc,
+                  item.desc ?? "",
                   style: Get.textTheme.subtitle1,
                   overflow: TextOverflow.fade,
                 ),
