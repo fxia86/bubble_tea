@@ -136,14 +136,17 @@ class AdditionList extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20),
+                    padding: EdgeInsets.only(left: 16, top: 8),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          items[i].name ?? "",
-                          style: Get.textTheme.bodyText1
-                              ?.copyWith(fontWeight: FontWeight.w500),
+                        Expanded(
+                          child: Text(
+                            items[i].name ?? "",
+                            style: Get.textTheme.bodyText1
+                                ?.copyWith(fontWeight: FontWeight.w500),
+                            overflow: TextOverflow.clip,
+                          ),
                         ),
                         PopupMenuButton(
                           // offset: Offset(-30,30),
@@ -175,34 +178,42 @@ class AdditionList extends StatelessWidget {
                     ),
                   ),
                   Divider(),
-                  for (var option in items[i].options)
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 20),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            option.name ?? "",
-                            style: Get.textTheme.bodyText1,
-                          ),
-                          ButtonBar(
-                            buttonPadding: EdgeInsets.symmetric(horizontal: 0),
-                            children: [
-                              ScaleIconButton(
+                  Expanded(
+                    child: Scrollbar(
+                      child: ListView.builder(
+                        itemCount: items[i].options.length,
+                        itemBuilder: (c, j) {
+                          final option = items[i].options[j];
+                          return Padding(
+                            padding: EdgeInsets.only(left: 16),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    option.name ?? "",
+                                    style: Get.textTheme.bodyText1,
+                                  ),
+                                ),
+                                ScaleIconButton(
                                   onPressed: () {
                                     controller.editOption(option.id);
                                     Get.dialog(OptionForm());
                                   },
-                                  icon: Icon(Icons.edit)),
-                              ScaleIconButton(
+                                  icon: Icon(Icons.edit),
+                                ),
+                                ScaleIconButton(
                                   onPressed: () =>
                                       controller.deleteOptionConfirm(option.id),
-                                  icon: Icon(Icons.close))
-                            ],
-                          )
-                        ],
+                                  icon: Icon(Icons.close),
+                                )
+                              ],
+                            ),
+                          );
+                        },
                       ),
-                    )
+                    ),
+                  ),
                 ],
               ),
             );
