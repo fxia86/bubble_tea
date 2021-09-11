@@ -5,6 +5,7 @@ import 'package:bubble_tea/widgets/dialog_form.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:tuple/tuple.dart';
+import 'package:collection/collection.dart';
 
 import '../reception_controller.dart';
 
@@ -64,8 +65,8 @@ class DishConfirm extends StatelessWidget {
           totalAmount += bundle.offerPrice!;
           discountAmount += bundleList.fold(
                   0,
-                  (int? previousValue, element) =>
-                      previousValue! + element.originalPrice! * element.qty!) -
+                  (int previousValue, element) =>
+                      previousValue + element.originalPrice! * element.qty!) -
               bundle.offerPrice!;
         } else {
           needed = false;
@@ -73,67 +74,123 @@ class DishConfirm extends StatelessWidget {
       }
     });
 
-    var discountList = [];
+    final groups = groupBy(list, (OrderDishModel p) => p.dishId);
+    for (var i = 0; i < groups.keys.length; i++) {
+      final dishId = groups.keys.elementAt(i);
+      final discountIdx =
+          controller.specialDiscounts.indexWhere((d) => d.dishId == dishId);
+      if (discountIdx > -1) {
+        final items = groups.values
+            .elementAt(i)
+            .sorted((a, b) => b.offerPrice!.compareTo(a.offerPrice!));
+        final count = items.fold(
+            0, (int previousValue, element) => previousValue + element.qty!);
+        if (count > 1) {
+          var discountList = <OrderDishModel>[];
+          final discount = controller.specialDiscounts[discountIdx].discount!;
+          final idx = count / 2;
+          var added = 0;
+          for (var i = 0; i < items.length; i++) {
+            var item = items.elementAt(i);
+            if (added < idx) {
+              if (item.qty! + added <= idx) {
+                discountList.add(item);
+                added += item.qty!;
+              } else {
+                final qty = idx.ceil() - added;
+                discountList.add(OrderDishModel.copyWith(item)..qty = qty);
+                if (item.qty! > qty) {
+                  discountList.add(OrderDishModel.copyWith(item)
+                    ..qty = item.qty! - qty
+                    ..offerPrice =
+                        (item.originalPrice! * (1 - discount / 100)).toInt()
+                    ..specialOffer = "Buy 1 get 1 $discount% discount");
+                }
+                added += item.qty!;
+              }
+            } else {
+              discountList.add(OrderDishModel.copyWith(item)
+                ..offerPrice =
+                    (item.originalPrice! * (1 - discount / 100)).toInt()
+                ..specialOffer = "Buy 1 get 1 $discount% discount");
+            }
+          }
+
+          totalAmount += discountList.fold(
+              0,
+              (int previousValue, element) =>
+                  previousValue + element.offerPrice! * element.qty!);
+          discountAmount += discountList.fold(
+              0,
+              (int previousValue, element) =>
+                  previousValue +
+                  (element.originalPrice! - element.offerPrice!) *
+                      element.qty!);
+          confirmList.add(discountList);
+          list.removeWhere((element) => element.dishId == dishId);
+        }
+      }
+    }
+
     var priceList = [];
     var normalList = [];
 
     list.forEach((element) {
-      var discountIdx = controller.specialDiscounts
-          .indexWhere((d) => d.dishId == element.dishId);
-      if (discountIdx > -1) {
-        if (element.qty! > 1) {
-          // buy 1 get 1 discount
-          var qty = element.qty! ~/ 2;
-          var discount = controller.specialDiscounts[discountIdx].discount!;
-          var first = OrderDishModel.copyWith(element)
-            ..qty = element.qty! - qty;
+      // var discountIdx = controller.specialDiscounts
+      //     .indexWhere((d) => d.dishId == element.dishId);
+      // if (discountIdx > -1) {
+      //   if (element.qty! > 1) {
+      //     // buy 1 get 1 discount
+      //     var qty = element.qty! ~/ 2;
+      //     var discount = controller.specialDiscounts[discountIdx].discount!;
+      //     var first = OrderDishModel.copyWith(element)
+      //       ..qty = element.qty! - qty;
 
-          var second = OrderDishModel.copyWith(element)
-            ..offerPrice =
-                (element.originalPrice! * (1 - discount / 100)).toInt()
-            ..qty = qty
-            ..specialOffer = "Buy 1 get 1 $discount% discount";
+      //     var second = OrderDishModel.copyWith(element)
+      //       ..offerPrice =
+      //           (element.originalPrice! * (1 - discount / 100)).toInt()
+      //       ..qty = qty
+      //       ..specialOffer = "Buy 1 get 1 $discount% discount";
 
-          discountList.add([first, second]);
+      //     discountList.add([first, second]);
 
-          totalAmount += first.originalPrice! * first.qty!;
-          totalAmount += second.offerPrice! * second.qty!;
+      //     totalAmount += first.originalPrice! * first.qty!;
+      //     totalAmount += second.offerPrice! * second.qty!;
 
-          discountAmount +=
-              (second.originalPrice! - second.offerPrice!) * second.qty!;
-        } else {
-          // normal
-          normalList.add([element]);
-          totalAmount += element.offerPrice! * element.qty!;
-        }
+      //     discountAmount +=
+      //         (second.originalPrice! - second.offerPrice!) * second.qty!;
+      //   } else {
+      //     // normal
+      //     normalList.add([element]);
+      //     totalAmount += element.offerPrice! * element.qty!;
+      //   }
+      // } else {
+      var priceIndex = controller.specialPrices
+          .indexWhere((p) => p.dishId == element.dishId);
+      if (priceIndex > -1 &&
+          CommonUtils.toDateTime(controller.specialPrices[priceIndex].start!)
+              .isBefore(DateTime.now()) &&
+          CommonUtils.toDateTime(controller.specialPrices[priceIndex].end!)
+              .isAfter(DateTime.now())) {
+        // special price
+        priceList.add([
+          element
+            ..offerPrice = controller.specialPrices[priceIndex].offerPrice!
+            ..specialOffer = "Special Price"
+        ]);
+
+        totalAmount += element.offerPrice! * element.qty!;
+
+        discountAmount +=
+            (element.originalPrice! - element.offerPrice!) * element.qty!;
       } else {
-        var priceIndex = controller.specialPrices
-            .indexWhere((p) => p.dishId == element.dishId);
-        if (priceIndex > -1 &&
-            CommonUtils.toDateTime(controller.specialPrices[priceIndex].start!)
-                .isBefore(DateTime.now()) &&
-            CommonUtils.toDateTime(controller.specialPrices[priceIndex].end!)
-                .isAfter(DateTime.now())) {
-          // special price
-          priceList.add([
-            element
-              ..offerPrice = controller.specialPrices[priceIndex].offerPrice!
-              ..specialOffer = "Special Price"
-          ]);
-
-          totalAmount += element.offerPrice! * element.qty!;
-
-          discountAmount +=
-              (element.originalPrice! - element.offerPrice!) * element.qty!;
-        } else {
-          // normal
-          normalList.add([element]);
-          totalAmount += element.offerPrice! * element.qty!;
-        }
+        // normal
+        normalList.add([element]);
+        totalAmount += element.offerPrice! * element.qty!;
       }
+      // }
     });
 
-    confirmList.addAll(discountList);
     confirmList.addAll(priceList);
     confirmList.addAll(normalList);
 
@@ -217,16 +274,22 @@ class DishConfirm extends StatelessWidget {
                       subtotal = items[0].offerPrice!;
                       subDiscount = items.fold(
                               0,
-                              (int? previousValue, element) =>
-                                  previousValue! +
+                              (int previousValue, element) =>
+                                  previousValue +
                                   element.originalPrice! * element.qty!) -
                           subtotal;
                     } else {
-                      subtotal = items[0].originalPrice! * items[0].qty! +
-                          items[1].offerPrice! * items[1].qty!;
-                      subDiscount =
-                          (items[1].originalPrice! - items[1].offerPrice!) *
-                              items[1].qty!;
+                      subtotal = items.fold(
+                          0,
+                          (int previousValue, element) =>
+                              previousValue +
+                              element.offerPrice! * element.qty!);
+                      subDiscount = items.fold(
+                          0,
+                          (int previousValue, element) =>
+                              previousValue +
+                              (element.originalPrice! - element.offerPrice!) *
+                                  element.qty!);
                     }
 
                     return Container(

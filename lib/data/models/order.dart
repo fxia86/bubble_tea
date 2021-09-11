@@ -51,6 +51,7 @@ class OrderModel extends BaseModel {
 class OrderDishModel extends BaseModel {
   String? orderId;
   String? dishId;
+  String? optionIds;
   String? desc;
   int? originalPrice;
   int? offerPrice;
@@ -61,6 +62,7 @@ class OrderDishModel extends BaseModel {
     String? id,
     this.orderId,
     this.dishId,
+    this.optionIds,
     this.desc,
     this.originalPrice,
     this.offerPrice,
@@ -72,6 +74,7 @@ class OrderDishModel extends BaseModel {
     this.id = json['id'];
     this.orderId = json['orderId'];
     this.dishId = json['dishId'];
+    this.optionIds = json['optionIds'];
     this.desc = json['desc'];
     this.originalPrice = json['originalPrice'];
     this.offerPrice = json['offerPrice'];
@@ -83,6 +86,7 @@ class OrderDishModel extends BaseModel {
     this.id = other.id;
     this.orderId = other.orderId;
     this.dishId = other.dishId;
+    this.optionIds = other.optionIds;
     this.desc = other.desc;
     this.originalPrice = other.originalPrice;
     this.offerPrice = other.offerPrice;
@@ -95,6 +99,7 @@ class OrderDishModel extends BaseModel {
     data['id'] = this.id;
     data['orderId'] = this.orderId;
     data['dishId'] = this.dishId;
+    data['optionIds'] = this.optionIds;
     data['desc'] = this.desc;
     data['originalPrice'] = this.originalPrice;
     data['offerPrice'] = this.offerPrice;

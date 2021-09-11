@@ -130,16 +130,16 @@ class ReceptionController extends GetxController
 
   setOption(DishOptionModel option, bool add) {
     if (add) {
-      if (currentOptions
-          .any((element) => element.additionName == option.additionName)) {
-        currentOptions.removeWhere(
-            (element) => element.additionName == option.additionName);
-      }
+      // if (currentOptions
+      //     .any((element) => element.additionName == option.additionName)) {
+      //   currentOptions.removeWhere(
+      //       (element) => element.additionName == option.additionName);
+      // }
 
-      currentPrice.value = currentItem.value.price!;
-      currentOptions.forEach((element) {
-        currentPrice.value += element.price!;
-      });
+      // currentPrice.value = currentItem.value.price!;
+      // currentOptions.forEach((element) {
+      //   currentPrice.value += element.price!;
+      // });
 
       currentOptions.add(option);
       currentPrice.value += option.price!;
@@ -151,30 +151,36 @@ class ReceptionController extends GetxController
 
   order([DishModel? item]) {
     if (item == null) {
-      if (currentOptions.length != currentOptionMap.length) {
-        return;
-      }
+      // if (currentOptions.length != currentOptionMap.length) {
+      //   return;
+      // }
 
       currentOptions.sort((a, b) =>
           a.optionName!.toLowerCase().compareTo(b.optionName!.toLowerCase()));
 
-      final desc = currentItem.value.name! +
-          " + " +
-          currentOptions
-              .map((element) =>
-                  "${element.optionName}" +
-                  (element.price! > 0
-                      ? " € ${(element.price! / 100).toStringAsFixed(2)}"
-                      : ""))
-              .join(" + ");
-      final idx = orderList.indexWhere((element) => element.desc == desc);
+      final optionIds =
+          currentOptions.map((element) => element.optionId).join(",");
+
+      final idx =
+          orderList.indexWhere((element) => element.optionIds == optionIds);
       if (idx > -1) {
         orderList[idx].qty = orderList[idx].qty! + currentQty.value;
         orderList.refresh();
       } else {
+        final desc = currentItem.value.name! +
+            " + " +
+            currentOptions
+                .map((element) =>
+                    "${element.optionName}" +
+                    (element.price! > 0
+                        ? " € ${(element.price! / 100).toStringAsFixed(2)}"
+                        : ""))
+                .join(" + ");
+
         orderList.add(OrderDishModel(
             dishId: currentItem.value.id,
             desc: desc,
+            optionIds: optionIds,
             originalPrice: currentPrice.value,
             offerPrice: currentPrice.value,
             qty: currentQty.value));
