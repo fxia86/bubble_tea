@@ -171,90 +171,84 @@ class AdditionMap extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scrollbar(
-      child: ListView.builder(
-        shrinkWrap: true,
-        itemCount: parent.additions.length,
-        itemBuilder: (c, i) {
-          final addition = parent.additions[i];
+      child: Obx(() => ListView.builder(
+            shrinkWrap: true,
+            itemCount: parent.additions
+                .where((element) =>
+                    element.catalogId == controller.editItem.value.catalogId)
+                .length,
+            itemBuilder: (c, i) {
+              final addition = parent.additions
+                  .where((element) =>
+                      element.catalogId == controller.editItem.value.catalogId)
+                  .elementAt(i);
 
-          return Container(
-            margin: EdgeInsets.only(top: 30),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  margin: EdgeInsets.only(bottom: 10),
-                  child: Row(
-                    children: [
-                      Container(
-                        color: Get.theme.primaryColor,
-                        width: 5,
-                        height: 30,
-                        margin: EdgeInsets.only(right: 10),
+              return Container(
+                margin: EdgeInsets.only(top: 30),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      margin: EdgeInsets.only(bottom: 10),
+                      child: Row(
+                        children: [
+                          Container(
+                            color: Get.theme.primaryColor,
+                            width: 5,
+                            height: 30,
+                            margin: EdgeInsets.only(right: 10),
+                          ),
+                          Text(
+                            addition.name ?? "",
+                            style: Get.textTheme.bodyText1
+                                ?.copyWith(fontWeight: FontWeight.w500),
+                          ),
+                        ],
                       ),
-                      Text(
-                        addition.name ?? "",
-                        style: Get.textTheme.bodyText1
-                            ?.copyWith(fontWeight: FontWeight.w500),
+                    ),
+                    GridView.builder(
+                      shrinkWrap: true,
+                      primary: false,
+                      physics: NeverScrollableScrollPhysics(),
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 4,
+                        mainAxisExtent: 60,
+                        mainAxisSpacing: 20,
+                        crossAxisSpacing: 20,
                       ),
-                    ],
-                  ),
+                      itemCount: addition.options.length,
+                      itemBuilder: (c, j) => Obx(() {
+                        final option = addition.options[j];
+
+                        final selected = controller.dishOptions
+                            .any((element) => element.optionId == option.id);
+
+                        return Container(
+                          padding: EdgeInsets.all(0),
+                          decoration: BoxDecoration(
+                            color: selected
+                                ? Get.theme.accentColor
+                                : Colors.grey[200],
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                          child: TextButton(
+                              onPressed: () => controller.addAddition(
+                                  option.id, option.additionId, !selected),
+                              child: Text(
+                                option.name ?? "",
+                                style: Get.textTheme.bodyText1?.copyWith(
+                                    color: selected
+                                        ? Get.theme.primaryColor
+                                        : Colors.black87),
+                              )),
+                        );
+                      }),
+                    )
+                  ],
                 ),
-                GridView.builder(
-                  shrinkWrap: true,
-                  primary: false,
-                  physics: NeverScrollableScrollPhysics(),
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 4,
-                    mainAxisExtent: 50,
-                    mainAxisSpacing: 20,
-                    crossAxisSpacing: 20,
-                  ),
-                  itemCount: addition.options.length,
-                  itemBuilder: (c, j) {
-                    final option = addition.options[j];
-
-                    final selected = controller.dishOptions
-                        .any((element) => element.optionId == option.id);
-
-                    return Container(
-                      child: ValueBuilder<bool?>(
-                        initialValue: selected,
-                        builder: (value, updateFn) {
-                          return Container(
-                            padding: EdgeInsets.all(0),
-                            decoration: BoxDecoration(
-                              color: value!
-                                  ? Get.theme.accentColor
-                                  : Colors.grey[200],
-                              // border: Border.all(
-                              //     color: value
-                              //         ? Get.theme.primaryColor
-                              //         : Colors.black38),
-                              borderRadius: BorderRadius.circular(5),
-                            ),
-                            child: TextButton(
-                                onPressed: () => updateFn(!value),
-                                child: Text(
-                                  option.name ?? "",
-                                  style: Get.textTheme.bodyText1?.copyWith(
-                                      color: value
-                                          ? Get.theme.primaryColor
-                                          : Colors.black87),
-                                )),
-                          );
-                        },
-                        onUpdate: (value) => controller.addAddition(
-                            option.id, option.additionId, value!),
-                      ),
-                    );
-                  },
-                )
-              ],
-            ),
-          );
-        },
-      ),
+              );
+            },
+          )),
     );
   }
 }
@@ -266,15 +260,13 @@ class SetPriceForm extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final optionMap =
-        groupBy(controller.dishOptions, (DishOptionModel p) => p.additionId);
+        groupBy(controller.dishOptions, (DishOptionModel p) => p.additionName);
 
     return Scrollbar(
       child: ListView.builder(
         shrinkWrap: true,
         itemCount: optionMap.length,
         itemBuilder: (c, i) {
-          final addition = parent.additions.firstWhere(
-              (element) => element.id == optionMap.keys.elementAt(i));
           final selectedOptions = optionMap.values.elementAt(i);
 
           return Container(
@@ -293,7 +285,7 @@ class SetPriceForm extends StatelessWidget {
                         margin: EdgeInsets.only(right: 10),
                       ),
                       Text(
-                        addition.name ?? "",
+                        optionMap.keys.elementAt(i) ?? "",
                         style: Get.textTheme.bodyText1
                             ?.copyWith(fontWeight: FontWeight.w500),
                       ),
@@ -306,81 +298,218 @@ class SetPriceForm extends StatelessWidget {
                   physics: NeverScrollableScrollPhysics(),
                   itemCount: selectedOptions.length,
                   itemExtent: 60,
-                  itemBuilder: (c, j) {
-                    final option = addition.options.firstWhere(
-                        (element) => element.id == selectedOptions[j].optionId);
+                  itemBuilder: (c, j) => Container(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                          padding: EdgeInsets.all(0),
+                          width: 240,
+                          decoration: BoxDecoration(
+                            color: Colors.grey[200],
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                          child: TextButton(
+                              onPressed: null,
+                              child: Text(
+                                selectedOptions[j].optionName ?? "",
+                                style: Get.textTheme.bodyText1,
+                              )),
+                        ),
+                        SizedBox(width: 50),
+                        Expanded(
+                          child: MoneyTextField(
+                            initialValue: selectedOptions[j].price == 0
+                                ? ""
+                                : "${(selectedOptions[j].price! / 100).toStringAsFixed(2)}",
+                            labelText: "Extra Price",
+                            onChanged: (val) {
+                              selectedOptions[j].price =
+                                  CommonUtils.getMoney(val);
+                              controller.dishOptions.refresh();
+                            },
+                          ),
+                        ),
+                        SizedBox(width: 50),
+                        Container(
+                          width: 120,
+                          decoration: BoxDecoration(
+                            color: Colors.grey[200],
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                          child: Obx(() {
+                            final extraPrice = controller.dishOptions
+                                .firstWhere((element) =>
+                                    element.optionId ==
+                                    selectedOptions[j].optionId)
+                                .price;
 
-                    return Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Row(
-                        children: [
-                          Container(
-                            padding: EdgeInsets.all(0),
-                            width: 150,
-                            decoration: BoxDecoration(
-                              color: Colors.grey[200],
-                              borderRadius: BorderRadius.circular(5),
-                            ),
-                            child: TextButton(
-                                onPressed: null,
-                                child: Text(
-                                  option.name ?? "",
-                                  style: Get.textTheme.bodyText1,
-                                )),
-                          ),
-                          SizedBox(width: 50),
-                          Flexible(
-                            child: MoneyTextField(
-                              initialValue: selectedOptions[j].price == 0
-                                  ? ""
-                                  : "${(selectedOptions[j].price! / 100).toStringAsFixed(2)}",
-                              labelText: "Extra Price",
-                              onChanged: (val) {
-                                selectedOptions[j].price =
-                                    CommonUtils.getMoney(val);
-                                controller.dishOptions.refresh();
-                              },
-                            ),
-                          ),
-                          SizedBox(width: 50),
-                          Flexible(
-                            child: Container(
-                              width: 180,
-                              decoration: BoxDecoration(
-                                color: Colors.grey[200],
-                                borderRadius: BorderRadius.circular(5),
+                            final price =
+                                controller.editItem.value.price! + extraPrice!;
+                            return TextButton(
+                              onPressed: null,
+                              child: Text(
+                                "€  ${(price / 100).toStringAsFixed(2)}",
+                                style: Get.textTheme.bodyText1!.copyWith(
+                                    color: extraPrice == 0
+                                        ? Colors.black87
+                                        : Get.theme.primaryColor),
                               ),
-                              child: Obx(() {
-                                final extraPrice = controller.dishOptions
-                                    .firstWhere((element) =>
-                                        element.optionId ==
-                                        selectedOptions[j].optionId)
-                                    .price;
+                            );
+                          }),
+                        ),
+                        SizedBox(width: 20),
+                        Container(
+                          height: 60,
+                          width: 200,
+                          child: TextButton(
+                            style: ButtonStyle(
+                                backgroundColor: MaterialStateProperty.all(
+                                    Colors.indigo[300])),
+                            onPressed: () {
+                              controller.dishOptionMaterialId(
+                                  selectedOptions[j].materialId ?? "");
+                              controller.dishOptionMaterialQty(
+                                  selectedOptions[j].qty == 0
+                                      ? 1
+                                      : selectedOptions[j].qty);
 
-                                final price = controller.editItem.value.price! +
-                                    extraPrice!;
-                                return TextButton(
-                                  onPressed: null,
-                                  child: Text(
-                                    "€  ${(price / 100).toStringAsFixed(2)}",
-                                    style: Get.textTheme.bodyText1!.copyWith(
-                                        color: extraPrice == 0
-                                            ? Colors.black87
-                                            : Get.theme.primaryColor),
-                                  ),
-                                );
-                              }),
-                            ),
+                              Get.dialog(MaterialList(),
+                                  arguments: selectedOptions[j].id);
+                            },
+                            child: Obx(() {
+                              final materialId = controller.dishOptions
+                                  .firstWhere((element) =>
+                                      element.id == selectedOptions[j].id)
+                                  .materialId;
+                              var material = parent.materials.firstWhereOrNull(
+                                  (element) => element.id == materialId);
+                              return Text(
+                                material == null
+                                    ? "Add Material"
+                                    : "${material.name} * ${selectedOptions[j].qty}",
+                                style: Get.textTheme.bodyText1!
+                                    .copyWith(color: Colors.white),
+                              );
+                            }),
                           ),
-                        ],
-                      ),
-                    );
-                  },
+                        )
+                      ],
+                    ),
+                  ),
                 )
               ],
             ),
           );
         },
+      ),
+    );
+  }
+}
+
+class MaterialList extends StatelessWidget {
+  MaterialList({Key? key}) : super(key: key);
+  final controller = Get.find<DishDetailController>();
+  final parent = Get.find<MenuManageController>();
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(5),
+        ),
+        width: Get.width * 0.3,
+        height: Get.height * 0.8,
+        padding: EdgeInsets.only(bottom: 20),
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.symmetric(vertical: 20),
+              child: Center(
+                child: Text(
+                  "Available Materials",
+                  style: Get.textTheme.headline5,
+                ),
+              ),
+            ),
+            Expanded(
+              child: Container(
+                color: Get.theme.accentColor,
+                child: Scrollbar(
+                  child: ListView.builder(
+                    padding: EdgeInsets.symmetric(vertical: 8),
+                    itemCount: parent.materials.length,
+                    itemBuilder: (c, i) => Obx(() {
+                      final material = parent.materials[i];
+                      final selected =
+                          controller.dishOptionMaterialId.value == material.id;
+                      return Container(
+                        color: selected ? Colors.white : Colors.transparent,
+                        margin: EdgeInsets.symmetric(horizontal: 20),
+                        child: TextButton(
+                          onPressed: () {
+                            controller.dishOptionMaterialId(
+                                selected ? "" : material.id);
+                            controller.dishOptionMaterialQty(1);
+                          },
+                          child: Text(
+                            material.name!,
+                            style: Get.textTheme.bodyText1?.copyWith(
+                                color: selected
+                                    ? Get.theme.primaryColor
+                                    : Colors.black87),
+                          ),
+                        ),
+                      );
+                    }),
+                  ),
+                ),
+              ),
+            ),
+            Obx(() => IntegerTextField(
+                  key: Key('qty_${controller.dishOptionMaterialId.value}'),
+                  initialValue:
+                      controller.dishOptionMaterialQty.value.toString(),
+                  labelText: "Qty",
+                  onChanged: (val) {
+                    if (val.length > 0) {
+                      controller.dishOptionMaterialQty(int.parse(val));
+                    }
+                  },
+                )),
+            SizedBox(height: 30),
+            ElevatedButton(
+              onPressed: () {
+                final option = controller.dishOptions
+                    .firstWhere((element) => element.id == Get.arguments);
+                if (controller.dishOptionMaterialId.value.isEmpty) {
+                  option
+                    ..materialId = null
+                    ..qty = 0;
+                } else {
+                  option
+                    ..materialId = controller.dishOptionMaterialId.value
+                    ..qty = controller.dishOptionMaterialQty.value;
+                }
+                controller.dishOptions.refresh();
+                Get.back();
+              },
+              child: Padding(
+                padding: EdgeInsets.all(10),
+                child: Text(
+                  'OK',
+                  style: Theme.of(context)
+                      .textTheme
+                      .headline5
+                      ?.copyWith(color: Colors.white),
+                ),
+              ),
+            )
+          ],
+        ),
       ),
     );
   }

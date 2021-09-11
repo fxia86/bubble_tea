@@ -130,10 +130,20 @@ class DishOptionModel extends BaseModel {
   String? additionName;
   String? optionId;
   String? optionName;
+  String? materialId;
+  int? qty;
   int? price;
 
   DishOptionModel(
-      {String? id, this.dishId, this.additionId, this.optionId, this.price = 0})
+      {String? id,
+      this.dishId,
+      this.additionId,
+      this.additionName,
+      this.optionId,
+      this.optionName,
+      this.materialId,
+      this.qty,
+      this.price = 0})
       : super(id: id);
 
   DishOptionModel.fromJson(Map<String, dynamic> json) {
@@ -143,6 +153,8 @@ class DishOptionModel extends BaseModel {
     this.additionName = json['additionName'];
     this.optionId = json['optionId'];
     this.optionName = json['optionName'];
+    this.materialId = json['materialId'];
+    this.qty = json['qty'];
     this.price = json['price'];
   }
 
@@ -154,6 +166,8 @@ class DishOptionModel extends BaseModel {
     data['additionName'] = this.additionName;
     data['optionId'] = this.optionId;
     data['optionName'] = this.optionName;
+    data['materialId'] = this.materialId;
+    data['qty'] = this.qty;
     data['price'] = this.price;
     return data;
   }

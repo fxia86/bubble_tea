@@ -35,6 +35,10 @@ class DishOptions extends StatelessWidget {
                   shrinkWrap: true,
                   itemCount: controller.currentOptionMap.length,
                   itemBuilder: (c, i) {
+                    final additionName =
+                        controller.currentOptionMap.keys.elementAt(i);
+                    final options =
+                        controller.currentOptionMap.values.elementAt(i);
                     return Container(
                       margin: EdgeInsets.only(top: 30),
                       child: Column(
@@ -51,9 +55,7 @@ class DishOptions extends StatelessWidget {
                                   margin: EdgeInsets.only(right: 10),
                                 ),
                                 Text(
-                                  controller.currentOptionMap.keys
-                                          .elementAt(i) ??
-                                      "",
+                                  additionName ?? "",
                                   style: Get.textTheme.bodyText1
                                       ?.copyWith(fontWeight: FontWeight.w500),
                                 ),
@@ -71,14 +73,13 @@ class DishOptions extends StatelessWidget {
                               mainAxisSpacing: 20,
                               crossAxisSpacing: 20,
                             ),
-                            itemCount:
-                                controller.currentOptionMap.values.length,
+                            itemCount: options.length,
                             itemBuilder: (c, j) => Obx(() {
-                              final option = controller.currentOptionMap.values
-                                  .elementAt(i)[j];
+                              final option = options[j];
 
                               final selected = controller.currentOptions.any(
-                                  (element) => element.optionId == option.optionId);
+                                  (element) =>
+                                      element.optionId == option.optionId);
                               return Container(
                                 padding: EdgeInsets.all(0),
                                 decoration: BoxDecoration(

@@ -29,6 +29,9 @@ class DishDetailController extends GetxController {
   XFile? _image;
   var imagePath = "".obs;
 
+  var dishOptionMaterialId = "".obs;
+  var dishOptionMaterialQty = 1.obs;
+
   FocusNode qtyFocusNode = FocusNode();
   @override
   void onInit() {
@@ -66,11 +69,12 @@ class DishDetailController extends GetxController {
       var options = item.options.map((e) => DishOptionModel(
             id: e.id,
             dishId: e.dishId,
-            additionId: _parent.additions
-                .firstWhere((element) =>
-                    element.options.any((element) => element.id == e.optionId))
-                .id,
+            additionId: e.additionId,
             optionId: e.optionId,
+            materialId: e.materialId,
+            optionName: e.optionName,
+            additionName: e.additionName,
+            qty: e.qty,
             price: e.price,
           ));
 
@@ -179,7 +183,7 @@ class DishDetailController extends GetxController {
           ..isPopular = result.isPopular;
         _parent.items.refresh();
       }
-      
+
       editItem.refresh();
       MessageBox.success();
     }
@@ -216,11 +220,14 @@ class DishDetailController extends GetxController {
       if (_notEqualList(dishMaterials, editItem.value.materials)) {
         var result = await repository.saveDishMaterials(dishId, dishMaterials);
         if (result) {
-          editItem.value.materials = List.from(dishMaterials);
+          final list = dishMaterials
+              .map((element) => DishMaterialModel.fromJson(element.toJson()))
+              .toList();
+          editItem.value.materials = list;
 
           var item =
               _parent.items.singleWhere((element) => element.id == dishId);
-          item.materials = List.from(dishMaterials);
+          item.materials = list;
 
           MessageBox.success();
         }
@@ -243,10 +250,13 @@ class DishDetailController extends GetxController {
     if (_existDish() && _notEqualList(dishPrinters, editItem.value.printers)) {
       var result = await repository.saveDishPrinters(dishId, dishPrinters);
       if (result) {
-        editItem.value.printers = List.from(dishPrinters);
+        final list = dishMaterials
+            .map((element) => DishPrinterModel.fromJson(element.toJson()))
+            .toList();
+        editItem.value.printers = list;
 
         var item = _parent.items.singleWhere((element) => element.id == dishId);
-        item.printers = List.from(dishPrinters);
+        item.printers = list;
 
         MessageBox.success();
       }
@@ -269,10 +279,13 @@ class DishDetailController extends GetxController {
     if (_existDish() && _notEqualList(dishOptions, editItem.value.options)) {
       var result = await repository.saveDishOptions(dishId, dishOptions);
       if (result) {
-        editItem.value.options = List.from(dishOptions);
+        final list = dishMaterials
+            .map((element) => DishOptionModel.fromJson(element.toJson()))
+            .toList();
+        editItem.value.options = list;
 
         var item = _parent.items.singleWhere((element) => element.id == dishId);
-        item.options = List.from(dishOptions);
+        item.options = list;
 
         MessageBox.success();
       }
