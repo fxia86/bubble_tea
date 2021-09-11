@@ -40,10 +40,10 @@ dependencies:
   scan: ^1.4.3
   permission_handler: ^8.1.4+2
   # drag_and_drop_gridview: ^1.0.8
-  # drag_and_drop_gridview:
-  #   git: 
-  #     url: https://github.com/DevOrbiter/drag_and_drop_gridview.git
-  #     ref: master
+  drag_and_drop_gridview:
+    git: 
+      url: https://github.com/DevOrbiter/drag_and_drop_gridview.git
+      ref: master
 
   # shared_preferences: ^2.0.6
   # connectivity_plus: ^1.0.6
