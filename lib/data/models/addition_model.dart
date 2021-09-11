@@ -1,13 +1,15 @@
 import 'package:bubble_tea/data/models/base.dart';
 
 class AdditionModel extends BaseModel {
+  String? catalogId;
   String? name;
   List<AdditionOptionModel> options = <AdditionOptionModel>[];
 
-  AdditionModel({String? id, this.name}) : super(id: id);
+  AdditionModel({String? id, this.catalogId, this.name}) : super(id: id);
 
   AdditionModel.fromJson(Map<String, dynamic> json) {
     this.id = json['id'];
+    this.catalogId = json['catalogId'];
     this.name = json['name'];
     if (json['options'] != null) {
       this.options = List.castFrom(json['options'])
@@ -19,6 +21,7 @@ class AdditionModel extends BaseModel {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['id'] = this.id;
+    data['catalogId'] = this.catalogId;
     data['name'] = this.name;
     // if (this.options != null) {
     //   data['options'] = List.from(this.options!.map((o) => o.toJson()));

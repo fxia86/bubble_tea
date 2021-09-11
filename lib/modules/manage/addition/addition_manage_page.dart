@@ -1,9 +1,11 @@
+import 'package:bubble_tea/data/models/catalog_model.dart';
 import 'package:bubble_tea/widgets/body_layout.dart';
 import 'package:bubble_tea/widgets/dialog_form.dart';
 import 'package:bubble_tea/widgets/my_icon_button.dart';
 import 'package:bubble_tea/widgets/simple_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:menu_button/menu_button.dart';
 
 import 'addition_manage_controller.dart';
 
@@ -238,6 +240,7 @@ class AdditionForm extends StatelessWidget {
           child: SingleChildScrollView(
             child: Column(
               children: [
+                CatalogSelect(),
                 SizedBox(height: 30),
                 SimpleTextField(
                   initialValue: controller.editItem.value.name,
@@ -312,6 +315,66 @@ class OptionForm extends StatelessWidget {
           ),
         )
       ],
+    );
+  }
+}
+
+class CatalogSelect extends StatelessWidget {
+  final controller = Get.find<AdditionManageController>();
+
+  Widget childButton() => Container(
+        height: 60,
+        padding: const EdgeInsets.symmetric(horizontal: 10),
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.grey),
+          borderRadius: BorderRadius.circular(5),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            Flexible(
+              child: Obx(() => Text(
+                    controller.editItem.value.catalogId == null
+                        ? "Catalog"
+                        : controller.catalogs
+                            .firstWhere((element) =>
+                                element.id == controller.editItem.value.catalogId)
+                            .name!,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                        fontSize: 20,
+                        color: controller.editItem.value.catalogId == null
+                            ? Colors.black54
+                            : Colors.black),
+                  )),
+            ),
+            Icon(
+              Icons.arrow_drop_down,
+              color: Colors.grey,
+              size: 36,
+            ),
+          ],
+        ),
+      );
+
+  @override
+  Widget build(BuildContext context) {
+    return MenuButton<CatalogModel>(
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.transparent),
+      ),
+      child: childButton(),
+      items: controller.catalogs,
+      itemBuilder: (item) => Container(
+        height: 60,
+        alignment: Alignment.centerLeft,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: Text(item.name!, style: Get.textTheme.bodyText1),
+      ),
+      toggledChild: Container(
+        child: childButton(),
+      ),
+      onItemSelected: (item) => controller.selectCatalog(item.id),
     );
   }
 }

@@ -1,5 +1,7 @@
 import 'package:bubble_tea/data/models/addition_model.dart';
+import 'package:bubble_tea/data/models/catalog_model.dart';
 import 'package:bubble_tea/data/repositories/addition_repository.dart';
+import 'package:bubble_tea/data/repositories/catalog_repository.dart';
 import 'package:bubble_tea/utils/confirm_box.dart';
 import 'package:bubble_tea/utils/message_box.dart';
 import 'package:get/get.dart';
@@ -10,6 +12,7 @@ class AdditionManageController extends GetxController {
   var showForm = false.obs;
   var isNew = true.obs;
 
+  var catalogs = <CatalogModel>[];
   var items = <AdditionModel>[].obs;
   var editItem = AdditionModel().obs;
   var editOptionItem = AdditionOptionModel().obs;
@@ -20,6 +23,7 @@ class AdditionManageController extends GetxController {
     super.onReady();
 
     items.value = await repository.getAll();
+    catalogs = await Get.find<CatalogRepository>().getAll();
   }
 
   void add() {
@@ -32,7 +36,8 @@ class AdditionManageController extends GetxController {
     showForm.value = true;
     isNew.value = false;
     var item = items.singleWhere((element) => element.id == id);
-    editItem.value = AdditionModel(id: item.id, name: item.name);
+    editItem.value =
+        AdditionModel(id: item.id, catalogId: item.catalogId, name: item.name);
   }
 
   void deleteConfirm(String? id) {
@@ -48,6 +53,11 @@ class AdditionManageController extends GetxController {
         items.removeAt(idx);
       }
     }
+  }
+
+  void selectCatalog(String? catalogId) {
+    editItem.value.catalogId = catalogId;
+    editItem.refresh();
   }
 
   void save() async {
@@ -67,12 +77,14 @@ class AdditionManageController extends GetxController {
       } else {
         var item =
             items.singleWhere((element) => element.id == editItem.value.id);
-        if (item.name == editItem.value.name) {
+        if (item.name == editItem.value.name &&
+            item.catalogId == editItem.value.catalogId) {
           showForm.value = false;
           return;
         }
         var result = await repository.edit(editItem.value);
         if (result) {
+          item..catalogId = editItem.value.catalogId;
           item..name = editItem.value.name;
           items.refresh();
         }
