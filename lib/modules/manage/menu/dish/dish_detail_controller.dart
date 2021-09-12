@@ -1,3 +1,4 @@
+import 'package:bubble_tea/data/models/addition_model.dart';
 import 'package:bubble_tea/data/models/catalog_model.dart';
 import 'package:bubble_tea/data/models/dish_model.dart';
 import 'package:bubble_tea/data/models/material_model.dart';
@@ -263,15 +264,17 @@ class DishDetailController extends GetxController {
     }
   }
 
-  addAddition(String? id, String? additionId, bool add) {
+  addAddition(AdditionOptionModel option, String? additionName, bool add) {
     if (add) {
       dishOptions.add(DishOptionModel(
         dishId: dishId,
-        additionId: additionId,
-        optionId: id,
+        additionId: option.additionId,
+        additionName: additionName,
+        optionId: option.id,
+        optionName: option.name
       ));
     } else {
-      dishOptions.removeWhere((element) => element.optionId == id);
+      dishOptions.removeWhere((element) => element.optionId == option.id);
     }
   }
 

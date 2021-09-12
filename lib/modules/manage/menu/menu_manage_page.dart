@@ -114,7 +114,7 @@ class ReorderMenu extends StatelessWidget {
         // childAspectRatio: 0.9,
       ),
       itemCount: list.length,
-      itemBuilder: (c, i) => MenuItem(item: list.elementAt(i)),
+      itemBuilder: (c, i) => MenuItem(item: list.elementAt(i),deletable: true,),
     );
   }
 }
@@ -200,12 +200,12 @@ class MenuItem extends StatelessWidget {
                             padding: const EdgeInsets.only(right: 10),
                             child: Text(
                               item.name,
-                              style: Get.textTheme.headline5
-                                  ?.copyWith(fontWeight: FontWeight.w500),
+                              style: Get.textTheme.headline5,
                             ),
                           )),
                           Text("€ ${(item.price / 100).toStringAsFixed(2)}",
-                              style: Get.textTheme.headline5),
+                              style: Get.textTheme.headline5
+                                  ?.copyWith(fontWeight: FontWeight.w500)),
                         ],
                       ),
                     ),

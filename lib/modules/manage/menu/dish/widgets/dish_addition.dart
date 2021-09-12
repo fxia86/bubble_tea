@@ -233,7 +233,8 @@ class AdditionMap extends StatelessWidget {
                           ),
                           child: TextButton(
                               onPressed: () => controller.addAddition(
-                                  option.id, option.additionId, !selected),
+                                option..additionId = addition.id,
+                                  addition.name, !selected),
                               child: Text(
                                 option.name ?? "",
                                 style: Get.textTheme.bodyText1?.copyWith(
@@ -305,7 +306,7 @@ class SetPriceForm extends StatelessWidget {
                       children: [
                         Container(
                           padding: EdgeInsets.all(0),
-                          width: 240,
+                          width: 280,
                           decoration: BoxDecoration(
                             color: Colors.grey[200],
                             borderRadius: BorderRadius.circular(5),
@@ -317,7 +318,7 @@ class SetPriceForm extends StatelessWidget {
                                 style: Get.textTheme.bodyText1,
                               )),
                         ),
-                        SizedBox(width: 50),
+                        SizedBox(width: 30),
                         Expanded(
                           child: MoneyTextField(
                             initialValue: selectedOptions[j].price == 0
@@ -331,9 +332,9 @@ class SetPriceForm extends StatelessWidget {
                             },
                           ),
                         ),
-                        SizedBox(width: 50),
+                        SizedBox(width: 30),
                         Container(
-                          width: 120,
+                          width: 100,
                           decoration: BoxDecoration(
                             color: Colors.grey[200],
                             borderRadius: BorderRadius.circular(5),
@@ -362,7 +363,7 @@ class SetPriceForm extends StatelessWidget {
                         SizedBox(width: 20),
                         Container(
                           height: 60,
-                          width: 200,
+                          width: 240,
                           child: TextButton(
                             style: ButtonStyle(
                                 backgroundColor: MaterialStateProperty.all(
@@ -376,12 +377,12 @@ class SetPriceForm extends StatelessWidget {
                                       : selectedOptions[j].qty);
 
                               Get.dialog(MaterialList(),
-                                  arguments: selectedOptions[j].id);
+                                  arguments: selectedOptions[j].optionId);
                             },
                             child: Obx(() {
                               final materialId = controller.dishOptions
                                   .firstWhere((element) =>
-                                      element.id == selectedOptions[j].id)
+                                      element.optionId == selectedOptions[j].optionId)
                                   .materialId;
                               var material = parent.materials.firstWhereOrNull(
                                   (element) => element.id == materialId);
@@ -469,22 +470,24 @@ class MaterialList extends StatelessWidget {
                 ),
               ),
             ),
-            Obx(() => IntegerTextField(
-                  key: Key('qty_${controller.dishOptionMaterialId.value}'),
-                  initialValue:
-                      controller.dishOptionMaterialQty.value.toString(),
-                  labelText: "Qty",
-                  onChanged: (val) {
-                    if (val.length > 0) {
-                      controller.dishOptionMaterialQty(int.parse(val));
-                    }
-                  },
-                )),
-            SizedBox(height: 30),
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: Obx(() => IntegerTextField(
+                    key: Key('qty_${controller.dishOptionMaterialId.value}'),
+                    initialValue:
+                        controller.dishOptionMaterialQty.value.toString(),
+                    labelText: "Qty",
+                    onChanged: (val) {
+                      if (val.length > 0) {
+                        controller.dishOptionMaterialQty(int.parse(val));
+                      }
+                    },
+                  )),
+            ),
             ElevatedButton(
               onPressed: () {
                 final option = controller.dishOptions
-                    .firstWhere((element) => element.id == Get.arguments);
+                    .firstWhere((element) => element.optionId == Get.arguments);
                 if (controller.dishOptionMaterialId.value.isEmpty) {
                   option
                     ..materialId = null
