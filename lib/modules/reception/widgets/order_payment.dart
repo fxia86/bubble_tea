@@ -18,17 +18,32 @@ class OrderPayment extends StatelessWidget {
           width: Get.width * 0.3,
           child: Column(
             children: [
-              RichText(
-                  text: TextSpan(
-                      text: "Total:",
-                      style: Get.textTheme.bodyText1,
-                      children: [
-                    TextSpan(
-                      text:
-                          "  € ${(controller.totalAmount / 100).toStringAsFixed(2)}",
-                      style: Get.textTheme.headline5?.copyWith(color: Get.theme.primaryColor),
-                    )
-                  ])),
+              Obx(() => RichText(
+                      text: TextSpan(
+                          text: "Total:",
+                          style: Get.textTheme.bodyText1,
+                          children: [
+                        TextSpan(
+                          text:
+                              "  € ${(controller.totalAmount * (1 - controller.discount / 100) / 100).toStringAsFixed(2)}",
+                          style: Get.textTheme.headline5
+                              ?.copyWith(color: Get.theme.primaryColor),
+                        )
+                      ]))),
+              Container(
+                height: 30,
+                margin: EdgeInsets.symmetric(vertical: 5),
+                child: ElevatedButton(
+                  onPressed: () {
+                    controller.discount.value += 10;
+                  },
+                  child: Obx(() => Text(
+                      "Discount: ${controller.discount.value}%",
+                      style: Get.textTheme.headline5
+                          ?.copyWith(color: Colors.white))),
+                  style: ButtonStyle(elevation: MaterialStateProperty.all(0)),
+                ),
+              ),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
                 child: Obx(() => Row(
@@ -82,8 +97,9 @@ class OrderPayment extends StatelessWidget {
                               text: controller.amountPaid.value <
                                       controller.totalAmount
                                   ? "  € 0.00"
-                                  : "  € ${((controller.amountPaid.value - controller.totalAmount) / 100).toStringAsFixed(2)}",
-                              style: Get.textTheme.headline5?.copyWith(color: Get.theme.primaryColor),
+                                  : "  € ${((controller.amountPaid.value - controller.totalAmount * (1 - controller.discount / 100)) / 100).toStringAsFixed(2)}",
+                              style: Get.textTheme.headline5
+                                  ?.copyWith(color: Get.theme.primaryColor),
                             )
                           ]))
                     : SizedBox()),
@@ -95,7 +111,7 @@ class OrderPayment extends StatelessWidget {
                     if (controller.payment.value == 2 &&
                         controller.amountPaid.value < controller.totalAmount) {
                       return;
-                    } else{
+                    } else {
                       Get.back();
                       controller.placeOrder();
                     }

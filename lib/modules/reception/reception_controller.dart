@@ -11,7 +11,7 @@ import 'package:bubble_tea/data/repositories/order_repository.dart';
 import 'package:bubble_tea/data/repositories/printer_repository.dart';
 import 'package:bubble_tea/data/repositories/special_repository.dart';
 import 'package:bubble_tea/routes/pages.dart';
-import 'package:bubble_tea/utils/loading_box.dart';
+// import 'package:bubble_tea/utils/loading_box.dart';
 import 'package:bubble_tea/utils/message_box.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -24,6 +24,8 @@ class ReceptionController extends GetxController
 
   var shopId = LocalStorage.getAuthUser().shopId;
   var shopName = LocalStorage.getAuthUser().shopName;
+  var shopAddress = LocalStorage.getAuthUser().shopAddress;
+  var shopPhone = LocalStorage.getAuthUser().shopPhone;
 
   var catalogs = <CatalogModel>[].obs;
   var dishes = <DishModel>[].obs;
@@ -48,6 +50,7 @@ class ReceptionController extends GetxController
   var totalAmount = 0;
   var payment = 1.obs;
   var amountPaid = 0.obs;
+  var discount = 0.obs;
 
   @override
   void onInit() {
@@ -215,16 +218,20 @@ class ReceptionController extends GetxController
               (int previousValue, element) =>
                   previousValue + element.offerPrice! * element.qty!)
           .toInt(),
-      offerPrice: totalAmount,
+      offerPrice: (totalAmount * (1 - discount / 100)).toInt(),
+      discount: discount.value,
     )..dishes = confirmList
         .expand((element) => element as List<OrderDishModel>)
         .toList();
 
     var result = await Get.find<OrderRepository>().save(order.toJson());
+    var orderDishList =
+        List.from(orderList.map((element) => OrderDishModel.copyWith(element)));
+    reset();
 
     //print
     if (pairedPrinters.length > 0 && printers.length > 0) {
-      LoadingBox.show();
+      // LoadingBox.show();
       for (var item in printers) {
         try {
           var printer = pairedPrinters
@@ -234,17 +241,30 @@ class ReceptionController extends GetxController
           bluetoothPrinter.printCustom(item.shopName!, 3, 1);
           bluetoothPrinter.printNewLine();
           bluetoothPrinter.printNewLine();
-          bluetoothPrinter.printCustom("Order SN:   ${result.sn}", 0, 0);
+          bluetoothPrinter.printCustom("Address: $shopAddress", 0, 0);
+          bluetoothPrinter.printCustom("Tel: $shopPhone", 0, 0);
+          bluetoothPrinter.printCustom("Order SN: ${result.sn}", 0, 0);
           bluetoothPrinter.printCustom("Order Time: ${result.date}", 0, 0);
           printDevider();
-          bluetoothPrinter.printLeftRight("Item", "Qty", 1);
+          // bluetoothPrinter.printLeftRight("Item", "Qty", 1);
+          bluetoothPrinter.print4Column(
+              "Item".padRight(20), "UnitPrice", "Qty", "Subtotal", 1);
           bluetoothPrinter.printNewLine();
-          for (var orderItem in orderList) {
+          for (var orderItem in orderDishList) {
             var dish =
                 dishes.firstWhere((element) => element.id == orderItem.dishId);
             if (dish.printers.any((element) => element.printerId == item.id)) {
-              bluetoothPrinter.printLeftRight(
-                  dish.name!, orderItem.qty.toString(), 1);
+              // bluetoothPrinter.printLeftRight(
+              //     dish.name!, orderItem.qty.toString(), 1);
+              bluetoothPrinter.print4Column(
+                  dish.name!.padRight(20),
+                  "€ ${(orderItem.offerPrice / 100).toStringAsFixed(2)}"
+                      .padLeft(9),
+                  orderItem.qty.toString().padLeft(3),
+                  "€ ${(orderItem.offerPrice * orderItem.qty / 100).toStringAsFixed(2)}"
+                      .padLeft(8),
+                  1,
+                  charset: "windows-1256");
 
               var options = orderItem.desc!
                   .split(" + ")
@@ -257,6 +277,15 @@ class ReceptionController extends GetxController
               bluetoothPrinter.printNewLine();
             }
           }
+          bluetoothPrinter.printNewLine();
+          if (order.discount! > 0) {
+            bluetoothPrinter.print4Column("".padRight(12), "", "",
+                "Extra Discount: ${order.discount}%", 1);
+          }
+          bluetoothPrinter.print4Column("".padRight(16), "", "",
+              "Total: € ${(result.offerPrice! / 100).toStringAsFixed(2)}", 1,
+              charset: "windows-1256");
+
           printDevider();
 
           bluetoothPrinter.printCustom("Thanks for your patronage!", 0, 1);
@@ -274,10 +303,8 @@ class ReceptionController extends GetxController
           print(e);
         }
       }
-      LoadingBox.hide();
+      // LoadingBox.hide();
     }
-
-    reset();
   }
 
   printDevider() {

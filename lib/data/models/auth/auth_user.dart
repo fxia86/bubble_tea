@@ -3,6 +3,8 @@ class AuthUserModel {
   String? email;
   String? shopId;
   String? shopName;
+  String? shopAddress;
+  String? shopPhone;
   String? merchantName;
   int? role;
 
@@ -19,6 +21,8 @@ class AuthUserModel {
     this.email = json['email'];
     this.shopId = json['shopId'];
     this.shopName = json['shopName'];
+    this.shopAddress = json['shopAddress'];
+    this.shopPhone = json['shopPhone'];
     this.merchantName = json['merchantName'];
     this.role = json['role'];
   }
@@ -29,6 +33,8 @@ class AuthUserModel {
     data['email'] = this.email;
     data['shopId'] = this.shopId;
     data['shopName'] = this.shopName;
+    data['shopAddress'] = this.shopAddress;
+    data['shopPhone'] = this.shopPhone;
     data['merchantName'] = this.merchantName;
     data['role'] = this.role;
     return data;

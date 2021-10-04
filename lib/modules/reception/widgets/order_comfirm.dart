@@ -531,6 +531,7 @@ class DishConfirm extends StatelessWidget {
                     child: ElevatedButton(
                       onPressed: () {
                         Get.back();
+                        controller.discount.value = 0;
                         Get.dialog(OrderPayment());
                       },
                       child: Text("Order",

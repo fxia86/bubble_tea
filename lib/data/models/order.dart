@@ -7,6 +7,7 @@ class OrderModel extends BaseModel {
   String? date;
   int? originalPrice;
   int? offerPrice;
+  int? discount;
   List<OrderDishModel> dishes = <OrderDishModel>[];
 
   OrderModel({
@@ -17,6 +18,7 @@ class OrderModel extends BaseModel {
     this.date,
     this.originalPrice,
     this.offerPrice,
+    this.discount,
   }) : super(id: id);
 
   OrderModel.fromJson(Map<String, dynamic> json) {
@@ -27,6 +29,7 @@ class OrderModel extends BaseModel {
     this.date = json['date'];
     this.originalPrice = json['originalPrice'];
     this.offerPrice = json['offerPrice'];
+    this.discount = json['discount'];
     if (json['dishes'] != null) {
       this.dishes = List.castFrom(json['dishes'])
           .map((v) => OrderDishModel.fromJson(v))
@@ -43,6 +46,7 @@ class OrderModel extends BaseModel {
     data['date'] = this.date;
     data['originalPrice'] = this.originalPrice;
     data['offerPrice'] = this.offerPrice;
+    data['discount'] = this.discount;
     data['dishes'] = List.castFrom(this.dishes.map((e) => e.toJson()).toList());
     return data;
   }

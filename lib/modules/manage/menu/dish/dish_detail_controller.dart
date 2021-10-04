@@ -271,7 +271,8 @@ class DishDetailController extends GetxController {
         additionId: option.additionId,
         additionName: additionName,
         optionId: option.id,
-        optionName: option.name
+        optionName: option.name,
+        qty: 0
       ));
     } else {
       dishOptions.removeWhere((element) => element.optionId == option.id);
