@@ -2,8 +2,11 @@ import 'package:bubble_tea/data/local/local_storage.dart';
 import 'package:bubble_tea/r.dart';
 import 'package:bubble_tea/routes/pages.dart';
 import 'package:bubble_tea/widgets/modify_password.dart';
+import 'package:bubble_tea/widgets/my_icon_button.dart';
+import 'package:bubble_tea/widgets/qrcode_scanner.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import 'reception_controller.dart';
 import 'widgets/dish_options.dart';
@@ -26,26 +29,28 @@ class ReceptionPage extends GetView<ReceptionController> {
                   Expanded(
                     child: Container(
                       height: 72,
-                      child: Obx(() => TabBar(
-                            controller: controller.tabController,
-                            isScrollable: true,
-                            labelColor: Colors.blue,
-                            unselectedLabelColor: Colors.white,
-                            labelStyle: Get.textTheme.headline5?.copyWith(
-                                fontWeight: FontWeight.w500, fontSize: 25),
-                            unselectedLabelStyle:
-                                Get.textTheme.bodyText1?.copyWith(fontSize: 22),
-                            indicator: BoxDecoration(color: Colors.white),
-                            tabs: [
-                              for (var item in controller.catalogs)
-                                Tab(
-                                  child: Container(
-                                    child: Center(child: Text(item.name!)),
-                                    width: 100,
-                                  ),
-                                )
-                            ],
-                          )),
+                      child: Obx(() => controller.searching.value
+                          ? SearchBar()
+                          : TabBar(
+                              controller: controller.tabController,
+                              isScrollable: true,
+                              labelColor: Colors.blue,
+                              unselectedLabelColor: Colors.white,
+                              labelStyle: Get.textTheme.headline5?.copyWith(
+                                  fontWeight: FontWeight.w500, fontSize: 25),
+                              unselectedLabelStyle: Get.textTheme.bodyText1
+                                  ?.copyWith(fontSize: 22),
+                              indicator: BoxDecoration(color: Colors.white),
+                              tabs: [
+                                for (var item in controller.catalogs)
+                                  Tab(
+                                    child: Container(
+                                      child: Center(child: Text(item.name!)),
+                                      width: 100,
+                                    ),
+                                  )
+                              ],
+                            )),
                     ),
                   ),
                 ],
@@ -56,19 +61,23 @@ class ReceptionPage extends GetView<ReceptionController> {
                 children: [
                   OrderList(),
                   Expanded(
-                    child: Obx(() => TabBarView(
-                          controller: controller.tabController,
-                          children: [
-                            for (var i = 0; i < controller.catalogs.length; i++)
-                              MenuGrid(
-                                list: i == 0
-                                    ? controller.popularList
-                                    : controller.dishes.where((element) =>
-                                        element.catalogId ==
-                                        controller.catalogs[i].id),
-                              ),
-                          ],
-                        )),
+                    child: Obx(() => controller.searching.value
+                        ? SearchResult()
+                        : TabBarView(
+                            controller: controller.tabController,
+                            children: [
+                              for (var i = 0;
+                                  i < controller.catalogs.length;
+                                  i++)
+                                MenuGrid(
+                                  list: i == 0
+                                      ? controller.popularList
+                                      : controller.dishes.where((element) =>
+                                          element.catalogId ==
+                                          controller.catalogs[i].id),
+                                ),
+                            ],
+                          )),
                   )
                 ],
               ),
@@ -116,6 +125,10 @@ class Logo extends StatelessWidget {
             iconSize: 30,
             onSelected: (v) {
               switch (v) {
+                case 0:
+                  controller.searching(!controller.searching.value);
+                  controller.keywords("");
+                  break;
                 case 1:
                   //sync
                   controller.refresh();
@@ -133,6 +146,17 @@ class Logo extends StatelessWidget {
               }
             },
             itemBuilder: (c) => <PopupMenuEntry<int>>[
+              PopupMenuItem(
+                value: 0,
+                child: Center(
+                  child: Icon(
+                    controller.searching.value
+                        ? Icons.search_off
+                        : Icons.search,
+                    size: Get.theme.iconTheme.size,
+                  ),
+                ),
+              ),
               PopupMenuItem(
                 value: 1,
                 child: Center(
@@ -192,12 +216,10 @@ class MenuGrid extends StatelessWidget {
 }
 
 class MenuItem extends StatelessWidget {
-  MenuItem({Key? key, required this.item, this.deletable = false})
-      : super(key: key);
-  final controller = Get.find<ReceptionController>();
+  MenuItem({Key? key, required this.item}) : super(key: key);
 
+  final controller = Get.find<ReceptionController>();
   final item;
-  final bool deletable;
 
   @override
   Widget build(BuildContext context) {
@@ -259,5 +281,110 @@ class MenuItem extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+class SearchBar extends StatelessWidget {
+  final TextEditingController _textEditingController = TextEditingController();
+  final FocusNode _focusNode = FocusNode();
+
+  final controller = Get.find<ReceptionController>();
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Container(
+          width: Get.width * 0.375,
+          height: Get.height * 0.481,
+          margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          padding: EdgeInsets.only(left: 20, top: 4),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: ValueBuilder<bool?>(
+            initialValue: _textEditingController.text == "",
+            builder: (value, updateFn) => TextFormField(
+              controller: _textEditingController,
+              focusNode: _focusNode,
+              decoration: InputDecoration(
+                icon: Icon(
+                  Icons.search,
+                  size: Get.theme.iconTheme.size! * 1.5,
+                ),
+                // contentPadding: EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                border: InputBorder.none,
+                hintText: "Search",
+                suffixIcon: value!
+                    ? null
+                    : ScaleIconButton(
+                        onPressed: () {
+                          if (!_focusNode.hasFocus) {
+                            _focusNode.canRequestFocus = false;
+                            Future.delayed(Duration(milliseconds: 300), () {
+                              _focusNode.canRequestFocus = true;
+                            });
+                          }
+                          updateFn(true);
+
+                          controller.keywords("");
+                          _textEditingController.clear();
+                        },
+                        icon: Icon(
+                          Icons.close,
+                        )),
+              ),
+              style: Get.textTheme.bodyText1,
+              onChanged: (val) {
+                updateFn(val == "");
+                controller.keywords(val);
+              },
+            ),
+          ),
+        ),
+        Container(
+          height: Get.height * 0.052,
+          child: ElevatedButton(
+            onPressed: () async {
+              if (await Permission.camera.request().isGranted)
+                Get.dialog(QrcodeScanner(
+                  onCapture: (data) {
+                    Get.back();
+                    controller.keywords(data);
+                  },
+                ));
+            },
+            child: Icon(
+              Icons.qr_code_scanner,
+              size: Get.theme.iconTheme.size! * 1.25,
+              color: Colors.black87,
+            ),
+            style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all(Colors.white)),
+          ),
+        )
+      ],
+    );
+  }
+}
+
+class SearchResult extends StatelessWidget {
+  SearchResult({Key? key}) : super(key: key);
+
+  final controller = Get.find<ReceptionController>();
+
+  @override
+  Widget build(BuildContext context) {
+    return Obx(() {
+      var keywords = controller.keywords.toLowerCase();
+      return MenuGrid(
+        list: keywords == ""
+            ? []
+            : controller.dishes.where((element) =>
+                element.name!.toLowerCase().contains(keywords) ||
+                element.code!.toLowerCase().contains(keywords)),
+      );
+    });
   }
 }

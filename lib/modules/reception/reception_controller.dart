@@ -52,6 +52,9 @@ class ReceptionController extends GetxController
   var amountPaid = 0.obs;
   var discount = 0.obs;
 
+  var searching = false.obs;
+  var keywords = "".obs;
+
   @override
   void onInit() {
     super.onInit();

@@ -3,6 +3,7 @@ import 'package:bubble_tea/data/models/base.dart';
 class DishModel extends BaseModel {
   String? catalogId;
   String? name;
+  String? code;
   int? price;
   String? img;
   String? desc;
@@ -17,6 +18,7 @@ class DishModel extends BaseModel {
     String? id,
     this.catalogId,
     this.name,
+    this.code,
     this.price = 0,
     this.img,
     this.desc,
@@ -28,6 +30,7 @@ class DishModel extends BaseModel {
     this.id = json['id'];
     this.catalogId = json['catalogId'];
     this.name = json['name'];
+    this.code = json['code'];
     this.price = json['price'];
     this.img = json['img'];
     this.desc = json['desc'];
@@ -55,6 +58,7 @@ class DishModel extends BaseModel {
     data['id'] = this.id;
     data['catalogId'] = this.catalogId;
     data['name'] = this.name;
+    data['code'] = this.code;
     data['price'] = this.price;
     data['img'] = this.img;
     data['desc'] = this.desc;

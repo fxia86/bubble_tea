@@ -84,6 +84,7 @@ class DishDetailController extends GetxController {
         img: item.img,
         catalogId: item.catalogId,
         name: item.name,
+        code: item.code,
         desc: item.desc,
         price: item.price,
         isPopular: item.isPopular,
@@ -138,11 +139,25 @@ class DishDetailController extends GetxController {
       MessageBox.error('Invalid price', 'It should be a number.');
     } else {
       final idx = _parent.items.indexWhere((element) =>
-          element.name == editItem.value.name &&
+          (element.name == editItem.value.name ||
+              element.code == editItem.value.code) &&
           element.id != editItem.value.id);
       if (idx > -1) {
-        MessageBox.error('Duplicated Name');
+        MessageBox.error('Duplicated Item');
         return;
+      }
+      if (editItem.value.code == null || editItem.value.code!.isEmpty) {
+        var number = 1;
+        _parent.items.forEach((element) {
+          if (element.id != editItem.value.id &&
+              element.code!.contains("AUTO-")) {
+            var code = int.parse(element.code!.replaceFirst("AUTO-", ""));
+            if (code >= number) {
+              number = code + 1;
+            }
+          }
+        });
+        editItem.value.code = "AUTO-$number";
       }
       var data = editItem.value.toJson();
       if (imagePath.value.isNotEmpty) {
@@ -168,6 +183,7 @@ class DishDetailController extends GetxController {
         if (imagePath.value.isEmpty &&
             item.catalogId == editItem.value.catalogId &&
             item.name == editItem.value.name &&
+            item.code == editItem.value.code &&
             item.desc == editItem.value.desc &&
             item.price == editItem.value.price &&
             item.isPopular == editItem.value.isPopular) {
@@ -178,6 +194,7 @@ class DishDetailController extends GetxController {
         item
           ..catalogId = result.catalogId
           ..name = result.name
+          ..code = result.code
           ..img = result.img
           ..desc = result.desc
           ..price = result.price
@@ -267,13 +284,12 @@ class DishDetailController extends GetxController {
   addAddition(AdditionOptionModel option, String? additionName, bool add) {
     if (add) {
       dishOptions.add(DishOptionModel(
-        dishId: dishId,
-        additionId: option.additionId,
-        additionName: additionName,
-        optionId: option.id,
-        optionName: option.name,
-        qty: 0
-      ));
+          dishId: dishId,
+          additionId: option.additionId,
+          additionName: additionName,
+          optionId: option.id,
+          optionName: option.name,
+          qty: 0));
     } else {
       dishOptions.removeWhere((element) => element.optionId == option.id);
     }

@@ -3,10 +3,12 @@ import 'dart:io';
 import 'package:bubble_tea/data/models/catalog_model.dart';
 import 'package:bubble_tea/modules/manage/menu/menu_manage_controller.dart';
 import 'package:bubble_tea/utils/common_utils.dart';
+import 'package:bubble_tea/widgets/qrcode_scanner.dart';
 import 'package:bubble_tea/widgets/simple_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:menu_button/menu_button.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import 'dish_detail_controller.dart';
 import 'widgets/dish_addition.dart';
@@ -152,6 +154,48 @@ class DishForm extends StatelessWidget {
                 onChanged: (val) {
                   controller.editItem.value.name = val.trim();
                 },
+              ),
+              SizedBox(height: 20),
+              Row(
+                children: [
+                  Expanded(
+                    child: Obx(() => SimpleTextField(
+                          key: Key("barcode_${controller.editItem.value.code}"),
+                          enable: enable,
+                          initialValue: controller.editItem.value.code,
+                          labelText: "Barcode",
+                          onChanged: (val) {
+                            controller.editItem.value.code = val.trim();
+                          },
+                        )),
+                  ),
+                  if (enable)
+                    Container(
+                      margin: EdgeInsets.symmetric(horizontal: 2),
+                      width: 50,
+                      height: 50,
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          if (await Permission.camera.request().isGranted)
+                            Get.dialog(QrcodeScanner(
+                              onCapture: (data) {
+                                Get.back();
+                                controller.editItem.value.code = data;
+                                controller.editItem.refresh();
+                              },
+                            ));
+                        },
+                        child: Icon(
+                          Icons.qr_code_scanner,
+                          size: Get.theme.iconTheme.size! * 1.25,
+                        ),
+                        style: ButtonStyle(
+                            padding: MaterialStateProperty.all(EdgeInsets.zero),
+                            backgroundColor:
+                                MaterialStateProperty.all(Colors.indigo[300])),
+                      ),
+                    )
+                ],
               ),
               SizedBox(height: 20),
               SimpleTextField(
