@@ -168,7 +168,7 @@ class ReceptionController extends GetxController
           currentOptions.map((element) => element.optionId).join(",");
 
       final idx =
-          orderList.indexWhere((element) => element.optionIds == optionIds);
+          orderList.indexWhere((element) => element.dishId == currentItem.value.id && element.optionIds == optionIds);
       if (idx > -1) {
         orderList[idx].qty = orderList[idx].qty! + currentQty.value;
         orderList.refresh();

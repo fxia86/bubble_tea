@@ -44,9 +44,10 @@ class ReceptionPage extends GetView<ReceptionController> {
                               tabs: [
                                 for (var item in controller.catalogs)
                                   Tab(
-                                    child: Container(
+                                    child: ConstrainedBox(
+                                      constraints:
+                                          BoxConstraints(minWidth: 100),
                                       child: Center(child: Text(item.name!)),
-                                      width: 100,
                                     ),
                                   )
                               ],

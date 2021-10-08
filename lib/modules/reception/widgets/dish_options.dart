@@ -18,7 +18,7 @@ class DishOptions extends StatelessWidget {
       onWillPop: Get.back,
       form: Container(
         color: Colors.white,
-        width: Get.width * 0.5,
+        width: Get.width * 0.6,
         height: Get.height,
         padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
         child: Column(
@@ -69,7 +69,7 @@ class DishOptions extends StatelessWidget {
                             gridDelegate:
                                 SliverGridDelegateWithFixedCrossAxisCount(
                               crossAxisCount: 3,
-                              mainAxisExtent: 60,
+                              mainAxisExtent: 80,
                               mainAxisSpacing: 20,
                               crossAxisSpacing: 20,
                             ),
