@@ -95,7 +95,7 @@ class OrderPayment extends StatelessWidget {
                             children: [
                             TextSpan(
                               text: controller.amountPaid.value <
-                                      controller.totalAmount
+                                      controller.totalAmount * (1 - controller.discount / 100)
                                   ? "  € 0.00"
                                   : "  € ${((controller.amountPaid.value - controller.totalAmount * (1 - controller.discount / 100)) / 100).toStringAsFixed(2)}",
                               style: Get.textTheme.headline5
