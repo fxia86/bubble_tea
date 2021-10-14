@@ -109,7 +109,7 @@ class OrderPayment extends StatelessWidget {
                 child: ElevatedButton(
                   onPressed: () {
                     if (controller.payment.value == 2 &&
-                        controller.amountPaid.value < controller.totalAmount) {
+                        controller.amountPaid.value < controller.totalAmount * (1 - controller.discount / 100)) {
                       return;
                     } else {
                       Get.back();
