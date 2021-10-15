@@ -167,8 +167,9 @@ class ReceptionController extends GetxController
       final optionIds =
           currentOptions.map((element) => element.optionId).join(",");
 
-      final idx =
-          orderList.indexWhere((element) => element.dishId == currentItem.value.id && element.optionIds == optionIds);
+      final idx = orderList.indexWhere((element) =>
+          element.dishId == currentItem.value.id &&
+          element.optionIds == optionIds);
       if (idx > -1) {
         orderList[idx].qty = orderList[idx].qty! + currentQty.value;
         orderList.refresh();
@@ -230,10 +231,16 @@ class ReceptionController extends GetxController
     var result = await Get.find<OrderRepository>().save(order.toJson());
     var orderDishList =
         List.from(orderList.map((element) => OrderDishModel.copyWith(element)));
+    var paid = amountPaid.value;
     reset();
 
     //print
     if (pairedPrinters.length > 0 && printers.length > 0) {
+      bluetoothPrinter.isConnected.then((isConnected) async {
+        if (isConnected!) {
+          await bluetoothPrinter.disconnect();
+        }
+      });
       // LoadingBox.show();
       for (var item in printers) {
         try {
@@ -280,13 +287,27 @@ class ReceptionController extends GetxController
               bluetoothPrinter.printNewLine();
             }
           }
-          bluetoothPrinter.printNewLine();
+          bluetoothPrinter.print4Column("".padRight(8), "", "", "".padRight(22, "-"), 1);
           if (order.discount! > 0) {
-            bluetoothPrinter.print4Column("".padRight(12), "", "",
+            bluetoothPrinter.print4Column("".padRight(10), "", "",
                 "Extra Discount: ${order.discount}%", 1);
           }
           bluetoothPrinter.print4Column("".padRight(16), "", "",
               "Total: € ${(result.offerPrice! / 100).toStringAsFixed(2)}", 1,
+              charset: "windows-1256");
+          bluetoothPrinter.print4Column(
+              "".padRight(11),
+              "",
+              "",
+              "Paid(${result.payment == 1 ? "Card" : "Cash"}): € ${(paid / 100).toStringAsFixed(2)}",
+              1,
+              charset: "windows-1256");
+          bluetoothPrinter.print4Column(
+              "".padRight(15),
+              "",
+              "",
+              "Change: € ${((paid - result.offerPrice!) / 100).toStringAsFixed(2)}",
+              1,
               charset: "windows-1256");
 
           printDevider();
