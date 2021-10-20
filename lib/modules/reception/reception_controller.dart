@@ -17,6 +17,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:collection/collection.dart';
+import 'package:queue/queue.dart';
 
 class ReceptionController extends GetxController
     with SingleGetTickerProviderMixin {
@@ -54,6 +55,8 @@ class ReceptionController extends GetxController
 
   var searching = false.obs;
   var keywords = "".obs;
+
+  final printTaskQueue = Queue(delay: const Duration(milliseconds: 100));
 
   @override
   void onInit() {
@@ -236,96 +239,100 @@ class ReceptionController extends GetxController
 
     //print
     if (pairedPrinters.length > 0 && printers.length > 0) {
-      bluetoothPrinter.isConnected.then((isConnected) async {
-        if (isConnected!) {
-          await bluetoothPrinter.disconnect();
-        }
-      });
+      // bluetoothPrinter.isConnected.then((isConnected) async {
+      //   if (isConnected!) {
+      //     await bluetoothPrinter.disconnect();
+      //   }
+      // });
       // LoadingBox.show();
       for (var item in printers) {
-        try {
-          var printer = pairedPrinters
-              .firstWhere((element) => element.address == item.address);
-          await bluetoothPrinter.connect(printer);
-          bluetoothPrinter.printNewLine();
-          bluetoothPrinter.printCustom(item.shopName!, 3, 1);
-          bluetoothPrinter.printNewLine();
-          bluetoothPrinter.printNewLine();
-          bluetoothPrinter.printCustom("Address: $shopAddress", 0, 0);
-          bluetoothPrinter.printCustom("Tel: $shopPhone", 0, 0);
-          bluetoothPrinter.printCustom("Order SN: ${result.sn}", 0, 0);
-          bluetoothPrinter.printCustom("Order Time: ${result.date}", 0, 0);
-          printDevider();
-          // bluetoothPrinter.printLeftRight("Item", "Qty", 1);
-          bluetoothPrinter.print4Column(
-              "Item".padRight(20), "UnitPrice", "Qty", "Subtotal", 1);
-          bluetoothPrinter.printNewLine();
-          for (var orderItem in orderDishList) {
-            var dish =
-                dishes.firstWhere((element) => element.id == orderItem.dishId);
-            if (dish.printers.any((element) => element.printerId == item.id)) {
-              // bluetoothPrinter.printLeftRight(
-              //     dish.name!, orderItem.qty.toString(), 1);
-              bluetoothPrinter.print4Column(
-                  dish.name!.padRight(20),
-                  "€ ${(orderItem.offerPrice / 100).toStringAsFixed(2)}"
-                      .padLeft(9),
-                  orderItem.qty.toString().padLeft(3),
-                  "€ ${(orderItem.offerPrice * orderItem.qty / 100).toStringAsFixed(2)}"
-                      .padLeft(8),
-                  1,
-                  charset: "windows-1256");
+        printTaskQueue.add(() async {
+          try {
+            var printer = pairedPrinters
+                .firstWhere((element) => element.address == item.address);
+            await bluetoothPrinter.connect(printer);
+            bluetoothPrinter.printNewLine();
+            bluetoothPrinter.printCustom(item.shopName!, 3, 1);
+            bluetoothPrinter.printNewLine();
+            bluetoothPrinter.printNewLine();
+            bluetoothPrinter.printCustom("Address: $shopAddress", 0, 0);
+            bluetoothPrinter.printCustom("Tel: $shopPhone", 0, 0);
+            bluetoothPrinter.printCustom("Order SN: ${result.sn}", 0, 0);
+            bluetoothPrinter.printCustom("Order Time: ${result.date}", 0, 0);
+            printDevider();
+            // bluetoothPrinter.printLeftRight("Item", "Qty", 1);
+            bluetoothPrinter.print4Column(
+                "Item".padRight(20), "UnitPrice", "Qty", "Subtotal", 1);
+            bluetoothPrinter.printNewLine();
+            for (var orderItem in orderDishList) {
+              var dish = dishes
+                  .firstWhere((element) => element.id == orderItem.dishId);
+              if (dish.printers
+                  .any((element) => element.printerId == item.id)) {
+                // bluetoothPrinter.printLeftRight(
+                //     dish.name!, orderItem.qty.toString(), 1);
+                bluetoothPrinter.print4Column(
+                    dish.name!.padRight(20),
+                    "€ ${(orderItem.offerPrice / 100).toStringAsFixed(2)}"
+                        .padLeft(9),
+                    orderItem.qty.toString().padLeft(3),
+                    "€ ${(orderItem.offerPrice * orderItem.qty / 100).toStringAsFixed(2)}"
+                        .padLeft(8),
+                    1,
+                    charset: "windows-1256");
 
-              var options = orderItem.desc!
-                  .split(" + ")
-                  .skip(1)
-                  .join(" ,  ")
-                  .replaceAll(RegExp(r" € \d[.]\d{2}"), "");
-              if (options.trim().length > 0) {
-                bluetoothPrinter.printCustom(options, 0, 0);
+                var options = orderItem.desc!
+                    .split(" + ")
+                    .skip(1)
+                    .join(" ,  ")
+                    .replaceAll(RegExp(r" € \d[.]\d{2}"), "");
+                if (options.trim().length > 0) {
+                  bluetoothPrinter.printCustom(options, 0, 0);
+                }
+                bluetoothPrinter.printNewLine();
               }
-              bluetoothPrinter.printNewLine();
             }
+            bluetoothPrinter.print4Column(
+                "".padRight(8), "", "", "".padRight(22, "-"), 1);
+            if (order.discount! > 0) {
+              bluetoothPrinter.print4Column("".padRight(10), "", "",
+                  "Extra Discount: ${order.discount}%", 1);
+            }
+            bluetoothPrinter.print4Column("".padRight(16), "", "",
+                "Total: € ${(result.offerPrice! / 100).toStringAsFixed(2)}", 1,
+                charset: "windows-1256");
+            bluetoothPrinter.print4Column(
+                "".padRight(11),
+                "",
+                "",
+                "Paid(${result.payment == 1 ? "Card" : "Cash"}): € ${(paid / 100).toStringAsFixed(2)}",
+                1,
+                charset: "windows-1256");
+            bluetoothPrinter.print4Column(
+                "".padRight(15),
+                "",
+                "",
+                "Change: € ${((paid - result.offerPrice!) / 100).toStringAsFixed(2)}",
+                1,
+                charset: "windows-1256");
+
+            printDevider();
+
+            bluetoothPrinter.printCustom("Thanks for your patronage!", 0, 1);
+            bluetoothPrinter.printNewLine();
+            bluetoothPrinter.printCustom("", 3, 1);
+            bluetoothPrinter.printNewLine();
+            bluetoothPrinter.printCustom("", 3, 1);
+            bluetoothPrinter.printNewLine();
+            bluetoothPrinter.paperCut();
+
+            await bluetoothPrinter.disconnect();
+
+            await Future.delayed(Duration(seconds: 1));
+          } catch (e) {
+            print(e);
           }
-          bluetoothPrinter.print4Column("".padRight(8), "", "", "".padRight(22, "-"), 1);
-          if (order.discount! > 0) {
-            bluetoothPrinter.print4Column("".padRight(10), "", "",
-                "Extra Discount: ${order.discount}%", 1);
-          }
-          bluetoothPrinter.print4Column("".padRight(16), "", "",
-              "Total: € ${(result.offerPrice! / 100).toStringAsFixed(2)}", 1,
-              charset: "windows-1256");
-          bluetoothPrinter.print4Column(
-              "".padRight(11),
-              "",
-              "",
-              "Paid(${result.payment == 1 ? "Card" : "Cash"}): € ${(paid / 100).toStringAsFixed(2)}",
-              1,
-              charset: "windows-1256");
-          bluetoothPrinter.print4Column(
-              "".padRight(15),
-              "",
-              "",
-              "Change: € ${((paid - result.offerPrice!) / 100).toStringAsFixed(2)}",
-              1,
-              charset: "windows-1256");
-
-          printDevider();
-
-          bluetoothPrinter.printCustom("Thanks for your patronage!", 0, 1);
-          bluetoothPrinter.printNewLine();
-          bluetoothPrinter.printCustom("", 3, 1);
-          bluetoothPrinter.printNewLine();
-          bluetoothPrinter.printCustom("", 3, 1);
-          bluetoothPrinter.printNewLine();
-          bluetoothPrinter.paperCut();
-
-          await bluetoothPrinter.disconnect();
-
-          await Future.delayed(Duration(seconds: 1));
-        } catch (e) {
-          print(e);
-        }
+        });
       }
       // LoadingBox.hide();
     }

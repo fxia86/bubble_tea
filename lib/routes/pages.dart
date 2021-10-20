@@ -16,6 +16,8 @@ import 'package:bubble_tea/modules/manage/menu/menu_manage_binding.dart';
 import 'package:bubble_tea/modules/manage/menu/menu_manage_page.dart';
 import 'package:bubble_tea/modules/manage/printer/printer_manage_binding.dart';
 import 'package:bubble_tea/modules/manage/printer/printer_manage_page.dart';
+import 'package:bubble_tea/modules/manage/report/report_manage_binding.dart';
+import 'package:bubble_tea/modules/manage/report/report_manage_page.dart';
 import 'package:bubble_tea/modules/manage/shop/shop_manage_binding.dart';
 import 'package:bubble_tea/modules/manage/shop/shop_manage_page.dart';
 import 'package:bubble_tea/modules/manage/special/bundle/bundle_page.dart';
@@ -119,6 +121,11 @@ class Pages {
       name: Routes.MERCHANT_MANAGER,
       page: () => MerchantManagerPage(),
       binding: MerchantManagerBinding(),
+    ),
+    GetPage(
+      name: Routes.MANAGE_REPORT,
+      page: () => ReportManagePage(),
+      binding: ReportManageBinding(),
     ),
   ];
 }

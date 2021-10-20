@@ -127,6 +127,12 @@ class _LeftState extends State<Left> {
         iconData: Icons.local_offer,
         collapsed: collapsed,
       ),
+      NaviItem(
+        text: "Report",
+        routeName: Routes.MANAGE_REPORT,
+        iconData: Icons.table_chart,
+        collapsed: collapsed,
+      )
     ];
   }
 

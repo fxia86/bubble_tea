@@ -17,6 +17,7 @@ abstract class Routes {
   static const MANAGE_SPECIAL_DISCOUNT = "/manage/special/discount";
   static const MANAGE_SPECIAL_BUNDLE = "/manage/special/bundle";
   static const MANAGE_SPECIAL_PRICE = "/manage/special/price";
+  static const MANAGE_REPORT = "/manage/report";
   static const MERCHANT = "/admin/merchant";
   static const MERCHANT_MANAGER = "/admin/merchant/manager";
 }

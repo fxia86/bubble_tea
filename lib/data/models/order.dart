@@ -9,6 +9,7 @@ class OrderModel extends BaseModel {
   int? offerPrice;
   int? discount;
   List<OrderDishModel> dishes = <OrderDishModel>[];
+  String? desc;
 
   OrderModel({
     String? id,
@@ -19,6 +20,7 @@ class OrderModel extends BaseModel {
     this.originalPrice,
     this.offerPrice,
     this.discount,
+    this.desc,
   }) : super(id: id);
 
   OrderModel.fromJson(Map<String, dynamic> json) {
@@ -35,6 +37,7 @@ class OrderModel extends BaseModel {
           .map((v) => OrderDishModel.fromJson(v))
           .toList();
     }
+    this.desc = json['desc'];
   }
 
   Map<String, dynamic> toJson() {
@@ -110,5 +113,20 @@ class OrderDishModel extends BaseModel {
     data['specialOffer'] = this.specialOffer;
     data['qty'] = this.qty;
     return data;
+  }
+}
+
+
+class OrderStatisticModel {
+  String? catalogName;
+  int? totalAmount;
+  int? cardAmount;
+  int? cashAmount;
+
+  OrderStatisticModel.fromJson(Map<String, dynamic> json) {
+    this.catalogName = json['catalogName'];
+    this.totalAmount = json['totalAmount'];
+    this.cardAmount = json['cardAmount'];
+    this.cashAmount = json['cashAmount'];
   }
 }

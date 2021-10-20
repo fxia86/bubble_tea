@@ -34,8 +34,6 @@ class MaterialManageController extends GetxController {
   void onReady() async {
     super.onReady();
 
-    print("material");
-
     items.value = await repository.getAll();
 
     shops = await Get.find<ShopRepository>().getAll(showLoading: false);
