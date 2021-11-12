@@ -90,11 +90,11 @@ class StatisticTable extends StatelessWidget {
                 DataRow(cells: [
                   DataCell(Text(item.catalogName ?? "")),
                   DataCell(Text(
-                    "€${(item.totalAmount! - item.cardAmount!)
-                      .toStringAsFixed(2)}"
-                    )),
-                  DataCell(Text("€${item.cardAmount!.toStringAsFixed(2)}")),
-                  DataCell(Text("€${item.totalAmount!.toStringAsFixed(2)}")),
+                      "€${((item.totalAmount! - item.cardAmount!) / 100).toStringAsFixed(2)}")),
+                  DataCell(
+                      Text("€${(item.cardAmount! / 100).toStringAsFixed(2)}")),
+                  DataCell(
+                      Text("€${(item.totalAmount! / 100).toStringAsFixed(2)}")),
                 ])
             ],
           ))
@@ -112,7 +112,6 @@ class OrderTable extends StatelessWidget {
       Obx(() => DataTable(
             dataRowHeight: 72,
             columns: [
-              
               DataColumn(label: Text('SN')),
               DataColumn(label: Text('Time')),
               DataColumn(label: Text('Desc')),
@@ -126,9 +125,11 @@ class OrderTable extends StatelessWidget {
                   DataCell(Text(item.sn ?? "")),
                   DataCell(Text(item.date ?? "")),
                   DataCell(Text(item.desc ?? "")),
-                  DataCell(Text("€${item.originalPrice!.toStringAsFixed(2)}")),
-                  DataCell(Text("€${item.offerPrice!.toStringAsFixed(2)}")),
-                  DataCell(Text(item.payment==1?"Card":"Cash")),
+                  DataCell(Text(
+                      "€${(item.originalPrice! / 100).toStringAsFixed(2)}")),
+                  DataCell(
+                      Text("€${(item.offerPrice! / 100).toStringAsFixed(2)}")),
+                  DataCell(Text(item.payment == 1 ? "Card" : "Cash")),
                 ])
             ],
           ))

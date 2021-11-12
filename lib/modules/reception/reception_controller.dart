@@ -320,6 +320,8 @@ class ReceptionController extends GetxController
 
             bluetoothPrinter.printCustom("Thanks for your patronage!", 0, 1);
             bluetoothPrinter.printNewLine();
+            bluetoothPrinter.printCustom(result.sn!.split('-')[1], 4, 1);
+            bluetoothPrinter.printNewLine();
             bluetoothPrinter.printCustom("", 3, 1);
             bluetoothPrinter.printNewLine();
             bluetoothPrinter.printCustom("", 3, 1);

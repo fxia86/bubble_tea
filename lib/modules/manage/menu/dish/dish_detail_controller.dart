@@ -268,7 +268,7 @@ class DishDetailController extends GetxController {
     if (_existDish() && _notEqualList(dishPrinters, editItem.value.printers)) {
       var result = await repository.saveDishPrinters(dishId, dishPrinters);
       if (result) {
-        final list = dishMaterials
+        final list = dishPrinters
             .map((element) => DishPrinterModel.fromJson(element.toJson()))
             .toList();
         editItem.value.printers = list;
@@ -299,7 +299,7 @@ class DishDetailController extends GetxController {
     if (_existDish() && _notEqualList(dishOptions, editItem.value.options)) {
       var result = await repository.saveDishOptions(dishId, dishOptions);
       if (result) {
-        final list = dishMaterials
+        final list = dishOptions
             .map((element) => DishOptionModel.fromJson(element.toJson()))
             .toList();
         editItem.value.options = list;
