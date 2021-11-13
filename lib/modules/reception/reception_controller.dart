@@ -234,7 +234,7 @@ class ReceptionController extends GetxController
     var result = await Get.find<OrderRepository>().save(order.toJson());
     var orderDishList =
         List.from(orderList.map((element) => OrderDishModel.copyWith(element)));
-    var paid = amountPaid.value;
+    var paid = payment.value == 1 ? result.offerPrice : amountPaid.value;
     reset();
 
     //print
@@ -346,6 +346,7 @@ class ReceptionController extends GetxController
     // 1- only bold text
     // 2- bold with medium text
     // 3- bold with large text
+    // 4- bold & huge
     //ALIGN
     // 0- ESC_ALIGN_LEFT
     // 1- ESC_ALIGN_CENTER

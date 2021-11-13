@@ -116,12 +116,18 @@ class OrderDishModel extends BaseModel {
   }
 }
 
-
 class OrderStatisticModel {
   String? catalogName;
   int? totalAmount;
   int? cardAmount;
   int? cashAmount;
+
+  OrderStatisticModel({
+    this.catalogName,
+    this.totalAmount,
+    this.cardAmount,
+    this.cashAmount,
+  });
 
   OrderStatisticModel.fromJson(Map<String, dynamic> json) {
     this.catalogName = json['catalogName'];

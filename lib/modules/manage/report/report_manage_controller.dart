@@ -26,6 +26,21 @@ class ReportManageController extends GetxController {
   getData() async {
     statisticItems.value = await repository.getStatistic(
         date: date.toString(), shopId: shopId.value);
+    if (statisticItems.length > 0) {
+      var cardAmount = 0;
+      var totalAmount = 0;
+      for (var item in statisticItems) {
+        cardAmount += item.cardAmount!;
+        totalAmount += item.totalAmount!;
+      }
+      statisticItems.add(OrderStatisticModel(
+        catalogName: "TOTAL",
+        cashAmount: totalAmount - cardAmount,
+        cardAmount: cardAmount,
+        totalAmount: totalAmount,
+      ));
+    }
+
     items.value =
         await repository.getAll(date: date.toString(), shopId: shopId.value);
   }
