@@ -234,7 +234,7 @@ class ReceptionController extends GetxController
     var result = await Get.find<OrderRepository>().save(order.toJson());
     var orderDishList =
         List.from(orderList.map((element) => OrderDishModel.copyWith(element)));
-    var paid = payment.value == 1 ? result.offerPrice : amountPaid.value;
+    var paid = payment.value == 1 ? result.offerPrice! : amountPaid.value;
     reset();
 
     //print
