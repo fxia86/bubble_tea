@@ -6,8 +6,15 @@ class PrinterModel extends BaseModel {
   String? name;
   String? address;
   String? alias;
+  int? copies;
 
-  PrinterModel({this.name, this.address, this.alias, this.shopId, this.shopName});
+  PrinterModel(
+      {this.name,
+      this.address,
+      this.alias,
+      this.shopId,
+      this.shopName,
+      this.copies});
 
   PrinterModel.fromJson(Map<String, dynamic> json) {
     this.id = json['id'];
@@ -16,6 +23,7 @@ class PrinterModel extends BaseModel {
     this.name = json['name'];
     this.address = json['address'];
     this.alias = json['alias'];
+    this.copies = json['copies'];
   }
 
   Map<String, dynamic> toJson() {
@@ -26,6 +34,7 @@ class PrinterModel extends BaseModel {
     data['name'] = this.name;
     data['address'] = this.address;
     data['alias'] = this.alias;
+    data['copies'] = this.copies;
     return data;
   }
 }

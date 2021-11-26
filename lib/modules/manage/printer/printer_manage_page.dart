@@ -120,6 +120,17 @@ class PrinterForm extends StatelessWidget {
                           },
                         ),
                         SizedBox(height: 30),
+                        IntegerTextField(
+                          key: Key('copys_${controller.radioValue}'),
+                          initialValue: controller.copies.value.toString(),
+                          labelText: "Copy(s)",
+                          onChanged: (val) {
+                            if (val.length > 0) {
+                        controller.copies(int.parse(val));
+                      }
+                          },
+                        ),
+                        SizedBox(height: 30),
                         ElevatedButton(
                           onPressed: controller.save,
                           child: Padding(
@@ -157,6 +168,7 @@ class PrinterTable extends StatelessWidget {
               DataColumn(label: Text('Printer')),
               DataColumn(label: Text('Shop')),
               DataColumn(label: Text('Nick Name')),
+              DataColumn(label: Text('Copy(s)')),
               DataColumn(label: Text('')),
             ],
             rows: [
@@ -165,6 +177,7 @@ class PrinterTable extends StatelessWidget {
                   DataCell(Text(item.name ?? "")),
                   DataCell(Text(item.shopName ?? "")),
                   DataCell(Text(item.alias ?? "")),
+                  DataCell(Text(item.copies.toString())),
                   DataCell(
                     ScaleIconButton(
                       onPressed: () => controller.deleteConfirm(item.id),

@@ -19,6 +19,7 @@ class PrinterManageController extends GetxController {
   String? name;
   String? address;
   var alias = "".obs;
+  var copies = 1.obs;
 
   BlueThermalPrinter bluetooth = BlueThermalPrinter.instance;
 
@@ -90,11 +91,13 @@ class PrinterManageController extends GetxController {
       }
 
       var item = PrinterModel(
-          name: name,
-          address: address,
-          shopId: shopId.value,
-          shopName: shopName.value,
-          alias: alias.value);
+        name: name,
+        address: address,
+        shopId: shopId.value,
+        shopName: shopName.value,
+        alias: alias.value,
+        copies: copies.value,
+      );
 
       var result = await repository.add(item);
       items.insert(0, item..id = result.id);
