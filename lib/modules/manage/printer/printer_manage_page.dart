@@ -75,7 +75,8 @@ class PrinterForm extends StatelessWidget {
                             RadioListTile(
                               value: index + 1,
                               groupValue: controller.radioValue.value,
-                              onChanged: (int? val) => controller.selectPrinter(val),
+                              onChanged: (int? val) =>
+                                  controller.selectPrinter(val),
                               title: Text(
                                 controller.pairedPrinters[index].name ?? "",
                                 style: controller.radioValue.value == index + 1
@@ -104,50 +105,50 @@ class PrinterForm extends StatelessWidget {
         Expanded(
           child: Padding(
             padding: EdgeInsets.symmetric(horizontal: 50),
-            child: Obx(() => Form(
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        SizedBox(height: 30),
-                        ShopSelect(),
-                        SizedBox(height: 30),
-                        SimpleTextField(
-                          key: Key('alias_${controller.radioValue}'),
-                          initialValue: controller.alias.value,
-                          labelText: "Nick Name",
-                          onChanged: (val) {
-                            controller.alias(val.trim());
-                          },
-                        ),
-                        SizedBox(height: 30),
-                        IntegerTextField(
-                          key: Key('copys_${controller.radioValue}'),
-                          initialValue: controller.copies.value.toString(),
-                          labelText: "Copy(s)",
-                          onChanged: (val) {
-                            if (val.length > 0) {
-                        controller.copies(int.parse(val));
-                      }
-                          },
-                        ),
-                        SizedBox(height: 30),
-                        ElevatedButton(
-                          onPressed: controller.save,
-                          child: Padding(
-                            padding: EdgeInsets.all(10),
-                            child: Text(
-                              'Save',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .headline5
-                                  ?.copyWith(color: Colors.white),
+            child: Obx(() => controller.radioValue.value > 0
+                ? Form(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          SizedBox(height: 30),
+                          ShopSelect(),
+                          SizedBox(height: 30),
+                          SimpleTextField(
+                            initialValue: controller.alias.value,
+                            labelText: "Nick Name",
+                            onChanged: (val) {
+                              controller.alias(val.trim());
+                            },
+                          ),
+                          SizedBox(height: 30),
+                          IntegerTextField(
+                            initialValue: controller.copies.value.toString(),
+                            labelText: "Copy(s)",
+                            onChanged: (val) {
+                              if (val.length > 0) {
+                                controller.copies(int.parse(val));
+                              }
+                            },
+                          ),
+                          SizedBox(height: 30),
+                          ElevatedButton(
+                            onPressed: controller.save,
+                            child: Padding(
+                              padding: EdgeInsets.all(10),
+                              child: Text(
+                                'Save',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .headline5
+                                    ?.copyWith(color: Colors.white),
+                              ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                )),
+                  )
+                : SizedBox()),
           ),
         ),
       ],
@@ -179,10 +180,19 @@ class PrinterTable extends StatelessWidget {
                   DataCell(Text(item.alias ?? "")),
                   DataCell(Text(item.copies.toString())),
                   DataCell(
-                    ScaleIconButton(
-                      onPressed: () => controller.deleteConfirm(item.id),
-                      icon: Icon(Icons.delete),
-                      color: Colors.red,
+                    Row(
+                      children: [
+                        ScaleIconButton(
+                          onPressed: () => controller.edit(item),
+                          icon: Icon(Icons.edit),
+                          color: Colors.amber,
+                        ),
+                        ScaleIconButton(
+                          onPressed: () => controller.deleteConfirm(item.id),
+                          icon: Icon(Icons.delete),
+                          color: Colors.red,
+                        ),
+                      ],
                     ),
                   ),
                 ])

@@ -13,6 +13,7 @@ class PrinterManageController extends GetxController {
 
   var shops = <ShopModel>[];
   var items = <PrinterModel>[].obs;
+  var editItem = PrinterModel().obs;
   var radioValue = 0.obs;
   var shopId = "".obs;
   var shopName = "".obs;
@@ -43,6 +44,7 @@ class PrinterManageController extends GetxController {
       pairedPrinters.value = devices
           .where((element) => element.name!.toLowerCase().contains("print"))
           .toList();
+      radioValue(0);
     } catch (e) {
       PlatformException exception = e as PlatformException;
       MessageBox.error(exception.code, exception.message ?? "");
@@ -76,31 +78,65 @@ class PrinterManageController extends GetxController {
     shopName(item.name);
   }
 
+  void edit(PrinterModel item) {
+    radioValue(0);
+    var idx =
+        pairedPrinters.indexWhere((element) => element.address == item.address);
+    if (idx > -1) {
+      radioValue(idx + 1);
+      shopId(item.shopId);
+      shopName(item.shopName);
+      alias(item.alias);
+      copies(item.copies);
+      editItem.value = item;
+    } else {
+      MessageBox.error('This printer is not paired');
+    }
+  }
+
   void save() async {
     if (shopId.value.isEmpty) {
       MessageBox.error('Please select a shop');
     } else if (alias.isEmpty) {
       MessageBox.error('Invalid name');
     } else {
-      final idx = items.indexWhere((element) =>
-          (element.alias == alias.value && element.shopId == shopId.value) ||
-          element.address == address);
-      if (idx > -1) {
-        MessageBox.error('Duplicated', 'this printer was already added');
-        return;
+      if (editItem.value.id != null) {
+        var item =
+            items.singleWhere((element) => element.id == editItem.value.id);
+        if (item.alias == alias.value &&
+            item.copies == copies.value &&
+            item.shopId == shopId.value) {
+          return;
+        }
+        var result = await repository.edit(editItem.value);
+        if (result) {
+          item
+            ..alias = alias.value
+            ..copies = copies.value
+            ..shopId = shopId.value;
+          items.refresh();
+        }
+      } else {
+        final idx = items.indexWhere((element) =>
+            (element.alias == alias.value && element.shopId == shopId.value) ||
+            element.address == address);
+        if (idx > -1) {
+          MessageBox.error('Duplicated', 'this printer was already added');
+          return;
+        }
+
+        var item = PrinterModel(
+          name: name,
+          address: address,
+          shopId: shopId.value,
+          shopName: shopName.value,
+          alias: alias.value,
+          copies: copies.value,
+        );
+
+        var result = await repository.add(item);
+        items.insert(0, item..id = result.id);
       }
-
-      var item = PrinterModel(
-        name: name,
-        address: address,
-        shopId: shopId.value,
-        shopName: shopName.value,
-        alias: alias.value,
-        copies: copies.value,
-      );
-
-      var result = await repository.add(item);
-      items.insert(0, item..id = result.id);
     }
   }
 }
