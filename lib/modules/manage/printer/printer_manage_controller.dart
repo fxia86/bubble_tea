@@ -108,12 +108,12 @@ class PrinterManageController extends GetxController {
             item.shopId == shopId.value) {
           return;
         }
-        var result = await repository.edit(editItem.value);
+        var result = await repository.edit(editItem.value
+          ..alias = alias.value
+          ..copies = copies.value
+          ..shopId = shopId.value);
         if (result) {
-          item
-            ..alias = alias.value
-            ..copies = copies.value
-            ..shopId = shopId.value;
+          item = editItem.value;
           items.refresh();
         }
       } else {

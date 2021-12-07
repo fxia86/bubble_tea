@@ -253,7 +253,6 @@ class ReceptionController extends GetxController
       // LoadingBox.show();
       for (var item in printers) {
         for (var i = 0; i < item.copies!; i++) {
-          print(item.address! + "====================" + i.toString());
           printTaskQueue.add(() async {
             try {
               var printer = pairedPrinters
