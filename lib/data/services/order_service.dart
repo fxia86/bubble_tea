@@ -8,9 +8,14 @@ class OrderService {
     return response;
   }
 
-  getStatistic({bool showLoading = true, String? date, String? shopId}) async {
+  getStatistic(
+      {bool showLoading = true,
+      String? beginDate,
+      String? endDate,
+      String? shopId}) async {
     var response = await http.get("${ServiceUrl.ORDER}/statistic",
-        showLoading: showLoading, params: {"shopId": shopId, "date": date});
+        showLoading: showLoading,
+        params: {"shopId": shopId, "beginDate": beginDate, "endDate": endDate});
 
     return response;
   }

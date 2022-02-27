@@ -1,8 +1,7 @@
-import 'package:bubble_tea/data/models/shop_model.dart';
 import 'package:bubble_tea/widgets/body_layout.dart';
+import 'package:bubble_tea/widgets/dialog_form.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:menu_button/menu_button.dart';
 
 import 'report_manage_controller.dart';
 
@@ -11,60 +10,67 @@ class ReportManagePage extends GetView<ReportManageController> {
   Widget build(BuildContext context) {
     return BodyLayout(
       top: Top(
-        "Daily Report",
+        "Report",
       ),
       body: Column(
         children: [
           Row(
             children: [
-              DatePicker(),
-              Container(
-                width: 300,
-                height: 40,
-                margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                child: ShopSelect(),
-              )
+              DatePicker(type: "begin"),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 10),
+                child: Text("To", style: Theme.of(context).textTheme.headline5),
+              ),
+              DatePicker(type: "end"),
+              SizedBox(
+                width: 20,
+              ),
+              ElevatedButton(
+                  onPressed: controller.getData,
+                  child: Text("Search",
+                      style: Theme.of(context)
+                          .textTheme
+                          .headline5
+                          ?.copyWith(color: Colors.white)))
             ],
           ),
           Container(
               color: Colors.white,
               width: context.width,
-              height: context.height * 0.35,
+              height: context.height * 0.75,
               child: StatisticTable()),
-          SizedBox(height: 24),
-          Expanded(
-            child: Container(
-              color: Colors.white,
-              width: context.width,
-              child: OrderTable(),
-            ),
-          )
         ],
       ),
+      other: Obx(() => controller.showDetail.value ? OrderTable() : SizedBox()),
     );
   }
 }
 
 class DatePicker extends StatelessWidget {
+  DatePicker({Key? key, required this.type}) : super(key: key);
   final controller = Get.find<ReportManageController>();
+
+  final String type;
 
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton(
-        child: Obx(() => Text(controller.date.toString().split(" ")[0],
-            style: Theme.of(context)
-                .textTheme
-                .headline5
-                ?.copyWith(color: Colors.white))),
+    var date = type == "begin" ? controller.beginDate : controller.endDate;
+
+    return OutlinedButton(
+        child: Obx(() => Text(date.toString().split(" ")[0],
+            style: Theme.of(context).textTheme.headline5)),
         onPressed: () => showDatePicker(
                     context: context,
-                    initialDate: controller.date.value,
-                    firstDate: DateTime.now().subtract(Duration(days: 30)),
-                    lastDate: DateTime.now())
+                    initialDate: date.value,
+                    firstDate: type == "begin"
+                        ? DateTime.now().subtract(Duration(days: 960))
+                        : controller.beginDate.value,
+                    lastDate: type == "begin"
+                        ? controller.endDate.value
+                        : DateTime.now())
                 .then((value) {
               if (value != null) {
-                controller.date(value);
-                controller.getData();
+                date(value);
               }
             }));
   }
@@ -76,29 +82,67 @@ class StatisticTable extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scrollbar(
-        child: ListView(children: [
-      Obx(() => DataTable(
-            dataRowHeight: 72,
-            columns: [
-              DataColumn(label: Text('Catalog')),
-              DataColumn(label: Text('Cash')),
-              DataColumn(label: Text('Card')),
-              DataColumn(label: Text('Total')),
-            ],
-            rows: [
-              for (var item in controller.statisticItems)
-                DataRow(cells: [
-                  DataCell(Text(item.catalogName ?? "")),
-                  DataCell(Text(
-                      "€${((item.totalAmount! - item.cardAmount!) / 100).toStringAsFixed(2)}")),
-                  DataCell(
-                      Text("€${(item.cardAmount! / 100).toStringAsFixed(2)}")),
-                  DataCell(
-                      Text("€${(item.totalAmount! / 100).toStringAsFixed(2)}")),
-                ])
-            ],
-          ))
-    ]));
+      child: ListView(
+        children: [
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Obx(() {
+              var datarows = <DataRow>[];
+              var card = 0;
+              var total = 0;
+              for (var i = 0; i < controller.rows.length; i++) {
+                var item = controller.rows[i];
+                card += item["card"] as int;
+                total += item["total"] as int;
+                datarows.add(DataRow(
+                  selected: controller.selectedRowIndex.value == i.toString(),
+                  cells: [
+                    DataCell(Text(item["date"] ?? "")),
+                    DataCell(Text(item["shop"] ?? "")),
+                    ...controller.catalogs.map((e) => DataCell(
+                          Text(
+                              "€${((item[e.name] ?? 0) / 100).toStringAsFixed(2)}"),
+                        )),
+                    DataCell(
+                        Text("€${(item["cash"] / 100).toStringAsFixed(2)}")),
+                    DataCell(
+                        Text("€${(item["card"] / 100).toStringAsFixed(2)}")),
+                    DataCell(
+                        Text("€${(item["total"] / 100).toStringAsFixed(2)}")),
+                  ],
+                  onSelectChanged: (value) {
+                    controller.selectedRowIndex(i.toString());
+                    controller.showDetail(true);
+                    controller.getDetail(item["date"], item["shop"]);
+                  },
+                ));
+              }
+              if (datarows.length > 0) {
+                datarows.add(DataRow(
+                  cells: [
+                    DataCell(Text("")),
+                    DataCell(Text("")),
+                    ...controller.catalogs.map((e) => DataCell(Text(""))),
+                    DataCell(
+                        Text("€${((total - card) / 100).toStringAsFixed(2)}")),
+                    DataCell(Text("€${(card / 100).toStringAsFixed(2)}")),
+                    DataCell(Text("€${(total / 100).toStringAsFixed(2)}")),
+                  ],
+                ));
+              }
+              return DataTable(
+                showCheckboxColumn: false,
+                dataRowHeight: 72,
+                columns: controller.titles
+                    .map((element) => DataColumn(label: Text(element)))
+                    .toList(),
+                rows: datarows,
+              );
+            }),
+          ),
+        ],
+      ),
+    );
   }
 }
 
@@ -107,83 +151,42 @@ class OrderTable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scrollbar(
-        child: ListView(children: [
-      Obx(() => DataTable(
-            dataRowHeight: 72,
-            columns: [
-              DataColumn(label: Text('SN')),
-              DataColumn(label: Text('Time')),
-              DataColumn(label: Text('Desc')),
-              DataColumn(label: Text('OriPrice')),
-              DataColumn(label: Text('Price')),
-              DataColumn(label: Text('Payment')),
-            ],
-            rows: [
-              for (var item in controller.items)
-                DataRow(cells: [
-                  DataCell(Text(item.sn ?? "")),
-                  DataCell(Text(item.date ?? "")),
-                  DataCell(Text(item.desc ?? "")),
-                  DataCell(Text(
-                      "€${(item.originalPrice! / 100).toStringAsFixed(2)}")),
-                  DataCell(
-                      Text("€${(item.offerPrice! / 100).toStringAsFixed(2)}")),
-                  DataCell(Text(item.payment == 1 ? "Card" : "Cash")),
-                ])
-            ],
-          ))
-    ]));
-  }
-}
-
-class ShopSelect extends StatelessWidget {
-  final controller = Get.find<ReportManageController>();
-
-  Widget childButton() => Container(
-        height: 40,
-        padding: const EdgeInsets.symmetric(horizontal: 10),
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey),
-          borderRadius: BorderRadius.circular(5),
+    return DialogForm(
+      onWillPop: () => controller.showDetail(false),
+      form: Container(
+        color: Colors.white,
+        width: context.width * 0.70,
+        height: context.height,
+        padding: EdgeInsets.symmetric(vertical: 20),
+        child: Scrollbar(
+          child: ListView(children: [
+            Obx(() => DataTable(
+                  dataRowHeight: 80,
+                  columns: [
+                    DataColumn(label: Text('SN')),
+                    DataColumn(label: Text('Time')),
+                    DataColumn(label: Text('Desc')),
+                    DataColumn(label: Text('OriPrice')),
+                    DataColumn(label: Text('Price')),
+                    DataColumn(label: Text('Payment')),
+                  ],
+                  rows: [
+                    for (var item in controller.items)
+                      DataRow(cells: [
+                        DataCell(Text(item.sn ?? "")),
+                        DataCell(Text(item.date ?? "")),
+                        DataCell(Text(item.desc ?? "")),
+                        DataCell(Text(
+                            "€${(item.originalPrice! / 100).toStringAsFixed(2)}")),
+                        DataCell(Text(
+                            "€${(item.offerPrice! / 100).toStringAsFixed(2)}")),
+                        DataCell(Text(item.payment == 1 ? "Card" : "Cash")),
+                      ])
+                  ],
+                )),
+          ]),
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            Flexible(
-              child: Obx(() => Text(
-                    controller.shopName.value,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(fontSize: 20, color: Colors.black),
-                  )),
-            ),
-            Icon(
-              Icons.arrow_drop_down,
-              color: Colors.grey,
-              size: 36,
-            ),
-          ],
-        ),
-      );
-
-  @override
-  Widget build(BuildContext context) {
-    return Obx(() => MenuButton<ShopModel>(
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.transparent),
-          ),
-          child: childButton(),
-          items: List<ShopModel>.from(controller.shops),
-          itemBuilder: (item) => Container(
-            height: 40,
-            alignment: Alignment.centerLeft,
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Text(item.name!, style: Get.textTheme.bodyText1),
-          ),
-          toggledChild: Container(
-            child: childButton(),
-          ),
-          onItemSelected: (item) => controller.selectShop(item),
-        ));
+      ),
+    );
   }
 }

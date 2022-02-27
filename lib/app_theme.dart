@@ -43,7 +43,9 @@ class AppThemeData {
             appTextTheme.bodyText1?.copyWith(color: const Color(0xFF2196F3)),
         dataRowColor: MaterialStateProperty.resolveWith<Color>(
             (Set<MaterialState> states) {
-          if (states.contains(MaterialState.selected)) return Colors.white;
+          if (states.contains(MaterialState.selected) ||
+              states.contains(MaterialState.pressed))
+            return const Color(0xFF2196F3);
           return Colors.white; // Use the default value.
         }),
         dataTextStyle: appTextTheme.bodyText1,

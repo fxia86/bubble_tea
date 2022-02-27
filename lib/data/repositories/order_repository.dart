@@ -14,9 +14,15 @@ class OrderRepository {
   }
 
   Future<List<OrderStatisticModel>> getStatistic(
-      {bool showLoading = true, String? date, String? shopId}) async {
+      {bool showLoading = true,
+      String? beginDate,
+      String? endDate,
+      String? shopId}) async {
     var data = await service.getStatistic(
-        showLoading: showLoading, date: date, shopId: shopId);
+        showLoading: showLoading,
+        beginDate: beginDate,
+        endDate: endDate,
+        shopId: shopId);
     var items = List.castFrom(data)
         .map((v) => OrderStatisticModel.fromJson(v))
         .toList();
