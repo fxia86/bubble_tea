@@ -4,29 +4,45 @@ import 'package:bubble_tea/data/models/shop_model.dart';
 import 'package:bubble_tea/data/repositories/catalog_repository.dart';
 import 'package:bubble_tea/data/repositories/order_repository.dart';
 import 'package:bubble_tea/data/repositories/shop_repository.dart';
+import 'package:bubble_tea/utils/message_box.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:charts_flutter/flutter.dart';
 
 class ReportManageController extends GetxController {
   final OrderRepository repository = Get.find();
 
-  var shops = <ShopModel>[];
-  var statisticItems = <OrderStatisticModel>[];
+  var shops = <ShopModel>[].obs;
   var items = <OrderModel>[].obs;
   var shopId = "".obs;
-  var shopName = "All".obs;
+  var shopName = "select a shop".obs;
   var beginDate = DateTime.now().obs;
   var endDate = DateTime.now().obs;
+  var lineDate = DateTime.now().obs;
   var selectedRowIndex = "".obs;
   var catalogs = <CatalogModel>[];
   var titles = ['Date'].obs;
   var rows = [].obs;
   var showDetail = false.obs;
+  var category = 1.obs;
+  var barchartData = <Series<BarItem, String>>[].obs;
+  var linechartData = <Series<LineItem, num>>[].obs;
+  final colorArray = [
+    Colors.red,
+    Colors.blue,
+    Colors.yellow,
+    Colors.green,
+    Colors.purple,
+    Colors.black,
+    Colors.orange,
+    Colors.pink
+  ];
 
   @override
   void onReady() async {
     super.onReady();
 
-    shops = await Get.find<ShopRepository>().getAll();
+    shops.value = await Get.find<ShopRepository>().getAll();
     catalogs = await Get.find<CatalogRepository>().getAll();
 
     titles.value = [
@@ -43,10 +59,10 @@ class ReportManageController extends GetxController {
 
   getData() async {
     rows.value = [];
-    statisticItems = await repository.getStatistic(
-        beginDate: beginDate.toString(),
-        endDate: endDate.toString(),
-        shopId: shopId.value);
+    var statisticItems = await repository.getStatistic(
+      beginDate: beginDate.toString(),
+      endDate: endDate.toString(),
+    );
     statisticItems.forEach((element) {
       var row = rows.firstWhere(
         (r) => r["date"] == element.date && r["shop"] == element.shop,
@@ -72,4 +88,95 @@ class ReportManageController extends GetxController {
         date: date,
         shopId: shops.firstWhere((element) => element.name == shop).id);
   }
+
+  void selectShop(ShopModel item) {
+    shopId(item.id);
+    shopName(item.name);
+  }
+
+  getBarChartData() async {
+    if (shopId.value == "") {
+      MessageBox.error("Please select a shop!");
+      return;
+    }
+
+    barchartData.value = [];
+    var statisticItems = await repository.getStatistic(
+        beginDate: beginDate.toString(),
+        endDate: endDate.toString(),
+        shopId: shopId.value);
+
+    statisticItems.forEach((element) {
+      var idx = barchartData.indexWhere((s) => s.id == element.date);
+      var item = new BarItem(
+          element.date!, element.catalogName!, element.totalAmount! / 100);
+      if (idx > -1) {
+        barchartData[idx].data.add(item);
+      } else {
+        barchartData.add(new Series<BarItem, String>(
+            id: element.date!,
+            data: [item],
+            domainFn: (BarItem v, _) => v.catalog,
+            measureFn: (BarItem v, _) => v.amount,
+            labelAccessorFn: (BarItem v, _) => "${v.date.substring(5)}"));
+      }
+    });
+
+    // barData.value = catalogs
+    //     .map(
+    //       (e) => new Series<BarItem, String>(
+    //           id: e.name!,
+    //           data: statisticItems
+    //               .where((element) => element.catalogName == e.name)
+    //               .map((element) => new BarItem(element.date!,
+    //                   element.catalogName!, element.totalAmount! / 100))
+    //               .toList(),
+    //           domainFn: (BarItem v, _) => v.date,
+    //           measureFn: (BarItem v, _) => v.amount,
+    //           labelAccessorFn: (BarItem v, _) => "${v.catalog} €${v.amount}"),
+    //     )
+    //     .toList();
+  }
+
+  getLineChartData() async {
+    linechartData.value = [];
+    var statisticItems = await repository.getLineStatistic(
+      date: lineDate.toString(),
+    );
+
+    statisticItems.forEach((element) {
+      final shopName = shops.firstWhere((s) => s.id == element.shopId).name!;
+      var idx = linechartData.indexWhere((s) => s.id == shopName);
+      var item = new LineItem(element.hour!, element.num!);
+      if (idx > -1) {
+        linechartData[idx].data.add(item);
+      } else {
+        final c = colorArray[linechartData.length];
+        linechartData.add(new Series<LineItem, num>(
+            id: shopName,
+            data: [item],
+            // colorFn: (_, __) =>
+            //     ColorUtil.fromDartColor(c),
+            seriesColor: ColorUtil.fromDartColor(c),
+            domainFn: (LineItem v, _) => v.hour,
+            measureFn: (LineItem v, _) => v.num,
+            labelAccessorFn: (_, __) => shopName));
+      }
+    });
+  }
+}
+
+class BarItem {
+  final String date;
+  final String catalog;
+  final double amount;
+
+  BarItem(this.date, this.catalog, this.amount);
+}
+
+class LineItem {
+  final int hour;
+  final int num;
+
+  LineItem(this.hour, this.num);
 }

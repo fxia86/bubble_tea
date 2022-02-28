@@ -139,3 +139,21 @@ class OrderStatisticModel {
     this.cardAmount = json['cardAmount'];
   }
 }
+
+class OrderNumStatisticModel {
+  int? hour;
+  String? shopId;
+  int? num;
+
+  OrderNumStatisticModel({
+    this.hour,
+    this.shopId,
+    this.num,
+  });
+
+  OrderNumStatisticModel.fromJson(Map<String, dynamic> json) {
+    this.hour = json['hour'];
+    this.shopId = json['shopId'];
+    this.num = json['num'];
+  }
+}

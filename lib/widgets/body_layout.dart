@@ -318,10 +318,11 @@ class NaviItem extends StatelessWidget {
 }
 
 class Top extends StatelessWidget {
-  Top(this.title, {Key? key, this.add, this.scan, this.search})
+  Top(this.title, {Key? key, this.child, this.add, this.scan, this.search})
       : super(key: key);
 
   final String title;
+  final Widget? child;
   final VoidCallback? add;
   final VoidCallback? scan;
   final Function(String? val)? search;
@@ -338,11 +339,13 @@ class Top extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            title,
-            style:
-                Get.textTheme.headline5?.copyWith(fontWeight: FontWeight.w500),
-          ),
+          child == null
+              ? Text(
+                  title,
+                  style: Get.textTheme.headline5
+                      ?.copyWith(fontWeight: FontWeight.w500),
+                )
+              : child!,
           if (search != null)
             Container(
               width: Get.width * 0.375,

@@ -20,6 +20,16 @@ class OrderService {
     return response;
   }
 
+  getLineStatistic({
+    bool showLoading = true,
+    String? date,
+  }) async {
+    var response = await http.get("${ServiceUrl.ORDER}/line-statistic",
+        showLoading: showLoading, params: {"date": date});
+
+    return response;
+  }
+
   save(obj) async {
     var response = await http.post(ServiceUrl.ORDER, data: obj);
 

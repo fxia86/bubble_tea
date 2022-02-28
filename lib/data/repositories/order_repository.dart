@@ -29,6 +29,16 @@ class OrderRepository {
     return items;
   }
 
+  Future<List<OrderNumStatisticModel>> getLineStatistic(
+      {bool showLoading = true, String? date}) async {
+    var data =
+        await service.getLineStatistic(showLoading: showLoading, date: date);
+    var items = List.castFrom(data)
+        .map((v) => OrderNumStatisticModel.fromJson(v))
+        .toList();
+    return items;
+  }
+
   Future<OrderModel> save(Map<dynamic, dynamic> model) async {
     var data = await service.save(model);
     return OrderModel.fromJson(data);
