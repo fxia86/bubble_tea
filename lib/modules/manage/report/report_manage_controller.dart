@@ -1,13 +1,18 @@
+import 'dart:io';
+
 import 'package:bubble_tea/data/models/catalog_model.dart';
 import 'package:bubble_tea/data/models/order.dart';
 import 'package:bubble_tea/data/models/shop_model.dart';
 import 'package:bubble_tea/data/repositories/catalog_repository.dart';
 import 'package:bubble_tea/data/repositories/order_repository.dart';
 import 'package:bubble_tea/data/repositories/shop_repository.dart';
+import 'package:bubble_tea/utils/loading_box.dart';
 import 'package:bubble_tea/utils/message_box.dart';
+import 'package:excel/excel.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:charts_flutter/flutter.dart';
+import 'package:path_provider/path_provider.dart';
 
 class ReportManageController extends GetxController {
   final OrderRepository repository = Get.find();
@@ -21,8 +26,8 @@ class ReportManageController extends GetxController {
   var lineDate = DateTime.now().obs;
   var selectedRowIndex = "".obs;
   var catalogs = <CatalogModel>[];
-  var titles = ['Date'].obs;
-  var rows = [].obs;
+  var titles = ['Date', 'Shop', 'Cash', 'Card', 'Total'].obs;
+  var rows = <Map<String, dynamic>>[].obs;
   var showDetail = false.obs;
   var category = 1.obs;
   var barchartData = <Series<BarItem, String>>[].obs;
@@ -75,12 +80,75 @@ class ReportManageController extends GetxController {
         },
       );
       rows.remove(row);
-      row[element.catalogName] = element.totalAmount;
+      row[element.catalogName!] = element.totalAmount;
       row["card"] += element.cardAmount;
       row["total"] += element.totalAmount;
       row["cash"] = row["total"] - row["card"];
       rows.add(row);
     });
+  }
+
+  export() async {
+    if (rows.length == 0) {
+      MessageBox.error("no data");
+      return;
+    }
+    try {
+      LoadingBox.show();
+      var excel = Excel.createExcel();
+
+      var sheetName = excel.getDefaultSheet() ?? "Sheet1";
+      Sheet sheetObject = excel[sheetName];
+
+      CellStyle cellStyle = CellStyle(fontSize: 14);
+
+      sheetObject.insertRowIterables([...titles], 0);
+      sheetObject.rows[0].forEach((element) {
+        element!.cellStyle = cellStyle;
+      });
+
+      for (var i = 0; i < rows.length; i++) {
+        var row = [];
+        var item = rows[i];
+        row.add(item["date"]);
+        row.add(item["shop"]);
+        catalogs.forEach((element) {
+          row.add("€${((item[element.name] ?? 0) / 100).toStringAsFixed(2)}");
+        });
+        row.add("€${(item["cash"] / 100).toStringAsFixed(2)}");
+        row.add("€${(item["card"] / 100).toStringAsFixed(2)}");
+        row.add("€${(item["total"] / 100).toStringAsFixed(2)}");
+        sheetObject.insertRowIterables(row, i + 1);
+      }
+
+      var fileBytes = excel.save();
+      var directory = await getApplicationDocumentsDirectory();
+
+      var filePath = "${directory.path}/report_.xlsx";
+      File(filePath)
+        ..createSync(recursive: true)
+        ..writeAsBytesSync(fileBytes!);
+      LoadingBox.hide();
+      MessageBox.success("The excel has saved to path: $filePath");
+    } catch (e) {
+      LoadingBox.hide();
+      print(e);
+    }
+    // var a = await File("${directory.path}/output_file_name.xlsx").create();
+    // await a.writeAsBytes(fileBytes!);
+
+    // var bytes =
+    //     File("${directory.path}/output_file_name.xlsx").readAsBytesSync();
+    // var excel1 = Excel.decodeBytes(bytes);
+
+    // for (var table in excel1.tables.keys) {
+    //   print(table); //sheet Name
+    //   print(excel1.tables[table]?.maxCols);
+    //   print(excel1.tables[table]?.maxRows);
+    //   for (var row in excel.tables[table]!.rows) {
+    //     print("$row");
+    //   }
+    // }
   }
 
   getDetail(date, shop) async {

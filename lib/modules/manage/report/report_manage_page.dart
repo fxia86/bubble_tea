@@ -46,12 +46,18 @@ class ReportManagePage extends GetView<ReportManageController> {
                           style: Theme.of(context).textTheme.headline5),
                     ),
                     DatePicker(type: "end"),
-                    SizedBox(
-                      width: 20,
-                    ),
+                    SizedBox(width: 20),
                     ElevatedButton(
                         onPressed: controller.getData,
                         child: Text("Search",
+                            style: Theme.of(context)
+                                .textTheme
+                                .headline5
+                                ?.copyWith(color: Colors.white))),
+                    SizedBox(width: 20),
+                    ElevatedButton(
+                        onPressed: controller.export,
+                        child: Text("Export",
                             style: Theme.of(context)
                                 .textTheme
                                 .headline5
@@ -184,7 +190,7 @@ class DatePicker extends StatelessWidget {
                     initialDate: date.value,
                     firstDate: type == "end"
                         ? controller.beginDate.value
-                        : DateTime.now().subtract(Duration(days: 30)),
+                        : DateTime.now().subtract(Duration(days: 360)),
                     lastDate: type == "begin"
                         ? controller.endDate.value
                         : DateTime.now())
